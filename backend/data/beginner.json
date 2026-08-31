@@ -1,4 +1,42 @@
 {
     "level": "beginner",
-    "exercises": []
+    "exercises": [
+        {
+            "id": "beg-001",
+            "level": "beginner",
+            "type": "multiple_choice",
+            "instruction": "Qual palavra começa com o som /P/?",
+            "targetWord": "Pato",
+            "options": ["Pato", "Gato", "Bola"],
+            "correctAnswer": "Pato"
+        },
+        {
+            "id": "beg-002",
+            "level": "beginner",
+            "type": "image_word_match",
+            "instruction": "Qual imagem representa a palavra BOLA?",
+            "targetWord": "Bola",
+            "options": ["⚽ Bola", "🚗 Carro", "🍎 Maçã"],
+            "correctAnswer": "⚽ Bola"
+        },
+        {
+            "id": "beg-003",
+            "level": "beginner",
+            "type": "sound_identification",
+            "instruction": "Qual dessas palavras rima com MÃO?",
+            "targetWord": "Mão",
+            "options": ["Pão", "Cão", "Sol"],
+            "correctAnswer": "Pão"
+        },
+        {
+            "id": "beg-004",
+            "level": "beginner",
+            "type": "voice",
+            "instruction": "Pronuncie a palavra PATO em voz alta.",
+            "targetWord": "Pato",
+            "options": ["Pato", "Mato", "Gato"],
+            "correctAnswer": "Pato"
+        }
+    ]
 }
+

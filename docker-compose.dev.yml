@@ -2,6 +2,8 @@ services:
   api:
     build:
       target: dev
+    # Tag própria para o build de dev não sobrescrever a imagem de produção.
+    image: falaeh-api-dev
     volumes:
       - ./backend:/app
 

@@ -59,16 +59,37 @@ make down
 
 ## Comandos
 
-| Comando        | Descrição                                     |
-| -------------- | --------------------------------------------- |
-| `make dev`     | Sobe a aplicação em modo desenvolvimento      |
-| `make down`    | Derruba os containers                         |
-| `make build`   | Constrói as imagens de produção               |
-| `make test`    | Executa os testes com cobertura               |
-| `make lint`    | Executa `go vet`                              |
-| `make fmt`     | Formata o código Go                           |
-| `make swagger` | Regenera a documentação Swagger               |
-| `make logs`    | Acompanha os logs                             |
+Use `make help` para listar todos os comandos disponíveis.
+
+| Comando                   | Descrição                                            |
+| ------------------------- | ---------------------------------------------------- |
+| `make setup`              | Cria o `.env` a partir do `.env.example`             |
+| `make dev`                | Sobe a aplicação em desenvolvimento (foreground)     |
+| `make up`                 | Sobe a aplicação em desenvolvimento (background)     |
+| `make down`               | Derruba os containers                                |
+| `make stop`               | Para os containers sem removê-los                    |
+| `make restart`            | Reinicia os containers                               |
+| `make build`              | Constrói as imagens de produção                      |
+| `make logs`               | Acompanha os logs                                    |
+| `make bash`               | Abre um shell no container da api                    |
+| `make test`               | Executa testes unitários e de aceitação              |
+| `make test-unit`          | Executa apenas os testes unitários                   |
+| `make test-acceptance`    | Executa apenas os testes de aceitação                |
+| `make test-run`           | Executa um teste específico (`TEST=Nome [PKG=path]`) |
+| `make coverage`           | Gera o relatório de cobertura                        |
+| `make coverage-check`     | Falha se a cobertura ficar abaixo de `COVERAGE_MIN`  |
+| `make fmt`                | Formata o código Go (`gofmt -w -s`)                  |
+| `make vet`                | Executa `go vet`                                     |
+| `make lint`               | Analisa o código com golangci-lint                   |
+| `make lint-fix`           | Corrige automaticamente o que o linter souber        |
+| `make tidy`               | Organiza e verifica as dependências do módulo        |
+| `make audit`              | Procura vulnerabilidades com govulncheck             |
+| `make audit-image`        | Escaneia a imagem de produção com trivy              |
+| `make ci`                 | Quality gate: vet + lint + testes + cobertura        |
+| `make swagger` / `docs`   | Regenera a documentação Swagger                      |
+| `make clean`              | Remove artefatos de teste e cobertura                |
+| `make docker-down-volumes`| Derruba containers e remove volumes                  |
+| `make docker-clean`       | Derruba containers, volumes e imagens do projeto     |
 
 ## Estrutura de pastas
 
