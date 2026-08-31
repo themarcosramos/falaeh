@@ -1,20 +1,341 @@
 :root {
-    --app-bg: #1e1b4b;
+    --app-bg: #0f172a;
+    --app-bg-gradient: radial-gradient(circle at 50% 0%, #311042 0%, #1e1b4b 50%, #0f172a 100%);
+    --app-primary: #8b5cf6;
+    --app-primary-hover: #7c3aed;
     --app-accent: #f59e0b;
+    --app-accent-glow: rgba(245, 158, 11, 0.4);
+    --app-success: #10b981;
+    --app-card-bg: rgba(30, 27, 75, 0.65);
+    --app-card-border: rgba(139, 92, 246, 0.25);
+    --app-card-border-active: rgba(245, 158, 11, 0.8);
+    --app-text-muted: #94a3b8;
 }
 
-.bg-app {
-    background: radial-gradient(circle at top, #4c1d95, var(--app-bg));
+body.bg-app {
+    background: var(--app-bg-gradient);
     min-height: 100vh;
+    color: #f8fafc;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow-x: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Identidade Visual & Tipografia Gamificada */
+.game-title {
+    font-size: clamp(2.5rem, 6vw, 4.2rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #ec4899 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+}
 
+.game-subtitle {
+    font-size: clamp(1.1rem, 2.5vw, 1.35rem);
+    color: #cbd5e1;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.badge-tagline {
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(167, 139, 250, 0.4);
+    color: #ddd6fe;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.5rem 1.25rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Mascote Eco com microanimação de flutuação */
+.mascot-container {
+    position: relative;
+    display: inline-block;
+    filter: drop-shadow(0 15px 25px rgba(124, 58, 237, 0.35));
+}
+
+.mascot-svg {
+    width: clamp(140px, 20vw, 190px);
+    height: auto;
+    animation: float 4s ease-in-out infinite;
+}
+
+.mascot-sparkle {
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    animation: sparkle 2s ease-in-out infinite alternate;
+}
+
+/* Botão de Destaque "Começar" */
+.btn-game-primary {
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.25rem;
+    border: none;
+    border-radius: 9999px;
+    padding: 0.9rem 2.5rem;
+    box-shadow: 0 10px 25px var(--app-accent-glow), 0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: pulse-glow 3s infinite;
+}
+
+.btn-game-primary:hover,
+.btn-game-primary:focus-visible {
+    background: linear-gradient(135deg, #fbbf24 0%, #f97316 100%);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(245, 158, 11, 0.55), 0 0 0 2px rgba(255, 255, 255, 0.35) inset;
+    outline: none;
+}
+
+.btn-game-primary:active {
+    transform: translateY(1px) scale(0.98);
+}
+
+/* Cards dos Mundos */
+.world-card {
+    background: var(--app-card-bg);
+    border: 2px solid var(--app-card-border);
+    border-radius: 1.75rem;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1.75rem 1.5rem;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Mundo Liberado (Iniciante) */
+.world-card.unlocked {
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 25px rgba(16, 185, 129, 0.15);
+    cursor: pointer;
+}
+
+.world-card.unlocked:hover {
+    transform: translateY(-6px);
+    border-color: #10b981;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 35px rgba(16, 185, 129, 0.3);
+}
+
+.world-card.unlocked.active-focus {
+    border-color: var(--app-accent);
+    box-shadow: 0 0 0 4px var(--app-accent-glow), 0 16px 36px rgba(0, 0, 0, 0.4);
+    animation: pulse-border 1.5s infinite;
+}
+
+/* Mundos Bloqueados (Intermediário e Avançado) */
+.world-card.locked {
+    opacity: 0.72;
+    border-color: rgba(148, 163, 184, 0.15);
+    background: rgba(15, 23, 42, 0.55);
+    cursor: not-allowed;
+}
+
+.world-card.locked:hover {
+    opacity: 0.85;
+    border-color: rgba(148, 163, 184, 0.35);
+}
+
+/* Ícone do mundo com container circular estilizado */
+.world-badge-icon {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    transition: transform 0.3s ease;
+}
+
+.world-card.unlocked .world-badge-icon {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(6, 182, 212, 0.2) 100%);
+    border: 2px solid rgba(16, 185, 129, 0.4);
+}
+
+.world-card.unlocked:hover .world-badge-icon {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.world-card.locked .world-badge-icon {
+    background: rgba(51, 65, 85, 0.3);
+    border: 2px dashed rgba(148, 163, 184, 0.3);
+}
+
+/* Pílulas de status */
+.badge-status-unlocked {
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+    font-size: 0.82rem;
+    font-weight: 700;
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+}
+
+.badge-status-locked {
+    background: rgba(100, 116, 139, 0.2);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #94a3b8;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    border-radius: 9999px;
+}
+
+/* Botões dos Mundos */
+.btn-world {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    font-weight: 700;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.btn-world-unlocked {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-world-unlocked:hover,
+.btn-world-unlocked:focus-visible {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.5);
+    outline: none;
+}
+
+.btn-world-locked {
+    background: rgba(51, 65, 85, 0.4);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    color: #94a3b8;
+}
+
+.btn-world-locked:hover,
+.btn-world-locked:focus-visible {
+    background: rgba(71, 85, 105, 0.5);
+    color: #e2e8f0;
+    outline: none;
+}
+
+/* Toast de Feedback Interativo amigável */
+.friendly-toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: rgba(30, 27, 75, 0.95);
+    border: 2px solid var(--app-primary);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(139, 92, 246, 0.35);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #f8fafc;
+    padding: 0.85rem 1.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    z-index: 1050;
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    max-width: 90vw;
+    text-align: center;
+}
+
+.friendly-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Microanimações */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-9px);
+    }
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 10px 25px var(--app-accent-glow), 0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+    }
+    50% {
+        box-shadow: 0 14px 32px rgba(245, 158, 11, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.35) inset;
+    }
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        border-color: var(--app-accent);
+    }
+    50% {
+        border-color: rgba(245, 158, 11, 0.4);
+    }
+}
+
+@keyframes sparkle {
+    0% {
+        transform: scale(0.8) rotate(0deg);
+        opacity: 0.4;
+    }
+    100% {
+        transform: scale(1.15) rotate(20deg);
+        opacity: 1;
+    }
+}
+
+@keyframes gentle-shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+}
+
+.shake {
+    animation: gentle-shake 0.4s ease;
+}
+
+/* Acessibilidade: prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
     *,
     *::before,
     *::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .mascot-svg,
+    .mascot-sparkle,
+    .btn-game-primary,
+    .shake {
+        animation: none !important;
     }
 }
