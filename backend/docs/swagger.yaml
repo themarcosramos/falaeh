@@ -1,0 +1,35 @@
+basePath: /
+definitions:
+  httpapi.HealthResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API do jogo educativo de exercícios fonoaudiológicos. Não possui autenticação
+    nem armazena dados pessoais.
+  license:
+    name: MIT
+    url: https://github.com/themarcosramos/falaeh/blob/main/LICENSE
+  title: Fala Eh API
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.HealthResponse'
+      summary: Verifica se a API está disponível
+      tags:
+      - health
+schemes:
+- http
+- https
+swagger: "2.0"

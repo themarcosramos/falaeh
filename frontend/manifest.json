@@ -1,0 +1,19 @@
+{
+    "name": "Fala Eh",
+    "short_name": "Fala Eh",
+    "description": "Jogo educativo de exercícios fonoaudiológicos.",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#1e1b4b",
+    "theme_color": "#4c1d95",
+    "icons": [
+        {
+            "src": "/assets/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

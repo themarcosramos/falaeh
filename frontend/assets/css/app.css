@@ -1,0 +1,20 @@
+:root {
+    --app-bg: #1e1b4b;
+    --app-accent: #f59e0b;
+}
+
+.bg-app {
+    background: radial-gradient(circle at top, #4c1d95, var(--app-bg));
+    min-height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}

@@ -1,0 +1,6 @@
+# Arquivos de ambiente
+.env
+
+# Artefatos de build e cobertura
+backend/coverage.out
+backend/bin/
