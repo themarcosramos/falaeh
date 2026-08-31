@@ -1,4 +1,24 @@
 {
     "level": "intermediate",
-    "exercises": []
+    "exercises": [
+        {
+            "id": "int-001",
+            "level": "intermediate",
+            "type": "multiple_choice",
+            "instruction": "Qual palavra contém o encontro consonantal /TR/?",
+            "targetWord": "Trator",
+            "options": ["Prato", "Trator", "Tigre"],
+            "correctAnswer": "Trator"
+        },
+        {
+            "id": "int-002",
+            "level": "intermediate",
+            "type": "voice",
+            "instruction": "Pronuncie a palavra BORBOLETA com clareza.",
+            "targetWord": "Borboleta",
+            "options": ["Borboleta", "Bombom", "Boneca"],
+            "correctAnswer": "Borboleta"
+        }
+    ]
 }
+

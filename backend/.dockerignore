@@ -1,0 +1,6 @@
+tmp/
+.tmp/
+bin/
+coverage.out
+Dockerfile
+.dockerignore

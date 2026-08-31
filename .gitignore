@@ -4,3 +4,7 @@
 # Artefatos de build e cobertura
 backend/coverage.out
 backend/bin/
+backend/.tmp/
+backend/tmp/
+.tmp/
+tmp/
