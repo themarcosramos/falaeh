@@ -691,6 +691,94 @@ body.bg-app {
     line-height: 1.4;
 }
 
+/* Detalhes do Relatório Final */
+.report-details-box {
+    background: rgba(15, 23, 42, 0.75);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos de Impressão / PDF Local */
+@media print {
+    body, body.bg-app {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+
+    header, footer, #toast-message, .d-print-none, .btn {
+        display: none !important;
+    }
+
+    #screen-home, #screen-game {
+        display: none !important;
+    }
+
+    #screen-celebration {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .celebration-card {
+        background: #ffffff !important;
+        border: 2px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: none !important;
+        padding: 1.5rem !important;
+    }
+
+    .game-title {
+        color: #4c1d95 !important;
+        -webkit-text-fill-color: #4c1d95 !important;
+        text-shadow: none !important;
+        font-size: 2rem !important;
+    }
+
+    .report-details-box {
+        background: #f8fafc !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: none !important;
+    }
+
+    .summary-pill {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+        box-shadow: none !important;
+    }
+
+    .summary-pill .text-white,
+    .report-details-box .text-white {
+        color: #0f172a !important;
+    }
+
+    #report-player-display {
+        background: #f5f3ff !important;
+        border: 2px solid #8b5cf6 !important;
+        border-radius: 12px !important;
+        padding: 12px 20px !important;
+        margin-bottom: 16px !important;
+    }
+
+    #report-player-display .text-muted {
+        color: #6d28d9 !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        font-size: 13px !important;
+    }
+
+    #report-player-name-display {
+        color: #4c1d95 !important;
+        font-size: 24px !important;
+        font-weight: 800 !important;
+    }
+
+    .text-muted, .text-secondary {
+        color: #64748b !important;
+    }
+}
+
 /* Acessibilidade: prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
     *,

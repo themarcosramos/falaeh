@@ -328,47 +328,120 @@
             </section>
         </div>
 
-        <!-- TELA 3: Comemoração e Conclusão do Mundo -->
+        <!-- TELA 3: Comemoração e Relatório Final da Partida -->
         <div id="screen-celebration" class="screen-view d-none">
-            <section class="celebration-card p-4 p-md-5 text-center rounded-5">
-                <div class="celebration-trophy mb-3">
-                    <span class="fs-1">🏆</span>
+            <section class="celebration-card p-4 p-md-5 rounded-5" id="printable-report">
+                <!-- Cabeçalho Festivo -->
+                <div class="text-center mb-4">
+                    <div class="celebration-trophy mb-2">
+                        <span class="fs-1">🏆</span>
+                    </div>
+                    <span class="badge-tagline mb-2">
+                        <span>✨</span> RESULTADO DA MISSÃO
+                    </span>
+                    <h2 class="game-title h2 mb-1">Mundo Concluído!</h2>
+                    <p class="game-subtitle mb-0" id="celebration-subtitle">
+                        Incrível! Você concluiu todos os exercícios do <strong id="celebration-world-name">Planeta Sons</strong>!
+                    </p>
                 </div>
 
-                <h2 class="game-title h2 mb-2">Mundo Concluído!</h2>
-                <p class="game-subtitle mb-4" id="celebration-subtitle">
-                    Incrível! Você concluiu todos os exercícios do <strong id="celebration-world-name">Planeta Sons</strong>!
-                </p>
+                <!-- Painel Detalhado do Relatório -->
+                <div class="report-details-box p-3 p-md-4 rounded-4 mb-4" id="report-details-card">
+                    <!-- Destaque do Nome do Jogador Personalizado -->
+                    <div class="text-center mb-3 pb-3 border-bottom border-light border-opacity-10" id="report-player-display">
+                        <span class="text-muted small d-block mb-1">Certificado de Conclusão conferido a:</span>
+                        <strong class="fs-4 text-warning" id="report-player-name-display">⭐ Astronauta da Fala ⭐</strong>
+                    </div>
 
-                <div class="row g-3 justify-content-center mb-4">
-                    <div class="col-6 col-sm-4">
-                        <div class="summary-pill p-3 rounded-4">
-                            <div class="fs-3 mb-1">⭐</div>
-                            <div class="fw-bold fs-4 text-warning" id="summary-xp">400 XP</div>
-                            <div class="small text-muted">Pontos da missão</div>
+                    <div class="d-flex justify-content-between align-items-center border-bottom border-light border-opacity-10 pb-3 mb-3 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fs-3" id="report-world-icon">🌱</span>
+                            <div>
+                                <span class="text-muted small d-block">Nível</span>
+                                <strong class="fs-5 text-white" id="report-level">Iniciante</strong>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small d-block">Fase Concluída</span>
+                            <span class="badge text-bg-success px-3 py-2 fw-bold" id="report-phase-completed">Sim 🏆</span>
                         </div>
                     </div>
-                    <div class="col-6 col-sm-4">
-                        <div class="summary-pill p-3 rounded-4">
-                            <div class="fs-3 mb-1">🎯</div>
-                            <div class="fw-bold fs-4 text-success" id="summary-accuracy">100%</div>
-                            <div class="small text-muted">Acertos</div>
+
+                    <div class="row g-3 text-center mb-3">
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <div class="summary-pill p-3 rounded-4 h-100">
+                                <div class="fs-4 mb-1">⭐</div>
+                                <div class="fw-bold fs-4 text-warning" id="summary-xp">400 XP</div>
+                                <div class="small text-muted">XP Total</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <div class="summary-pill p-3 rounded-4 h-100">
+                                <div class="fs-4 mb-1">🎯</div>
+                                <div class="fw-bold fs-4 text-success" id="summary-accuracy">100%</div>
+                                <div class="small text-muted">Acurácia</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <div class="summary-pill p-3 rounded-4 h-100">
+                                <div class="fs-4 mb-1">🔥</div>
+                                <div class="fw-bold fs-4 text-danger" id="summary-streak">4</div>
+                                <div class="small text-muted">Maior Sequência</div>
+                            </div>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <div class="summary-pill p-3 rounded-4 h-100">
+                                <div class="fs-4 mb-1">📝</div>
+                                <div class="fw-bold fs-4 text-info" id="report-exercises-count">6</div>
+                                <div class="small text-muted">Exercícios Feitos</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-6 col-sm-4">
-                        <div class="summary-pill p-3 rounded-4">
-                            <div class="fs-3 mb-1">🔥</div>
-                            <div class="fw-bold fs-4 text-danger" id="summary-streak">4</div>
-                            <div class="small text-muted">Maior sequência</div>
+
+                    <!-- Detalhes de Tentativas e Próximo Nível -->
+                    <div class="row g-2 justify-content-between align-items-center pt-2 border-top border-light border-opacity-10 small text-secondary">
+                        <div class="col-12 col-md-6 d-flex gap-3 justify-content-center justify-content-md-start">
+                            <span>✅ Acertos: <strong class="text-white" id="report-hits">6</strong></span>
+                            <span>🔄 Tentativas: <strong class="text-white" id="report-attempts">6</strong></span>
+                        </div>
+                        <div class="col-12 col-md-6 text-center text-md-end">
+                            <span>Próximo nível: </span>
+                            <span class="badge text-bg-primary px-2 py-1 fw-bold" id="report-next-level">Intermediário</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-center gap-3 flex-wrap">
-                    <button type="button" id="btn-replay-world" class="btn btn-outline-light rounded-pill px-4 py-2">
+                <!-- Input Opcional para Personalizar Nome no Certificado -->
+                <div class="mb-4 text-center d-print-none">
+                    <label for="report-player-name" class="form-label text-warning small fw-bold mb-2 d-block">
+                        ⭐ Personalizar Certificado com o Nome do(a) Jogador(a):
+                    </label>
+                    <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3" style="max-width: 420px; width: 100%;">
+                        <span class="fs-4" aria-hidden="true">🧑‍🚀</span>
+                        <input type="text" id="report-player-name" class="form-control rounded-pill text-center bg-dark text-white border-warning border-opacity-50 px-3 py-2"
+                               placeholder="Digite seu nome (ex: Sofia, Lucas...)" maxlength="40" autocomplete="off" />
+                    </div>
+                    <div class="text-muted small mt-1" style="font-size: 0.75rem;">
+                        🔒 O nome é usado apenas para personalizar o PDF ou imagem localmente e nunca é enviado para nenhum servidor.
+                    </div>
+                </div>
+
+                <!-- Botões de Ação do Relatório (Exportação Local) -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap mb-3 d-print-none">
+                    <button type="button" id="btn-export-pdf" class="btn btn-outline-light rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2" aria-label="Gerar PDF do relatório">
+                        <span>📄</span> <span>Gerar PDF</span>
+                    </button>
+                    <button type="button" id="btn-export-image" class="btn btn-outline-light rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2" aria-label="Salvar imagem do resultado">
+                        <span>🖼️</span> <span>Salvar Imagem</span>
+                    </button>
+                </div>
+
+                <!-- Navegação do Jogo -->
+                <div class="d-flex justify-content-center gap-3 flex-wrap pt-2 d-print-none">
+                    <button type="button" id="btn-replay-world" class="btn btn-outline-secondary rounded-pill px-4 py-2 text-light">
                         🔄 Jogar Novamente
                     </button>
-                    <button type="button" id="btn-next-world" class="btn btn-game-primary rounded-pill px-4 py-2">
+                    <button type="button" id="btn-next-world" class="btn btn-game-primary rounded-pill px-5 py-2">
                         🚀 Próximo Mundo
                     </button>
                 </div>
