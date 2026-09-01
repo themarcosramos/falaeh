@@ -14,11 +14,46 @@
             "id": "adv-002",
             "level": "advanced",
             "type": "voice",
-            "instruction": "Pronuncie a frase trava-línguas: 'O sapo dentro do saco'.",
+            "instruction": "Pronuncie o trava-línguas: 'O sapo dentro do saco'.",
             "targetWord": "O sapo dentro do saco",
             "options": ["O sapo dentro do saco", "O pato dentro do saco"],
             "correctAnswer": "O sapo dentro do saco"
+        },
+        {
+            "id": "adv-003",
+            "level": "advanced",
+            "type": "sound_identification",
+            "instruction": "Qual destas frases possui repetição do som /R/ vibrante?",
+            "targetWord": "O rato roeu a roupa do rei",
+            "options": ["O rato roeu a roupa do rei", "O gato subiu no muro alto", "O pássaro canta na árvore"],
+            "correctAnswer": "O rato roeu a roupa do rei"
+        },
+        {
+            "id": "adv-004",
+            "level": "advanced",
+            "type": "voice",
+            "instruction": "Fale o clássico trava-línguas: 'O rato roeu a roupa do rei de Roma'.",
+            "targetWord": "O rato roeu a roupa do rei de Roma",
+            "options": ["O rato roeu a roupa do rei de Roma", "O gato comeu a roupa do rei de Roma"],
+            "correctAnswer": "O rato roeu a roupa do rei de Roma"
+        },
+        {
+            "id": "adv-005",
+            "level": "advanced",
+            "type": "voice",
+            "instruction": "Pronuncie com ritmo e dicção: 'Três pratos de trigo para três tigres tristes'.",
+            "targetWord": "Três pratos de trigo para três tigres tristes",
+            "options": ["Três pratos de trigo para três tigres tristes", "Dois pratos de trigo para dois tigres tristes"],
+            "correctAnswer": "Três pratos de trigo para três tigres tristes"
+        },
+        {
+            "id": "adv-006",
+            "level": "advanced",
+            "type": "voice",
+            "instruction": "Pronuncie articulando bem: 'Sabia que o sabiá sabia assobiar?'.",
+            "targetWord": "Sabia que o sabiá sabia assobiar",
+            "options": ["Sabia que o sabiá sabia assobiar", "Sabia que o sabiá sabia voar"],
+            "correctAnswer": "Sabia que o sabiá sabia assobiar"
         }
     ]
 }
-

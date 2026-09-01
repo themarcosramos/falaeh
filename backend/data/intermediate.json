@@ -14,11 +14,46 @@
             "id": "int-002",
             "level": "intermediate",
             "type": "voice",
-            "instruction": "Pronuncie a palavra BORBOLETA com clareza.",
+            "instruction": "Pronuncie a palavra BORBOLETA com clareza em todas as sílabas.",
             "targetWord": "Borboleta",
             "options": ["Borboleta", "Bombom", "Boneca"],
             "correctAnswer": "Borboleta"
+        },
+        {
+            "id": "int-003",
+            "level": "intermediate",
+            "type": "sound_identification",
+            "instruction": "Qual palavra começa com o mesmo som /J/ de JANELA?",
+            "targetWord": "Jacaré",
+            "options": ["Jacaré", "Gato", "Castelo"],
+            "correctAnswer": "Jacaré"
+        },
+        {
+            "id": "int-004",
+            "level": "intermediate",
+            "type": "voice",
+            "instruction": "Pronuncie a palavra JACARÉ estalando bem o som inicial /J/.",
+            "targetWord": "Jacaré",
+            "options": ["Jacaré", "Jipe", "Janela"],
+            "correctAnswer": "Jacaré"
+        },
+        {
+            "id": "int-005",
+            "level": "intermediate",
+            "type": "voice",
+            "instruction": "Diga a palavra ESTRELA soprando suavemente o som do /S/.",
+            "targetWord": "Estrela",
+            "options": ["Estrela", "Escola", "Espelho"],
+            "correctAnswer": "Estrela"
+        },
+        {
+            "id": "int-006",
+            "level": "intermediate",
+            "type": "voice",
+            "instruction": "Pronuncie a palavra PRATO destacando o encontro consonantal /PR/.",
+            "targetWord": "Prato",
+            "options": ["Prato", "Trato", "Grato"],
+            "correctAnswer": "Prato"
         }
     ]
 }
-
