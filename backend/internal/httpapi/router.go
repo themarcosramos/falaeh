@@ -8,11 +8,12 @@ import (
 )
 
 // NewRouter monta as rotas da API. Novos domínios devem registrar suas rotas aqui.
-func NewRouter(logger *slog.Logger, exerciseService ExerciseService) http.Handler {
+func NewRouter(logger *slog.Logger, exerciseService ExerciseService, gameService GameService) http.Handler {
 	mux := http.NewServeMux()
 
 	// Infraestrutura e documentação
 	mux.HandleFunc("GET /health", handleHealth(logger))
+	mux.HandleFunc("GET /api/health", handleHealth(logger))
 	mux.HandleFunc("GET /docs", handleSwaggerUI(logger))
 	mux.HandleFunc("GET /swagger.yaml", handleSwaggerSpec(logger))
 
@@ -23,6 +24,12 @@ func NewRouter(logger *slog.Logger, exerciseService ExerciseService) http.Handle
 		mux.HandleFunc("GET /api/v1/exercises", handleListExercises(logger, exerciseService))
 		mux.HandleFunc("GET /api/v1/exercises/{id}", handleGetExercise(logger, exerciseService))
 		mux.HandleFunc("POST /api/v1/exercises/{id}/answer", handleAnswerExercise(logger, exerciseService))
+	}
+
+	// Domínio de Partida
+	if gameService != nil {
+		mux.HandleFunc("POST /api/v1/game/start", handleStartGame(logger, gameService))
+		mux.HandleFunc("POST /api/v1/game/{sessionId}/answer", handleGameAnswer(logger, gameService))
 	}
 
 	return securityHeaders(mux)

@@ -67,7 +67,7 @@ func TestHTTP_ListLevels(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels", nil)
 
@@ -88,7 +88,7 @@ func TestHTTP_ListExercises_All(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises", nil)
 
@@ -109,7 +109,7 @@ func TestHTTP_ListExercises_WithValidLevel(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=beginner", nil)
 
@@ -128,7 +128,7 @@ func TestHTTP_ListExercises_LevelNotFound(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=beginner", nil)
 
@@ -143,7 +143,7 @@ func TestHTTP_ListExercises_InvalidLevel(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=invalido", nil)
 
@@ -162,7 +162,7 @@ func TestHTTP_ListExercises_InternalError(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises", nil)
 
@@ -181,7 +181,7 @@ func TestHTTP_ListExercisesByLevel_Success(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
 
@@ -196,7 +196,7 @@ func TestHTTP_ListExercisesByLevel_InvalidLevel(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/nao-existe/exercises", nil)
 
@@ -215,7 +215,7 @@ func TestHTTP_ListExercisesByLevel_LevelNotFound(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
 
@@ -234,7 +234,7 @@ func TestHTTP_ListExercisesByLevel_InternalError(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
 
@@ -253,7 +253,7 @@ func TestHTTP_GetExercise_Success(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/beg-001", nil)
 
@@ -272,7 +272,7 @@ func TestHTTP_GetExercise_NotFound(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/inexistente", nil)
 
@@ -291,7 +291,7 @@ func TestHTTP_GetExercise_InternalError(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/ex-1", nil)
 
@@ -310,7 +310,7 @@ func TestHTTP_AnswerExercise_Success(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":"pato"}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -326,7 +326,7 @@ func TestHTTP_AnswerExercise_MalformedBody(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{invalido`))
 	req.Header.Set("Content-Type", "application/json")
@@ -342,7 +342,7 @@ func TestHTTP_AnswerExercise_EmptyAnswer(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":""}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -362,7 +362,7 @@ func TestHTTP_AnswerExercise_ExerciseNotFound(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/inexistente/answer", bytes.NewBufferString(`{"answer":"pato"}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -382,7 +382,7 @@ func TestHTTP_AnswerExercise_EmptyAnswerErrorFromService(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":"a"}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -402,7 +402,7 @@ func TestHTTP_AnswerExercise_InternalError(t *testing.T) {
 		},
 	}
 
-	router := httpapi.NewRouter(logger, mockSvc)
+	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/ex-1/answer", bytes.NewBufferString(`{"answer":"pato"}`))
 	req.Header.Set("Content-Type", "application/json")
@@ -416,7 +416,7 @@ func TestHTTP_AnswerExercise_InternalError(t *testing.T) {
 
 func TestHTTP_NilExerciseService(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	router := httpapi.NewRouter(logger, nil)
+	router := httpapi.NewRouter(logger, nil, nil)
 
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)

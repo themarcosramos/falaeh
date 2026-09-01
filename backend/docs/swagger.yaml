@@ -59,6 +59,194 @@ definitions:
       exerciseId:
         type: string
     type: object
+  game.AnswerResult:
+    properties:
+      breakdown:
+        $ref: '#/definitions/gamification.XPBreakdown'
+      completion:
+        $ref: '#/definitions/gamification.LevelCompletionResult'
+      correct:
+        type: boolean
+      earnedXp:
+        type: integer
+      exerciseId:
+        type: string
+      exerciseIndex:
+        type: integer
+      newAchievements:
+        items:
+          $ref: '#/definitions/gamification.Achievement'
+        type: array
+      nextExercise:
+        $ref: '#/definitions/exercise.PublicExercise'
+      phaseCompleted:
+        type: boolean
+      progress:
+        $ref: '#/definitions/gamification.Progress'
+      report:
+        $ref: '#/definitions/game.Report'
+      streak:
+        type: integer
+      totalExercises:
+        type: integer
+      totalXp:
+        type: integer
+    type: object
+  game.Report:
+    properties:
+      accuracy:
+        type: integer
+      attempts:
+        type: integer
+      bestStreak:
+        type: integer
+      exercisesTotal:
+        type: integer
+      hits:
+        type: integer
+      level:
+        $ref: '#/definitions/exercise.Level'
+      levelName:
+        type: string
+      misses:
+        type: integer
+      nextLevel:
+        $ref: '#/definitions/exercise.Level'
+      nextLevelUnlocked:
+        type: boolean
+      phaseCompleted:
+        type: boolean
+      totalXp:
+        type: integer
+    type: object
+  game.StartResult:
+    properties:
+      exercise:
+        $ref: '#/definitions/exercise.PublicExercise'
+      exerciseIndex:
+        type: integer
+      level:
+        $ref: '#/definitions/exercise.Level'
+      levelName:
+        type: string
+      progress:
+        $ref: '#/definitions/gamification.Progress'
+      rules:
+        $ref: '#/definitions/gamification.Rules'
+      sessionId:
+        type: string
+      totalExercises:
+        type: integer
+    type: object
+  gamification.Achievement:
+    properties:
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        $ref: '#/definitions/gamification.AchievementID'
+      title:
+        type: string
+    type: object
+  gamification.AchievementID:
+    enum:
+    - first_correct
+    - streak_3
+    - streak_5
+    - beginner_complete
+    - intermediate_complete
+    - advanced_complete
+    type: string
+    x-enum-varnames:
+    - AchievementFirstCorrect
+    - AchievementStreak3
+    - AchievementStreak5
+    - AchievementBeginnerComplete
+    - AchievementIntermediateComplete
+    - AchievementAdvancedComplete
+  gamification.LevelCompletionResult:
+    properties:
+      breakdown:
+        $ref: '#/definitions/gamification.XPBreakdown'
+      earnedXp:
+        type: integer
+      level:
+        $ref: '#/definitions/exercise.Level'
+      newAchievements:
+        items:
+          $ref: '#/definitions/gamification.Achievement'
+        type: array
+      nextLevel:
+        $ref: '#/definitions/exercise.Level'
+      nextUnlocked:
+        type: boolean
+      totalXp:
+        type: integer
+    type: object
+  gamification.Progress:
+    properties:
+      achievements:
+        items:
+          $ref: '#/definitions/gamification.Achievement'
+        type: array
+      bestStreak:
+        type: integer
+      completedLevels:
+        items:
+          $ref: '#/definitions/exercise.Level'
+        type: array
+      currentLevel:
+        $ref: '#/definitions/exercise.Level'
+      currentStreak:
+        type: integer
+      totalAttempts:
+        type: integer
+      totalHits:
+        type: integer
+      totalMisses:
+        type: integer
+      totalXp:
+        type: integer
+      unlockedLevels:
+        items:
+          $ref: '#/definitions/exercise.Level'
+        type: array
+    type: object
+  gamification.Rules:
+    properties:
+      baseCorrectXp:
+        type: integer
+      firstAttemptBonusXp:
+        type: integer
+      levelCompletionBonusXp:
+        type: integer
+      phaseCompletionBonusXp:
+        type: integer
+      streak3BonusXp:
+        type: integer
+      streak3Threshold:
+        type: integer
+      streak5BonusXp:
+        type: integer
+      streak5Threshold:
+        type: integer
+    type: object
+  gamification.XPBreakdown:
+    properties:
+      baseXp:
+        type: integer
+      firstAttemptBonus:
+        type: integer
+      levelBonus:
+        type: integer
+      phaseBonus:
+        type: integer
+      streakBonus:
+        type: integer
+      total:
+        type: integer
+    type: object
   httpapi.AnswerRequest:
     properties:
       answer:
@@ -71,10 +259,28 @@ definitions:
         example: exercício não encontrado
         type: string
     type: object
+  httpapi.GameAnswerRequest:
+    properties:
+      answer:
+        example: pato
+        type: string
+      exerciseId:
+        example: beg-001
+        type: string
+    type: object
   httpapi.HealthResponse:
     properties:
       status:
         example: ok
+        type: string
+    type: object
+  httpapi.StartGameRequest:
+    properties:
+      level:
+        example: beginner
+        type: string
+      sessionId:
+        example: 9f1c2b3a4d5e6f708192a3b4c5d6e7f8
         type: string
     type: object
 host: localhost:8080
@@ -181,6 +387,85 @@ paths:
       summary: Valida a resposta de um exercício
       tags:
       - exercises
+  /api/v1/game/{sessionId}/answer:
+    post:
+      consumes:
+      - application/json
+      description: Valida a resposta no backend e devolve XP, streak, conquistas e
+        o próximo exercício. A pontuação nunca é calculada pelo cliente.
+      parameters:
+      - description: Identificador da partida
+        in: path
+        name: sessionId
+        required: true
+        type: string
+      - description: Resposta do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.GameAnswerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/game.AnswerResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Responde o exercício atual da partida
+      tags:
+      - game
+  /api/v1/game/start:
+    post:
+      consumes:
+      - application/json
+      description: Cria (ou retoma, informando sessionId) uma partida em memória e
+        devolve o primeiro exercício do nível. Nenhum dado pessoal é armazenado.
+      parameters:
+      - description: Nível a iniciar e sessão opcional a retomar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.StartGameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/game.StartResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Inicia uma fase da partida
+      tags:
+      - game
   /api/v1/levels:
     get:
       description: Retorna a lista de níveis de dificuldade e mundos suportados no
