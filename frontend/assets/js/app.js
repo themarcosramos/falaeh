@@ -108,7 +108,9 @@ const btnSelectAdvanced = document.getElementById("btn-select-advanced");
 
 const btnReplayWorld = document.getElementById("btn-replay-world");
 const btnNextWorld = document.getElementById("btn-next-world");
+const btnInstallPwa = document.getElementById("btn-install-pwa");
 
+let deferredInstallPrompt = null;
 let toastTimeoutId = null;
 
 function showToast(icon, message) {
@@ -836,6 +838,58 @@ async function checkAPI() {
     }
 }
 
+function initPWA() {
+    // Captura e gerenciamento do prompt de instalação do PWA
+    window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        if (btnInstallPwa) {
+            btnInstallPwa.classList.remove("d-none");
+            btnInstallPwa.classList.add("d-inline-flex");
+        }
+    });
+
+    if (btnInstallPwa) {
+        btnInstallPwa.addEventListener("click", async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            const { outcome } = await deferredInstallPrompt.userChoice;
+            if (outcome === "accepted") {
+                showToast("🎉", "Obrigado por instalar o Fala Eh!");
+            }
+            deferredInstallPrompt = null;
+            btnInstallPwa.classList.add("d-none");
+            btnInstallPwa.classList.remove("d-inline-flex");
+        });
+    }
+
+    window.addEventListener("appinstalled", () => {
+        deferredInstallPrompt = null;
+        if (btnInstallPwa) {
+            btnInstallPwa.classList.add("d-none");
+            btnInstallPwa.classList.remove("d-inline-flex");
+        }
+        showToast("🌟", "Aplicativo Fala Eh instalado com sucesso!");
+    });
+
+    // Detecção de conectividade online/offline simples e amigável
+    function handleNetworkStatus() {
+        if (!navigator.onLine) {
+            if (statusEl) {
+                statusEl.textContent = "Modo offline 📴";
+                statusEl.className = "badge text-bg-warning text-dark";
+            }
+            showToast("📴", "Você está offline. A interface do jogo continua disponível!");
+        } else {
+            checkAPI();
+            showToast("📶", "Conexão restabelecida!");
+        }
+    }
+
+    window.addEventListener("online", handleNetworkStatus);
+    window.addEventListener("offline", handleNetworkStatus);
+}
+
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker.register("/sw.js").catch(() => {
@@ -845,5 +899,7 @@ if ("serviceWorker" in navigator) {
 }
 
 initEventHandlers();
+initPWA();
 updateWorldCardsUI();
 checkAPI();
+

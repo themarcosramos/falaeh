@@ -1,19 +1,33 @@
 {
-    "name": "Fala Eh",
+    "name": "Fala Eh - Aventura da Fala",
     "short_name": "Fala Eh",
-    "description": "Jogo educativo de exercícios fonoaudiológicos.",
+    "description": "Jogo educativo e gamificado de exercícios fonoaudiológicos para crianças e adolescentes.",
     "start_url": "/",
     "scope": "/",
     "display": "standalone",
-    "orientation": "portrait",
-    "background_color": "#1e1b4b",
+    "orientation": "portrait-primary",
+    "background_color": "#0f172a",
     "theme_color": "#4c1d95",
+    "lang": "pt-BR",
+    "categories": ["education", "games", "health"],
     "icons": [
         {
             "src": "/assets/icons/icon.svg",
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/icons/icon.svg",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "/assets/icons/icon.svg",
+            "sizes": "512x512",
+            "type": "image/svg+xml",
+            "purpose": "any"
         }
     ]
 }
