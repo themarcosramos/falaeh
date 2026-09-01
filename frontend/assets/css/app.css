@@ -298,6 +298,255 @@ body.bg-app {
     }
 }
 
+/* ==========================================================
+   ESTILOS DO MODO DE JOGO & EXERCÍCIOS
+   ========================================================== */
+
+/* Telas e Transições Suaves */
+.screen-view {
+    animation: fadeIn 0.35s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* HUD do Jogo */
+.game-hud {
+    background: rgba(30, 27, 75, 0.85);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.hud-badge-world {
+    background: rgba(139, 92, 246, 0.25);
+    border: 1px solid rgba(167, 139, 250, 0.4);
+    color: #ede9fe;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 0.4rem 1rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.hud-stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    font-size: 0.95rem;
+}
+
+.hud-stat-icon {
+    font-size: 1.1rem;
+}
+
+/* Barra de Progresso Gamificada */
+.game-progress {
+    height: 12px;
+    background-color: rgba(15, 23, 42, 0.8);
+    border-radius: 9999px;
+    overflow: hidden;
+    border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.game-progress-bar {
+    background: linear-gradient(90deg, #10b981 0%, #06b6d4 50%, #8b5cf6 100%);
+    border-radius: 9999px;
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
+}
+
+/* Card Principal do Exercício */
+.exercise-card {
+    background: var(--app-card-bg);
+    border: 2px solid var(--app-card-border);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 30px rgba(139, 92, 246, 0.15);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.exercise-type-badge {
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(167, 139, 250, 0.35);
+    color: #c4b5fd;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.exercise-step-indicator {
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.exercise-instruction {
+    font-size: clamp(1.35rem, 3.5vw, 1.9rem);
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+}
+
+/* Balão da Palavra-Alvo */
+.target-word-bubble {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.2) 100%);
+    border: 2px solid rgba(167, 139, 250, 0.5);
+    color: #fef08a;
+    padding: 0.65rem 1.75rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
+    animation: target-pulse 3s infinite ease-in-out;
+}
+
+@keyframes target-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+}
+
+/* Grid e Botões de Opção */
+.option-btn {
+    width: 100%;
+    min-height: 72px;
+    padding: 1rem 1.5rem;
+    background: rgba(15, 23, 42, 0.7);
+    border: 2px solid rgba(139, 92, 246, 0.35);
+    border-radius: 1.25rem;
+    color: #f8fafc;
+    font-size: 1.25rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    user-select: none;
+}
+
+.option-btn:hover:not(:disabled) {
+    transform: translateY(-4px) scale(1.02);
+    border-color: rgba(245, 158, 11, 0.8);
+    background: rgba(30, 27, 75, 0.9);
+    box-shadow: 0 12px 24px rgba(245, 158, 11, 0.25);
+    color: #ffffff;
+}
+
+.option-btn:focus-visible {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 4px var(--app-accent-glow);
+}
+
+/* Opção Selecionada pelo Jogador */
+.option-btn.selected {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.25) 0%, rgba(234, 88, 12, 0.25) 100%);
+    border-color: #f59e0b;
+    color: #fef08a;
+    transform: scale(1.03);
+    box-shadow: 0 10px 25px rgba(245, 158, 11, 0.4), 0 0 0 2px rgba(245, 158, 11, 0.3) inset;
+}
+
+/* Opção Correta (Acerto) */
+.option-btn.correct {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.35) 0%, rgba(5, 150, 105, 0.35) 100%) !important;
+    border-color: #10b981 !important;
+    color: #ffffff !important;
+    box-shadow: 0 12px 30px rgba(16, 185, 129, 0.45) !important;
+    animation: popSuccess 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Opção Incorreta (Erro amigável) */
+.option-btn.incorrect {
+    background: rgba(244, 63, 94, 0.18) !important;
+    border-color: rgba(244, 63, 94, 0.6) !important;
+    color: #fca5a5 !important;
+    opacity: 0.65;
+}
+
+@keyframes popSuccess {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1.03); }
+}
+
+/* Botão de Próximo Sucesso */
+.btn-game-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    font-weight: 800;
+    font-size: 1.2rem;
+    border: none;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-game-success:hover,
+.btn-game-success:focus-visible {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    color: #ffffff;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(16, 185, 129, 0.6);
+    outline: none;
+}
+
+/* Banner de Feedback */
+.feedback-banner-correct {
+    background: rgba(16, 185, 129, 0.25);
+    border: 2px solid #10b981;
+    color: #6ee7b7;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.feedback-banner-incorrect {
+    background: rgba(245, 158, 11, 0.2);
+    border: 2px solid #f59e0b;
+    color: #fde68a;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+}
+
+/* Tela de Celebração */
+.celebration-card {
+    background: var(--app-card-bg);
+    border: 2px solid rgba(245, 158, 11, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(245, 158, 11, 0.25);
+}
+
+.celebration-trophy {
+    font-size: clamp(3.5rem, 8vw, 5.5rem);
+    filter: drop-shadow(0 10px 20px rgba(245, 158, 11, 0.5));
+    animation: float 3s ease-in-out infinite;
+}
+
+.summary-pill {
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Microanimações gerais */
 @keyframes sparkle {
     0% {
         transform: scale(0.8) rotate(0deg);
@@ -335,7 +584,10 @@ body.bg-app {
     .mascot-svg,
     .mascot-sparkle,
     .btn-game-primary,
-    .shake {
+    .btn-game-success,
+    .shake,
+    .target-word-bubble,
+    .celebration-trophy {
         animation: none !important;
     }
 }

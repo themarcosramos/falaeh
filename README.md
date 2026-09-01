@@ -118,13 +118,40 @@ docker-compose.dev.yml  # overrides de desenvolvimento
 Makefile
 ```
 
+## API
+
+Documentação interativa em `http://localhost:8080/docs` (spec em `/swagger.yaml`).
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/health` | Disponibilidade do serviço |
+| `GET` | `/api/v1/levels` | Lista os níveis do jogo |
+| `GET` | `/api/v1/levels/{level}/exercises` | Exercícios públicos de um nível (sem gabarito) |
+| `GET` | `/api/v1/exercises` | Lista exercícios, com filtro opcional `?level=` |
+| `GET` | `/api/v1/exercises/{id}` | Exercício por ID |
+| `POST` | `/api/v1/exercises/{id}/answer` | Valida uma resposta isolada |
+| `POST` | `/api/v1/game/start` | Inicia (ou retoma) uma partida e devolve o primeiro exercício |
+| `POST` | `/api/v1/game/{sessionId}/answer` | Responde o exercício atual e devolve XP, streak e o próximo exercício |
+
+### Fluxo da partida
+
+`POST /api/v1/game/start` cria uma partida em memória e devolve `sessionId`, o primeiro
+exercício e o progresso. Cada resposta é enviada para `POST /api/v1/game/{sessionId}/answer`,
+que valida no backend, aplica as regras de XP e devolve o próximo exercício. Ao final do nível
+a resposta inclui `phaseCompleted`, `completion` (com o desbloqueio do próximo mundo) e
+`report`, usado pela tela de resultado.
+
+Toda a pontuação, o streak e o desbloqueio de níveis são decididos pelo backend — o frontend
+apenas exibe o que recebe. O gabarito nunca é enviado ao cliente. A partida vive somente em
+memória, expira por inatividade e não guarda nenhum dado pessoal.
+
 ## Próximos passos
 
-1. Modelar exercícios e o carregamento dos arquivos JSON.
-2. Implementar as regras de gamificação (XP, streak, bônus, conquistas).
-3. Implementar a máquina de estados da partida e o desbloqueio de níveis.
-4. Expor os endpoints da API v1 e conectar o frontend.
-5. Implementar a interface do jogo, o modo por voz e o relatório final.
+1. ~~Modelar exercícios e o carregamento dos arquivos JSON.~~
+2. ~~Implementar as regras de gamificação (XP, streak, bônus, conquistas).~~
+3. ~~Implementar a máquina de estados da partida e o desbloqueio de níveis.~~
+4. ~~Expor os endpoints da API v1 e conectar o frontend.~~
+5. Implementar o modo por voz (Web Speech API) e a exportação do relatório final.
 
 ## Licença
 

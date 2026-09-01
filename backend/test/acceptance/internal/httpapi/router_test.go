@@ -13,10 +13,12 @@ import (
 	"testing"
 
 	"github.com/themarcosramos/falaeh/backend/internal/exercise"
+	"github.com/themarcosramos/falaeh/backend/internal/game"
+	"github.com/themarcosramos/falaeh/backend/internal/gamification"
 	"github.com/themarcosramos/falaeh/backend/internal/httpapi"
 )
 
-func newAcceptanceRouter(t *testing.T) http.Handler {
+func acceptanceRepository(t *testing.T) *exercise.JSONRepository {
 	t.Helper()
 
 	candidates := []string{"../../../../data", "../../../data", "../../data", "../data", "data"}
@@ -36,9 +38,16 @@ func newAcceptanceRouter(t *testing.T) http.Handler {
 		t.Fatalf("falha ao instanciar repositório de dados: %v", err)
 	}
 
-	svc := exercise.NewService(repo)
+	return repo
+}
+
+func newAcceptanceRouter(t *testing.T) http.Handler {
+	t.Helper()
+
+	svc := exercise.NewService(acceptanceRepository(t))
+	manager := game.NewManager(svc, gamification.DefaultRules(), game.Config{})
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
-	return httpapi.NewRouter(logger, svc)
+	return httpapi.NewRouter(logger, svc, manager)
 }
 
 func TestRouter_Health(t *testing.T) {
@@ -60,6 +69,14 @@ func TestRouter_Health(t *testing.T) {
 
 	if res.Status != "ok" {
 		t.Errorf("status = %q, esperado 'ok'", res.Status)
+	}
+
+	// Testa também rota com prefixo /api/health
+	recAPI := httptest.NewRecorder()
+	reqAPI := httptest.NewRequest(http.MethodGet, "/api/health", nil)
+	router.ServeHTTP(recAPI, reqAPI)
+	if recAPI.Code != http.StatusOK {
+		t.Fatalf("status code /api/health = %d, esperado %d", recAPI.Code, http.StatusOK)
 	}
 
 	// Verifica headers de segurança
