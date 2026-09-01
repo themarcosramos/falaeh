@@ -1,5 +1,76 @@
 basePath: /
 definitions:
+  exercise.Level:
+    enum:
+    - beginner
+    - intermediate
+    - advanced
+    type: string
+    x-enum-varnames:
+    - LevelBeginner
+    - LevelIntermediate
+    - LevelAdvanced
+  exercise.LevelInfo:
+    properties:
+      description:
+        example: 'Mundo 1: Sons e palavras fundamentais'
+        type: string
+      id:
+        allOf:
+        - $ref: '#/definitions/exercise.Level'
+        example: beginner
+      name:
+        example: Iniciante
+        type: string
+    type: object
+  exercise.PublicExercise:
+    properties:
+      id:
+        type: string
+      instruction:
+        type: string
+      level:
+        $ref: '#/definitions/exercise.Level'
+      options:
+        items:
+          type: string
+        type: array
+      targetWord:
+        type: string
+      type:
+        $ref: '#/definitions/exercise.Type'
+    type: object
+  exercise.Type:
+    enum:
+    - multiple_choice
+    - image_word_match
+    - sound_identification
+    - voice
+    type: string
+    x-enum-varnames:
+    - TypeMultipleChoice
+    - TypeImageWordMatch
+    - TypeSoundIdentification
+    - TypeVoice
+  exercise.ValidationResult:
+    properties:
+      correct:
+        type: boolean
+      exerciseId:
+        type: string
+    type: object
+  httpapi.AnswerRequest:
+    properties:
+      answer:
+        example: pato
+        type: string
+    type: object
+  httpapi.ErrorResponse:
+    properties:
+      error:
+        example: exercício não encontrado
+        type: string
+    type: object
   httpapi.HealthResponse:
     properties:
       status:
@@ -17,6 +88,145 @@ info:
   title: Fala Eh API
   version: 0.1.0
 paths:
+  /api/v1/exercises:
+    get:
+      description: Retorna a lista de exercícios públicos do jogo, podendo filtrar
+        por nível via query param.
+      parameters:
+      - description: Filtro opcional por nível
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        in: query
+        name: level
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exercise.PublicExercise'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Lista exercícios com filtro opcional por nível
+      tags:
+      - exercises
+  /api/v1/exercises/{id}:
+    get:
+      description: Retorna os dados públicos de um exercício específico. A resposta
+        correta nunca é exposta.
+      parameters:
+      - description: 'ID do exercício (ex: beg-001)'
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/exercise.PublicExercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Obtém um exercício por ID
+      tags:
+      - exercises
+  /api/v1/exercises/{id}/answer:
+    post:
+      consumes:
+      - application/json
+      description: Avalia se a resposta enviada pelo usuário está correta segundo
+        regras fonéticas e normalização do domínio.
+      parameters:
+      - description: ID do exercício
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Resposta do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.AnswerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/exercise.ValidationResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Valida a resposta de um exercício
+      tags:
+      - exercises
+  /api/v1/levels:
+    get:
+      description: Retorna a lista de níveis de dificuldade e mundos suportados no
+        jogo.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exercise.LevelInfo'
+            type: array
+      summary: Lista os níveis disponíveis
+      tags:
+      - levels
+  /api/v1/levels/{level}/exercises:
+    get:
+      description: Retorna a lista de exercícios públicos de um determinado nível.
+        A resposta correta nunca é exposta.
+      parameters:
+      - description: Nível (beginner, intermediate, advanced)
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        in: path
+        name: level
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exercise.PublicExercise'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Lista os exercícios de um nível
+      tags:
+      - exercises
   /health:
     get:
       produces:

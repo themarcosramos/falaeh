@@ -49,6 +49,27 @@ func NewService(repo Repository) *Service {
 	}
 }
 
+// ListLevels retorna os níveis disponíveis na aplicação.
+func (s *Service) ListLevels(_ context.Context) []LevelInfo {
+	result := make([]LevelInfo, len(AvailableLevels))
+	copy(result, AvailableLevels)
+	return result
+}
+
+// ListAll lista todos os exercícios de todos os níveis no formato público seguro.
+func (s *Service) ListAll(_ context.Context) ([]PublicExercise, error) {
+	exercises, err := s.repo.ListAll()
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]PublicExercise, len(exercises))
+	for i, ex := range exercises {
+		result[i] = ex.ToPublic()
+	}
+	return result, nil
+}
+
 // GetExerciseByID busca e retorna um exercício por ID no formato público.
 func (s *Service) GetExerciseByID(ctx context.Context, id string) (PublicExercise, error) {
 	ex, err := s.repo.GetByID(id)

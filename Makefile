@@ -22,7 +22,7 @@ TESTS_DIR := $(TMP_DIR)/tests
 COVERAGE  := $(TESTS_DIR)/coverage.out
 
 # Pacotes de teste por suíte.
-UNIT_PKGS       ?= internal/exercise
+UNIT_PKGS       ?= internal/exercise internal/httpapi
 ACCEPTANCE_PKGS ?= internal/exercise internal/httpapi
 
 # Executa comandos Go no container com o usuário do host, para não gerar
@@ -178,24 +178,24 @@ coverage-check: coverage ## Falha se a cobertura global ficar abaixo de COVERAGE
 ##@ Qualidade
 
 fmt: ## Formata o código Go
-	$(GO_RUN) gofmt -w -s .
+	$(GO_RUN) sh -c 'gofmt -w -s cmd internal test docs'
 
 vet: ## Executa go vet no backend
-	$(GO_RUN) go vet ./...
+	$(GO_RUN) go vet ./cmd/... ./internal/... ./docs/... ./test/...
 
 tidy: ## Organiza e verifica as dependências do módulo
 	$(GO_RUN) sh -c 'go mod tidy && go mod verify'
 
 generate: ## Executa go generate no backend
-	$(GO_RUN) go generate ./...
+	$(GO_RUN) go generate ./cmd/... ./internal/... ./docs/... ./test/...
 
 lint: ## Analisa o código com golangci-lint
 	@printf '\n  $(C_TITLE)Lint — $(APP_NAME)$(C_OFF)\n\n'
-	@$(LINT_RUN) golangci-lint run --show-stats ./...
+	@$(LINT_RUN) golangci-lint run --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
 
 lint-fix: fmt ## Corrige automaticamente o que o golangci-lint souber corrigir
 	@printf '\n  $(C_TITLE)Lint Fix — $(APP_NAME)$(C_OFF)\n\n'
-	@$(LINT_RUN) golangci-lint run --fix --show-stats ./...
+	@$(LINT_RUN) golangci-lint run --fix --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
 
 style-fix: lint-fix ## Alias de lint-fix
 
@@ -229,8 +229,8 @@ ci: vet lint test coverage-check ## Quality gate: vet + lint + testes + cobertur
 swagger: ## Regenera a documentação Swagger a partir das anotações
 	$(GO_RUN) sh -c 'go install github.com/swaggo/swag/cmd/swag@$(SWAG_VERSION) && \
 		$$GOPATH/bin/swag init \
-			--generalInfo cmd/api/main.go \
-			--dir ./ \
+			--generalInfo main.go \
+			--dir cmd/api,internal/httpapi,internal/exercise \
 			--output docs \
 			--outputTypes yaml \
 			--generatedTime=false'
