@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/themarcosramos/falaeh/backend/internal/exercise"
@@ -329,6 +330,24 @@ func TestHTTP_AnswerExercise_MalformedBody(t *testing.T) {
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
 	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{invalido`))
+	req.Header.Set("Content-Type", "application/json")
+
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("status code = %d, esperado %d", rec.Code, http.StatusBadRequest)
+	}
+}
+
+func TestHTTP_AnswerExercise_BodyTooLarge(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
+	mockSvc := &mockExerciseService{}
+
+	body := `{"answer":"` + strings.Repeat("a", 8<<10) + `"}`
+
+	router := httpapi.NewRouter(logger, mockSvc, nil)
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
