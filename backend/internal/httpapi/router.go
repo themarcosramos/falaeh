@@ -11,11 +11,13 @@ import (
 func NewRouter(logger *slog.Logger, exerciseService ExerciseService, gameService GameService) http.Handler {
 	mux := http.NewServeMux()
 
-	// Infraestrutura e documentação
+	// Infraestrutura e documentação (os prefixos /api são os acessíveis pelo proxy do frontend)
 	mux.HandleFunc("GET /health", handleHealth(logger))
 	mux.HandleFunc("GET /api/health", handleHealth(logger))
 	mux.HandleFunc("GET /docs", handleSwaggerUI(logger))
+	mux.HandleFunc("GET /api/docs", handleSwaggerUI(logger))
 	mux.HandleFunc("GET /swagger.yaml", handleSwaggerSpec(logger))
+	mux.HandleFunc("GET /api/swagger.yaml", handleSwaggerSpec(logger))
 
 	// Domínio de Exercícios
 	if exerciseService != nil {
