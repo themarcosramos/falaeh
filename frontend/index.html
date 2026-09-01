@@ -260,9 +260,43 @@
                     </div>
                 </div>
 
-                <!-- Opções de Resposta -->
+                <!-- Área de Interação por Voz (Exibida em exercícios do tipo voice) -->
+                <div id="voice-interaction-area" class="voice-container mb-4 text-center d-none">
+                    <div class="voice-mic-wrapper mb-3">
+                        <button type="button" id="btn-voice-record" class="btn-mic" aria-label="Falar pelo microfone">
+                            <span class="mic-icon" aria-hidden="true">🎙️</span>
+                            <span class="voice-pulse-ring" aria-hidden="true"></span>
+                        </button>
+                    </div>
+
+                    <div id="voice-status-badge" class="voice-status-pill mb-2">
+                        <span id="voice-status-icon">🎙️</span>
+                        <span id="voice-status-text">Toque no microfone para falar</span>
+                    </div>
+
+                    <div id="voice-transcript-container" class="voice-transcript-bubble mx-auto mb-3 d-none">
+                        <span class="small text-muted d-block">Ouvimos:</span>
+                        <span class="fw-bold fs-5 text-warning" id="voice-transcript-text">"..."</span>
+                    </div>
+
+                    <!-- Mensagem para navegador sem suporte ou recusa de permissão -->
+                    <div id="voice-unsupported-msg" class="alert alert-info py-2 px-3 d-inline-block small text-light bg-opacity-25 bg-info border-info border-opacity-50 rounded-pill mb-2 d-none">
+                        <span>ℹ️ Reconhecimento de voz não disponível no navegador. Você pode responder tocando nas opções abaixo!</span>
+                    </div>
+
+                    <div class="voice-fallback-divider text-muted small mt-2 mb-1" id="voice-fallback-label">
+                        <span>ou responda tocando em uma das opções:</span>
+                    </div>
+                </div>
+
+                <!-- Opções de Resposta (Múltipla escolha e fallback para voz) -->
                 <div class="row g-3 justify-content-center mb-4" id="options-grid" role="radiogroup" aria-label="Opções de resposta">
                     <!-- Opções inseridas dinamicamente via app.js -->
+                </div>
+
+                <!-- Aviso de uso educativo não clínico -->
+                <div class="voice-disclaimer text-center text-muted small mb-3 d-none" id="voice-disclaimer">
+                    <span>🌱 Prática lúdica da fala — não substitui avaliação nem diagnóstico clínico fonoaudiológico.</span>
                 </div>
 
                 <!-- Painel de Feedback e Ações -->
