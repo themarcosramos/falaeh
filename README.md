@@ -2,7 +2,9 @@
 
 Aplicação PWA gamificada para exercícios fonoaudiológicos, com progressão por níveis, interação por voz, gamificação e backend em Go.
 
-> Estado atual: **estrutura inicial**. Nenhuma funcionalidade de jogo foi implementada ainda — apenas o esqueleto do projeto, o servidor HTTP com `/health` e a casca da PWA.
+> Estado atual: **jogável de ponta a ponta**. Três mundos (iniciante, intermediário e avançado), quatro tipos de
+> exercício (incluindo o modo por voz), XP/streak/conquistas calculados no backend e relatório final da missão.
+> Pendente: exportação do relatório em PDF/imagem.
 
 ## Stack
 
@@ -145,13 +147,123 @@ Toda a pontuação, o streak e o desbloqueio de níveis são decididos pelo back
 apenas exibe o que recebe. O gabarito nunca é enviado ao cliente. A partida vive somente em
 memória, expira por inatividade e não guarda nenhum dado pessoal.
 
+## Como testar
+
+```bash
+make test              # unitários + aceitação
+make test-unit
+make test-acceptance
+make test-run TEST=TestAplicaXP PKG=./test/unit/...
+make coverage          # gera o perfil e o HTML em backend/tmp/tests
+make coverage-check    # falha se a cobertura global ficar abaixo de COVERAGE_MIN (80%)
+make ci                # quality gate completo: vet + lint + testes + cobertura
+```
+
+Os testes ficam separados por finalidade em `backend/test/unit` e `backend/test/acceptance`, e usam
+table-driven tests. Toda alteração relevante deve manter a cobertura global em pelo menos 80%.
+
+## Modo por voz
+
+Exercícios do tipo `voice` pedem que a criança pronuncie uma palavra. O reconhecimento acontece
+**inteiramente no navegador**, pela Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`),
+configurada em `pt-BR`. O fluxo é:
+
+1. o jogador toca no botão de microfone;
+2. o navegador transcreve a fala em texto;
+3. o texto é normalizado (minúsculas, sem pontuação e sem espaços extras);
+4. apenas esse **texto** é enviado para `POST /api/v1/game/{sessionId}/answer`;
+5. o backend normaliza novamente e compara com a resposta esperada.
+
+Nenhum áudio é gravado, armazenado ou enviado para o servidor.
+
+### Limitações do reconhecimento de fala
+
+- **Não é avaliação clínica.** O recurso apenas verifica se a palavra reconhecida corresponde à
+  palavra solicitada; não mede articulação, fonemas ou qualidade da produção da fala, e não
+  substitui a avaliação de um profissional de Fonoaudiologia. Um aviso equivalente é exibido na tela.
+- A disponibilidade varia por navegador; em vários casos a transcrição depende de conexão com a
+  internet e de serviço externo do próprio navegador.
+- Ruído, sotaque e microfone influenciam o resultado.
+- **Fallback sempre disponível**: as opções por toque continuam visíveis em todos os exercícios de voz.
+  Se o navegador não suportar a API, se a permissão do microfone for negada ou se ocorrer erro de rede,
+  a aplicação exibe uma mensagem amigável e o jogo continua normalmente pelo toque.
+
+## Relatório final
+
+Ao concluir um nível, a resposta da API traz o objeto `report` (exercícios, acertos, tentativas, XP,
+precisão, maior sequência, conquistas e próximo nível desbloqueado). A tela de comemoração monta o
+relatório no frontend, sem enviar nada para serviços externos. A exportação em PDF/imagem ainda não
+foi implementada.
+
+## Como estender o jogo
+
+### Adicionar um novo exercício
+
+Edite o JSON do nível correspondente em `backend/data/` (`beginner.json`, `intermediate.json` ou
+`advanced.json`) e acrescente um item ao array `exercises`:
+
+```json
+{
+    "id": "beg-005",
+    "level": "beginner",
+    "type": "multiple_choice",
+    "instruction": "Qual palavra começa com o som /F/?",
+    "targetWord": "Foca",
+    "options": ["Foca", "Bota", "Mala"],
+    "correctAnswer": "Foca"
+}
+```
+
+Regras: o `id` deve ser único, o `level` precisa coincidir com o do arquivo, `correctAnswer` deve
+estar entre as `options` e `type` deve ser um dos tipos suportados — `multiple_choice`,
+`image_word_match`, `sound_identification` ou `voice`. Os arquivos são validados no carregamento;
+um JSON inválido faz a API falhar na inicialização. Reinicie com `make restart` para recarregar.
+
+### Adicionar uma nova fase/nível
+
+Nesta versão cada arquivo de dados corresponde a uma fase (um mundo). Para acrescentar outra:
+
+1. crie o novo `Level` em [backend/internal/exercise/exercise.go](backend/internal/exercise/exercise.go);
+2. inclua-o na progressão em `NextLevel` ([backend/internal/gamification/rules.go](backend/internal/gamification/rules.go));
+3. adicione o arquivo `backend/data/<nivel>.json`;
+4. registre o mundo correspondente em `WORLDS` no [frontend/assets/js/app.js](frontend/assets/js/app.js) e o card em [frontend/index.html](frontend/index.html);
+5. atualize os testes de progressão e desbloqueio.
+
+O diretório dos dados pode ser trocado pela variável de ambiente `DATA_DIR`.
+
+### Alterar as regras de XP
+
+Todos os valores ficam centralizados em [backend/internal/gamification/rules.go](backend/internal/gamification/rules.go)
+(`DefaultRules`), sem números mágicos espalhados pelo código:
+
+| Regra | Constante | Valor padrão |
+| --- | --- | --- |
+| Resposta correta | `DefaultBaseCorrectXP` | 100 |
+| Acerto na primeira tentativa | `DefaultFirstAttemptBonusXP` | +50 |
+| Sequência de 3 acertos | `DefaultStreak3BonusXP` | +50 |
+| Sequência de 5 acertos | `DefaultStreak5BonusXP` | +100 |
+| Conclusão de fase | `DefaultPhaseCompletionBonusXP` | +300 |
+| Conclusão de nível | `DefaultLevelCompletionBonusXP` | +500 |
+
+As regras são injetadas no `game.Manager` em [backend/cmd/api/main.go](backend/cmd/api/main.go), o que
+permite usar um conjunto alternativo sem alterar o domínio. Ao mudar qualquer valor, atualize os
+testes de gamificação.
+
+## Privacidade
+
+- Sem cadastro, login ou coleta de dados pessoais.
+- Sem banco de dados, analytics, tracking ou telemetria.
+- Áudio não é gravado nem enviado ao backend.
+- A partida existe apenas em memória e expira por inatividade.
+
 ## Próximos passos
 
 1. ~~Modelar exercícios e o carregamento dos arquivos JSON.~~
 2. ~~Implementar as regras de gamificação (XP, streak, bônus, conquistas).~~
 3. ~~Implementar a máquina de estados da partida e o desbloqueio de níveis.~~
 4. ~~Expor os endpoints da API v1 e conectar o frontend.~~
-5. Implementar o modo por voz (Web Speech API) e a exportação do relatório final.
+5. ~~Implementar o modo por voz (Web Speech API) com fallback por toque.~~
+6. Implementar a exportação do relatório final (PDF/imagem).
 
 ## Licença
 
