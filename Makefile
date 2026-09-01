@@ -22,7 +22,7 @@ TESTS_DIR := $(TMP_DIR)/tests
 COVERAGE  := $(TESTS_DIR)/coverage.out
 
 # Pacotes de teste por suíte.
-UNIT_PKGS       ?= internal/exercise internal/httpapi
+UNIT_PKGS       ?= internal/exercise internal/httpapi internal/gamification
 ACCEPTANCE_PKGS ?= internal/exercise internal/httpapi
 
 # Executa comandos Go no container com o usuário do host, para não gerar
