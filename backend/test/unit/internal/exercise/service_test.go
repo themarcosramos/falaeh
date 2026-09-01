@@ -102,6 +102,35 @@ func TestService_ListByLevel(t *testing.T) {
 	})
 }
 
+func TestService_ListLevels(t *testing.T) {
+	svc := newTestService(t)
+	ctx := context.Background()
+
+	levels := svc.ListLevels(ctx)
+	if len(levels) != 3 {
+		t.Fatalf("esperava 3 níveis, obteve %d", len(levels))
+	}
+	if levels[0].ID != exercise.LevelBeginner || levels[1].ID != exercise.LevelIntermediate || levels[2].ID != exercise.LevelAdvanced {
+		t.Errorf("ordem de níveis inesperada: %+v", levels)
+	}
+}
+
+func TestService_ListAll(t *testing.T) {
+	svc := newTestService(t)
+	ctx := context.Background()
+
+	list, err := svc.ListAll(ctx)
+	if err != nil {
+		t.Fatalf("ListAll falhou: %v", err)
+	}
+	if len(list) != 2 {
+		t.Fatalf("esperava 2 exercícios no total, obteve %d", len(list))
+	}
+	if list[0].ID != "beg-1" || list[1].ID != "int-1" {
+		t.Errorf("lista inesperada: %+v", list)
+	}
+}
+
 func TestService_ValidateAnswer(t *testing.T) {
 	svc := newTestService(t)
 	ctx := context.Background()

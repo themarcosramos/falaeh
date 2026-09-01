@@ -26,6 +26,32 @@ func (l Level) IsValid() bool {
 	}
 }
 
+// LevelInfo descreve um nível de dificuldade do jogo e seu mundo correspondente.
+type LevelInfo struct {
+	ID          Level  `json:"id" example:"beginner"`
+	Name        string `json:"name" example:"Iniciante"`
+	Description string `json:"description" example:"Mundo 1: Sons e palavras fundamentais"`
+}
+
+// AvailableLevels lista todos os níveis suportados na ordem canônica do jogo.
+var AvailableLevels = []LevelInfo{
+	{
+		ID:          LevelBeginner,
+		Name:        "Iniciante",
+		Description: "Mundo 1: Sons e palavras fundamentais",
+	},
+	{
+		ID:          LevelIntermediate,
+		Name:        "Intermediário",
+		Description: "Mundo 2: Encontros consonantais e desafios silábicos",
+	},
+	{
+		ID:          LevelAdvanced,
+		Name:        "Avançado",
+		Description: "Mundo 3: Articulação avançada e frases",
+	},
+}
+
 // Type representa a modalidade de interação do exercício fonoaudiológico.
 type Type string
 
