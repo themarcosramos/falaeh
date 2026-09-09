@@ -4,6 +4,7 @@
 
 #  configuração
 APP_NAME     ?= Falaêh
+VERSION      ?= $(shell cat VERSION 2>/dev/null | tr -d '[:space:]' || echo "1.0.0")
 COMPOSE      ?= docker compose
 SWAG_VERSION ?= v1.16.6
 COVERAGE_MIN ?= 80
@@ -57,6 +58,7 @@ C_OFF   := \033[0m
 	fmt vet lint lint-fix style-fix tidy generate audit audit-image check ci \
 	wails-dev swagger docs \
 	desktop-builder desktop-icons desktop-sync desktop-linux desktop-appimage desktop-windows desktop-darwin desktop-all desktop-dev desktop-clean \
+	package-web package-linux package-windows \
 	clean docker-clean docker-down-volumes
 
 #  macros
@@ -324,10 +326,44 @@ desktop-dev: desktop-builder desktop-sync ## Inicia wails dev para hot-reload da
 		wails dev -s
 
 desktop-clean: ## Limpa os artefatos de build do desktop
-	@rm -rf backend/cmd/desktop/build backend/cmd/desktop/frontend backend/cmd/desktop/data build/bin/falaeh*
+	@rm -rf backend/cmd/desktop/build backend/cmd/desktop/frontend backend/cmd/desktop/data build/bin/falaeh* build/bin/Falaeh*
 	@printf '  $(C_OK)✔ Artefatos desktop limpos$(C_OFF)\n'
 
 wails-dev: desktop-dev ## Alias de desktop-dev
+
+##@ Release
+
+package-web: ## Empacota a versão Web/PWA estática via Docker para distribuição
+	@printf '\n  $(C_TITLE)Pacote Web/PWA — $(APP_NAME)$(C_OFF)\n\n'
+	@mkdir -p build/bin
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace \
+		-e VERSION=$(VERSION) \
+		alpine:3.22 sh -c '\
+		tar -czf build/bin/falaeh-web-v$${VERSION}.tar.gz -C frontend .'
+	@printf '  $(C_OK)✔ Pacote Web/PWA gerado em: build/bin/falaeh-web-v$(VERSION).tar.gz$(C_OFF)\n\n'
+
+package-linux: desktop-appimage ## Empacota os artefatos versionados Linux (AppImage e tar.gz) via Docker
+	@printf '\n  $(C_TITLE)Pacote Desktop Linux — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace \
+		-e HOME=/tmp \
+		-e VERSION=$(VERSION) \
+		$(DESKTOP_BUILDER_IMAGE) sh -c '\
+		tar -czf build/bin/falaeh-linux-amd64-v$${VERSION}.tar.gz -C build/bin falaeh && \
+		cp -f build/bin/Falaeh-x86_64.AppImage build/bin/Falaeh-linux-amd64-v$${VERSION}.AppImage'
+	@printf '  $(C_OK)✔ Pacote Linux gerado em build/bin/falaeh-linux-amd64-v$(VERSION).tar.gz e build/bin/Falaeh-linux-amd64-v$(VERSION).AppImage$(C_OFF)\n\n'
+
+package-windows: desktop-windows ## Empacota os artefatos versionados Windows (zip e portable .exe) via Docker
+	@printf '\n  $(C_TITLE)Pacote Desktop Windows — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace \
+		-e HOME=/tmp \
+		-e VERSION=$(VERSION) \
+		$(DESKTOP_BUILDER_IMAGE) sh -c '\
+		cp -f build/bin/falaeh.exe build/bin/falaeh-windows-amd64-portable-v$${VERSION}.exe && \
+		cd build/bin && zip -9 -q falaeh-windows-amd64-v$${VERSION}.zip falaeh.exe'
+	@printf '  $(C_OK)✔ Pacote Windows gerado em build/bin/falaeh-windows-amd64-v$(VERSION).zip e build/bin/falaeh-windows-amd64-portable-v$(VERSION).exe$(C_OFF)\n\n'
 
 ##@ Documentação
 
