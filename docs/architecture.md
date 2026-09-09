@@ -40,18 +40,21 @@ flowchart TB
             Router["Router net/http (REST API)"]
             GameHandler["Game Handlers (/api/v1/game/*)"]
             ExerciseHandler["Exercise Handlers (/api/v1/exercises/*)"]
+            FeedbackHandler["Feedback Handler (/api/v1/feedback)"]
             DocsHandler["Swagger Docs (/docs e /api/docs)"]
         end
 
-        subgraph Application["Application / Use Cases (internal/game & internal/exercise)"]
+        subgraph Application["Application / Use Cases (internal/game, exercise & feedback)"]
             GameManager["Game Manager (Sessões em Memória)"]
             ExerciseService["Exercise Service"]
+            FeedbackService["Feedback Service (Avaliação Anônima)"]
         end
 
-        subgraph Domain["Domain Layer (internal/gamification & internal/exercise)"]
+        subgraph Domain["Domain Layer (internal/gamification, exercise & feedback)"]
             GamificationEngine["Gamification Engine (XP, Bônus, Streaks)"]
             Rules["Gamification Rules (Tabela de XP)"]
-            DomainModels["Modelos: Level, Exercise, Session, Progress"]
+            DomainModels["Modelos: Level, Exercise, Session, Rating"]
+            FormsSender["Google Forms Sender (Opcional)"]
         end
 
         subgraph Infrastructure["Infrastructure & Data (backend/data)"]
@@ -67,10 +70,13 @@ flowchart TB
 
     Router --> GameHandler
     Router --> ExerciseHandler
+    Router --> FeedbackHandler
     Router --> DocsHandler
 
     GameHandler --> GameManager
     ExerciseHandler --> ExerciseService
+    FeedbackHandler --> FeedbackService
+    FeedbackService -.->|Envio Seguro Opcional| FormsSender
 
     GameManager --> ExerciseService
     GameManager --> GamificationEngine
@@ -96,6 +102,8 @@ backend/
 │   │   ├── exercise.go             # Entidades (Level, Type, Exercise), validações e NormalizeAnswer()
 │   │   ├── repository.go           # JSONRepository com carregamento e validação no startup
 │   │   └── service.go              # Casos de uso de busca e validação de exercícios
+│   ├── feedback/                   # Avaliação opcional e anônima da experiência (ETAPA 13)
+│   │   └── feedback.go             # Ratings fechados, Service e Sender do Google Forms
 │   ├── gamification/               # Domínio puro de pontuação, XP, sequência e conquistas
 │   │   ├── rules.go                # Tabela centralizada de constantes de XP e limiares de streak
 │   │   ├── xp.go                   # Funções puras de cálculo de XP
@@ -103,12 +111,13 @@ backend/
 │   │   ├── progress.go             # Acompanhamento de acertos, erros e acurácia
 │   │   └── engine.go               # Motor de cálculo de gamificação
 │   ├── game/                       # Máquina de estados das partidas em memória
-    │   ├── session.go              # Entidade Session com expiração por inatividade e relatório final
+│   │   ├── session.go              # Entidade Session com expiração por inatividade e relatório final
 │   │   └── manager.go              # Criação, progressão de exercícios e conclusão de fase
 │   ├── httpapi/                    # Camada Delivery (net/http padrão, sem framework pesado)
-    │   ├── router.go               # Definição de rotas e headers de segurança
+│   │   ├── router.go               # Definição de rotas e headers de segurança
 │   │   ├── game.go                 # Handlers para /api/v1/game/start e answer
 │   │   ├── exercises.go            # Handlers para /api/v1/levels e /api/v1/exercises
+│   │   ├── feedback.go             # Handler anônimo para /api/v1/feedback
 │   │   └── docs.go                 # Endpoint do Swagger UI embutido
 
 └── data/                           # Banco de dados baseado em arquivos JSON versionados
