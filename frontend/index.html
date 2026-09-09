@@ -20,17 +20,21 @@
 </head>
 
 <body class="bg-app text-light d-flex flex-column min-vh-100">
-    <header class="py-3 px-4 border-bottom border-light border-opacity-10">
-        <div class="container d-flex align-items-center justify-content-between">
-            <div class="d-flex align-items-center gap-2">
+    <header class="py-3 px-3 px-md-4 border-bottom border-light border-opacity-10">
+        <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <button type="button" id="brand-logo-btn" class="btn btn-link text-decoration-none p-1 d-flex align-items-center gap-2 brand-logo-btn" aria-label="Fala Eh - Ir para a tela inicial">
                 <span class="fs-4" aria-hidden="true">🎙️</span>
-                <span class="fw-bold tracking-wide text-white">Fala Eh</span>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button type="button" id="btn-install-pwa" class="btn btn-sm btn-outline-warning rounded-pill px-3 d-none align-items-center gap-1" aria-label="Instalar aplicativo Fala Eh no dispositivo">
-                    <span>📲</span> <span>Instalar App</span>
+                <span class="fw-bold tracking-wide text-white fs-5">Fala Eh</span>
+            </button>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <button type="button" id="btn-toggle-sound" class="btn btn-sm btn-outline-light rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1 header-sound-btn" aria-label="Efeitos sonoros ativados. Clique para desativar" title="Efeitos sonoros: Ativados" aria-pressed="true">
+                    <span id="sound-toggle-icon" aria-hidden="true">🔊</span>
+                    <span class="d-none d-sm-inline" id="sound-toggle-label">Som</span>
                 </button>
-                <span id="api-status" class="badge text-bg-secondary opacity-75">verificando conexão…</span>
+                <button type="button" id="btn-install-pwa" class="btn btn-sm btn-outline-warning rounded-pill px-3 py-2 d-none align-items-center gap-1 header-action-btn" aria-label="Instalar aplicativo Fala Eh no dispositivo">
+                    <span aria-hidden="true">📲</span> <span>Instalar App</span>
+                </button>
+                <span id="api-status" class="badge text-bg-secondary opacity-75 py-2 px-3">verificando conexão…</span>
             </div>
         </div>
     </header>
@@ -195,7 +199,7 @@
             <!-- HUD Superior -->
             <section class="game-hud mb-4 p-3 rounded-4" aria-label="Status do jogo">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <button type="button" id="btn-back-home" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1">
+                    <button type="button" id="btn-back-home" class="btn btn-sm btn-outline-light rounded-pill px-3 py-2 d-inline-flex align-items-center gap-1" aria-label="Voltar para a seleção de mundos">
                         <span>🗺️</span> <span>Mundos</span>
                     </button>
 
@@ -204,12 +208,12 @@
                     </div>
 
                     <div class="d-flex align-items-center gap-3">
-                        <div class="hud-stat" id="hud-xp-stat" title="XP acumulado">
+                        <div class="hud-stat" id="hud-xp-stat" role="status" aria-label="XP acumulado: 0" title="XP acumulado">
                             <span class="hud-stat-icon" aria-hidden="true">⭐</span>
                             <span class="hud-stat-value fw-bold text-warning" id="hud-xp">0</span>
                             <span class="hud-stat-label small text-muted">XP</span>
                         </div>
-                        <div class="hud-stat" id="hud-streak-stat" title="Sequência de acertos">
+                        <div class="hud-stat" id="hud-streak-stat" role="status" aria-label="Sequência de acertos: 0" title="Sequência de acertos">
                             <span class="hud-stat-icon" aria-hidden="true">🔥</span>
                             <span class="hud-stat-value fw-bold text-danger" id="hud-streak">0</span>
                         </div>
@@ -309,7 +313,7 @@
 
                 <!-- Painel de Feedback e Ações -->
                 <div class="exercise-feedback-panel text-center" id="feedback-panel">
-                    <div id="feedback-message-container" class="feedback-message mb-3 d-none">
+                    <div id="feedback-message-container" class="feedback-message mb-3 d-none" role="status" aria-live="polite">
                         <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill fw-bold" id="feedback-banner">
                             <span id="feedback-icon" class="fs-4">🎉</span>
                             <span id="feedback-text">Muito bem! Resposta correta!</span>
@@ -330,16 +334,23 @@
 
         <!-- TELA 3: Comemoração e Relatório Final da Partida -->
         <div id="screen-celebration" class="screen-view d-none">
+            <div id="confetti-container" class="confetti-container" aria-hidden="true"></div>
             <section class="celebration-card p-4 p-md-5 rounded-5" id="printable-report">
                 <!-- Cabeçalho Festivo -->
                 <div class="text-center mb-4">
                     <div class="celebration-trophy mb-2">
-                        <span class="fs-1">🏆</span>
+                        <span class="fs-1" aria-hidden="true">🏆</span>
                     </div>
-                    <span class="badge-tagline mb-2">
-                        <span>✨</span> RESULTADO DA MISSÃO
-                    </span>
-                    <h2 class="game-title h2 mb-1">Mundo Concluído!</h2>
+                    <div id="celebration-unlock-banner" class="celebration-unlock-banner mb-3 d-none">
+                        <span class="fs-4" aria-hidden="true">✨</span>
+                        <span id="celebration-unlock-text">NOVO MUNDO DESBLOQUEADO!</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge-tagline">
+                            <span aria-hidden="true">✨</span> RESULTADO DA MISSÃO
+                        </span>
+                    </div>
+                    <h2 class="game-title h2 mb-1" id="celebration-title">Mundo Concluído!</h2>
                     <p class="game-subtitle mb-0" id="celebration-subtitle">
                         Incrível! Você concluiu todos os exercícios do <strong id="celebration-world-name">Planeta Sons</strong>!
                     </p>
@@ -416,7 +427,7 @@
                     <label for="report-player-name" class="form-label text-warning small fw-bold mb-2 d-block">
                         ⭐ Personalizar Certificado com o Nome do(a) Jogador(a):
                     </label>
-                    <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3" style="max-width: 420px; width: 100%;">
+                    <div class="d-inline-flex align-items-center justify-content-center gap-2 px-3 player-name-wrapper">
                         <span class="fs-4" aria-hidden="true">🧑‍🚀</span>
                         <input type="text" id="report-player-name" class="form-control rounded-pill text-center bg-dark text-white border-warning border-opacity-50 px-3 py-2"
                                placeholder="Digite seu nome (ex: Sofia, Lucas...)" maxlength="40" autocomplete="off" />
@@ -448,6 +459,25 @@
             </section>
         </div>
     </main>
+
+    <!-- Modal de Confirmação para Evitar Perda Acidental de Progresso -->
+    <div id="modal-confirm-exit" class="confirm-modal-backdrop d-none" hidden role="dialog" aria-modal="true" aria-labelledby="modal-exit-title" aria-describedby="modal-exit-desc">
+        <div class="confirm-modal-box p-4 p-md-5 rounded-4 text-center">
+            <div class="fs-1 mb-2" aria-hidden="true">🚀</div>
+            <h3 class="h5 fw-bold text-white mb-2" id="modal-exit-title">Missão em Andamento!</h3>
+            <p class="text-light text-opacity-75 small mb-4" id="modal-exit-desc">
+                Você tem exercícios em andamento neste mundo. Deseja voltar para a escolha de mundos? Seu progresso nesta sessão permanecerá salvo.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button type="button" id="btn-modal-cancel-exit" class="btn btn-game-primary rounded-pill px-4 py-2" aria-label="Continuar jogando o exercício atual">
+                    Continuar Jogando 🎮
+                </button>
+                <button type="button" id="btn-modal-confirm-exit" class="btn btn-outline-light rounded-pill px-4 py-2" aria-label="Confirmar e voltar para a tela de mundos">
+                    Voltar aos Mundos 🗺️
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Feedback interativo amigável em toast -->
     <div id="toast-message" class="friendly-toast" role="status" aria-live="polite">
