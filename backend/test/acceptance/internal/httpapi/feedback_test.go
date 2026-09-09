@@ -23,7 +23,7 @@ func TestFeedbackAcceptance_Scenarios(t *testing.T) {
 
 		for _, opt := range options {
 			payload, _ := json.Marshal(map[string]string{"rating": opt})
-			req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 
@@ -48,7 +48,7 @@ func TestFeedbackAcceptance_Scenarios(t *testing.T) {
 
 		for _, input := range invalidInputs {
 			payload, _ := json.Marshal(map[string]string{"rating": input})
-			req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 			req.Header.Set("Content-Type", "application/json")
 			rec := httptest.NewRecorder()
 
@@ -65,7 +65,7 @@ func TestFeedbackAcceptance_Scenarios(t *testing.T) {
 		payload, _ := json.Marshal(map[string]string{
 			"rating": "gostei_muito",
 		})
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 
@@ -81,7 +81,7 @@ func TestFeedbackAcceptance_Scenarios(t *testing.T) {
 			"rating":  "gostei",
 			"comment": "Adorei os efeitos visuais e o planeta dos sons!",
 		})
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 

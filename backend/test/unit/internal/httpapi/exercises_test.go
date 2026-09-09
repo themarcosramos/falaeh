@@ -20,7 +20,7 @@ type mockExerciseService struct {
 	listAllFn         func(ctx context.Context) ([]exercise.PublicExercise, error)
 	listByLevelFn     func(ctx context.Context, level exercise.Level) ([]exercise.PublicExercise, error)
 	getExerciseByIDFn func(ctx context.Context, id string) (exercise.PublicExercise, error)
-	validateAnswerFn  func(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error)
+	validateAnswerFn  func(ctx context.Context, exerciseID, answer string) (exercise.ValidationResult, error)
 }
 
 func (m *mockExerciseService) ListLevels(ctx context.Context) []exercise.LevelInfo {
@@ -51,7 +51,7 @@ func (m *mockExerciseService) GetExerciseByID(ctx context.Context, id string) (e
 	return exercise.PublicExercise{}, nil
 }
 
-func (m *mockExerciseService) ValidateAnswer(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error) {
+func (m *mockExerciseService) ValidateAnswer(ctx context.Context, exerciseID, answer string) (exercise.ValidationResult, error) {
 	if m.validateAnswerFn != nil {
 		return m.validateAnswerFn(ctx, exerciseID, answer)
 	}
@@ -70,7 +70,7 @@ func TestHTTP_ListLevels(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -91,7 +91,7 @@ func TestHTTP_ListExercises_All(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -112,7 +112,7 @@ func TestHTTP_ListExercises_WithValidLevel(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=beginner", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises?level=beginner", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -131,7 +131,7 @@ func TestHTTP_ListExercises_LevelNotFound(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=beginner", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises?level=beginner", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -146,7 +146,7 @@ func TestHTTP_ListExercises_InvalidLevel(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=invalido", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises?level=invalido", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -165,7 +165,7 @@ func TestHTTP_ListExercises_InternalError(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -184,7 +184,7 @@ func TestHTTP_ListExercisesByLevel_Success(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels/beginner/exercises", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -199,7 +199,7 @@ func TestHTTP_ListExercisesByLevel_InvalidLevel(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/nao-existe/exercises", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels/nao-existe/exercises", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -218,7 +218,7 @@ func TestHTTP_ListExercisesByLevel_LevelNotFound(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels/beginner/exercises", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -237,7 +237,7 @@ func TestHTTP_ListExercisesByLevel_InternalError(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels/beginner/exercises", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -256,7 +256,7 @@ func TestHTTP_GetExercise_Success(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/beg-001", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises/beg-001", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -275,7 +275,7 @@ func TestHTTP_GetExercise_NotFound(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/inexistente", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises/inexistente", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -294,7 +294,7 @@ func TestHTTP_GetExercise_InternalError(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/ex-1", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises/ex-1", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -306,14 +306,14 @@ func TestHTTP_GetExercise_InternalError(t *testing.T) {
 func TestHTTP_AnswerExercise_Success(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{
-		validateAnswerFn: func(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error) {
+		validateAnswerFn: func(ctx context.Context, exerciseID, answer string) (exercise.ValidationResult, error) {
 			return exercise.ValidationResult{ExerciseID: exerciseID, Correct: true}, nil
 		},
 	}
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":"pato"}`))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":"pato"}`))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -329,7 +329,7 @@ func TestHTTP_AnswerExercise_MalformedBody(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{invalido`))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{invalido`))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -347,7 +347,7 @@ func TestHTTP_AnswerExercise_BodyTooLarge(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(body))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -363,7 +363,7 @@ func TestHTTP_AnswerExercise_EmptyAnswer(t *testing.T) {
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":""}`))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":""}`))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -376,14 +376,14 @@ func TestHTTP_AnswerExercise_EmptyAnswer(t *testing.T) {
 func TestHTTP_AnswerExercise_ExerciseNotFound(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{
-		validateAnswerFn: func(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error) {
+		validateAnswerFn: func(ctx context.Context, exerciseID, answer string) (exercise.ValidationResult, error) {
 			return exercise.ValidationResult{}, exercise.ErrExerciseNotFound
 		},
 	}
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/inexistente/answer", bytes.NewBufferString(`{"answer":"pato"}`))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/inexistente/answer", bytes.NewBufferString(`{"answer":"pato"}`))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -396,14 +396,14 @@ func TestHTTP_AnswerExercise_ExerciseNotFound(t *testing.T) {
 func TestHTTP_AnswerExercise_EmptyAnswerErrorFromService(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{
-		validateAnswerFn: func(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error) {
+		validateAnswerFn: func(ctx context.Context, exerciseID, answer string) (exercise.ValidationResult, error) {
 			return exercise.ValidationResult{}, exercise.ErrEmptyAnswer
 		},
 	}
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":"a"}`))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", bytes.NewBufferString(`{"answer":"a"}`))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -416,14 +416,14 @@ func TestHTTP_AnswerExercise_EmptyAnswerErrorFromService(t *testing.T) {
 func TestHTTP_AnswerExercise_InternalError(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	mockSvc := &mockExerciseService{
-		validateAnswerFn: func(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error) {
+		validateAnswerFn: func(ctx context.Context, exerciseID, answer string) (exercise.ValidationResult, error) {
 			return exercise.ValidationResult{}, errors.New("unexpected error")
 		},
 	}
 
 	router := httpapi.NewRouter(logger, mockSvc, nil)
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/ex-1/answer", bytes.NewBufferString(`{"answer":"pato"}`))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/ex-1/answer", bytes.NewBufferString(`{"answer":"pato"}`))
 	req.Header.Set("Content-Type", "application/json")
 
 	router.ServeHTTP(rec, req)
@@ -438,7 +438,7 @@ func TestHTTP_NilExerciseService(t *testing.T) {
 	router := httpapi.NewRouter(logger, nil, nil)
 
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/health", http.NoBody)
 	router.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {

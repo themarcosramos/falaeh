@@ -11,13 +11,14 @@ COVERAGE_MIN ?= 80
 # Imagens de ferramentas externas e imagem de produção auditada.
 GOLANGCI_IMAGE ?= golangci/golangci-lint:v2.13.2
 TRIVY_IMAGE    ?= aquasec/trivy:latest
-DOCKER_IMAGE   ?= falaeh-api
-DOCKER_TAG     ?= latest
+DOCKER_IMAGE          ?= falaeh-api
+DOCKER_TAG            ?= latest
+DESKTOP_BUILDER_IMAGE ?= falaeh-desktop-builder
 
 COMPOSE_DEV := $(COMPOSE) -f docker-compose.yml -f docker-compose.dev.yml
 
 # Caminhos relativos a ./backend, montado como /app no container de dev.
-TMP_DIR   := tmp
+TMP_DIR   := .tmp
 TESTS_DIR := $(TMP_DIR)/tests
 COVERAGE  := $(TESTS_DIR)/coverage.out
 
@@ -33,13 +34,13 @@ GO_RUN := $(COMPOSE_DEV) run --rm --no-deps -T --user $$(id -u):$$(id -g) \
 	-e GOCACHE=/app/$(TMP_DIR)/go-build \
 	api
 
-# golangci-lint não está no compose: roda pela imagem oficial sobre ./backend.
+# golangci-lint não está no compose: roda pela imagem oficial sobre o projeto.
 LINT_RUN := docker run --rm -t --user $$(id -u):$$(id -g) \
-	-v $$(pwd)/backend:/app -w /app \
+	-v $$(pwd):/app -w /app/backend \
 	-e HOME=/tmp \
-	-e GOPATH=/app/$(TMP_DIR)/go \
-	-e GOCACHE=/app/$(TMP_DIR)/go-build \
-	-e GOLANGCI_LINT_CACHE=/app/$(TMP_DIR)/golangci-lint \
+	-e GOPATH=/app/backend/$(TMP_DIR)/go \
+	-e GOCACHE=/app/backend/$(TMP_DIR)/go-build \
+	-e GOLANGCI_LINT_CACHE=/app/backend/$(TMP_DIR)/golangci-lint \
 	$(GOLANGCI_IMAGE)
 
 C_TITLE := \033[1;36m
@@ -52,9 +53,10 @@ C_OFF   := \033[0m
 .DEFAULT_GOAL := help
 
 .PHONY: help setup dev up down stop restart build logs bash \
-	test test-unit test-acceptance test-run coverage coverage-check \
-	fmt vet lint lint-fix style-fix tidy generate audit audit-image ci \
-	swagger docs \
+	test test-unit test-acceptance acceptance test-run coverage coverage-check \
+	fmt vet lint lint-fix style-fix tidy generate audit audit-image check ci \
+	wails-dev swagger docs \
+	desktop-builder desktop-icons desktop-sync desktop-linux desktop-appimage desktop-windows desktop-darwin desktop-all desktop-dev desktop-clean \
 	clean docker-clean docker-down-volumes
 
 #  macros
@@ -148,6 +150,8 @@ test-unit: ## Executa os testes unitários
 test-acceptance: ## Executa os testes de aceitação
 	$(call run_test_suite,acceptance,Testes de Aceitação,$(ACCEPTANCE_PKGS))
 
+acceptance: test-acceptance ## Alias de test-acceptance
+
 test-run: ## Executa um teste específico (uso: make test-run TEST=NomeDoTeste [PKG=caminho])
 ifndef TEST
 	$(error TEST é obrigatório: make test-run TEST=<nome_do_teste>)
@@ -191,11 +195,11 @@ generate: ## Executa go generate no backend
 
 lint: ## Analisa o código com golangci-lint
 	@printf '\n  $(C_TITLE)Lint — $(APP_NAME)$(C_OFF)\n\n'
-	@$(LINT_RUN) golangci-lint run --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
+	@$(LINT_RUN) golangci-lint run -c /app/.golangci.yml --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
 
 lint-fix: fmt ## Corrige automaticamente o que o golangci-lint souber corrigir
 	@printf '\n  $(C_TITLE)Lint Fix — $(APP_NAME)$(C_OFF)\n\n'
-	@$(LINT_RUN) golangci-lint run --fix --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
+	@$(LINT_RUN) golangci-lint run -c /app/.golangci.yml --fix --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
 
 style-fix: lint-fix ## Alias de lint-fix
 
@@ -222,7 +226,108 @@ audit-image: ## Escaneia a imagem de produção com trivy (requer make build)
 		--severity HIGH,CRITICAL \
 		$(DOCKER_IMAGE):$(DOCKER_TAG)
 
-ci: vet lint test coverage-check ## Quality gate: vet + lint + testes + cobertura mínima
+check: vet lint test coverage-check ## Quality Gate: vet + lint + testes + cobertura mínima
+
+ci: check ## Alias do Quality Gate para CI
+
+##@ Desktop (Wails)
+
+desktop-builder: ## Constrói a imagem Docker para compilação multiplataforma com Wails
+	@printf '\n  $(C_TITLE)Desktop Builder — $(APP_NAME)$(C_OFF)\n\n'
+	docker build -t $(DESKTOP_BUILDER_IMAGE) -f build/desktop/Dockerfile .
+
+desktop-icons: desktop-builder ## Gera os ícones da aplicação (PNG, ICO) a partir do SVG do navegador
+	@printf '\n  $(C_TITLE)Ícones Desktop — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace \
+		-e HOME=/tmp \
+		$(DESKTOP_BUILDER_IMAGE) sh -c '\
+		mkdir -p /tmp/icons build/windows build/darwin backend/cmd/desktop/build/windows backend/cmd/desktop/build/darwin && \
+		rsvg-convert -w 512 -h 512 frontend/assets/icons/icon.svg -o build/appicon.png && \
+		rsvg-convert -w 16 -h 16 frontend/assets/icons/icon.svg -o /tmp/icons/16.png && \
+		rsvg-convert -w 32 -h 32 frontend/assets/icons/icon.svg -o /tmp/icons/32.png && \
+		rsvg-convert -w 48 -h 48 frontend/assets/icons/icon.svg -o /tmp/icons/48.png && \
+		rsvg-convert -w 64 -h 64 frontend/assets/icons/icon.svg -o /tmp/icons/64.png && \
+		rsvg-convert -w 128 -h 128 frontend/assets/icons/icon.svg -o /tmp/icons/128.png && \
+		rsvg-convert -w 256 -h 256 frontend/assets/icons/icon.svg -o /tmp/icons/256.png && \
+		icotool -c -o build/windows/icon.ico /tmp/icons/*.png && \
+		cp -f build/appicon.png backend/cmd/desktop/build/appicon.png && \
+		cp -f build/windows/icon.ico backend/cmd/desktop/build/windows/icon.ico'
+	@printf '  $(C_OK)✔ Ícones PNG e Windows ICO gerados com sucesso a partir de frontend/assets/icons/icon.svg$(C_OFF)\n\n'
+
+desktop-sync: desktop-icons ## Sincroniza frontend, dados e ícones para o pacote desktop
+	@mkdir -p backend/cmd/desktop/frontend backend/cmd/desktop/data build/bin
+	@rsync -a --delete frontend/ backend/cmd/desktop/frontend/
+	@rsync -a --delete backend/data/ backend/cmd/desktop/data/
+
+desktop-linux: desktop-builder desktop-sync ## Compila o binário Falaêh Desktop Linux (AMD64)
+	@printf '\n  $(C_TITLE)Desktop Linux (AMD64) — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace/backend/cmd/desktop \
+		-e HOME=/tmp -e GOPATH=/tmp/go -e GOCACHE=/tmp/go-build \
+		$(DESKTOP_BUILDER_IMAGE) \
+		wails build -s -skipbindings -tags webkit2_41 -o falaeh
+	@cp -f backend/cmd/desktop/build/bin/falaeh build/bin/falaeh
+	@printf '  $(C_OK)✔ Binário Linux gerado em: build/bin/falaeh$(C_OFF)\n\n'
+
+desktop-appimage: desktop-linux ## Empacota o Falaêh Desktop Linux em formato portátil AppImage (x86_64)
+	@printf '\n  $(C_TITLE)Desktop Linux AppImage (x86_64) — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace \
+		-e HOME=/tmp \
+		$(DESKTOP_BUILDER_IMAGE) sh -c '\
+		mkdir -p build/AppDir/usr/bin build/bin && \
+		cp -f build/bin/falaeh build/AppDir/usr/bin/falaeh && \
+		chmod +x build/AppDir/usr/bin/falaeh && \
+		cp -f build/appicon.png build/AppDir/falaeh.png && \
+		cp -f build/appicon.png build/AppDir/.DirIcon && \
+		printf "[Desktop Entry]\nType=Application\nName=Falaêh\nComment=Jogo educativo de exercícios fonoaudiológicos\nExec=falaeh\nIcon=falaeh\nCategories=Education;Game;\nTerminal=false\n" > build/AppDir/falaeh.desktop && \
+		printf "#!/bin/sh\nSELF=\$$(readlink -f \"\$$0\")\nHERE=\$${SELF%%/*}\nexec \"\$$HERE/usr/bin/falaeh\" \"\$$@\"\n" > build/AppDir/AppRun && \
+		chmod +x build/AppDir/AppRun && \
+		ARCH=x86_64 appimagetool build/AppDir build/bin/Falaeh-x86_64.AppImage && \
+		rm -rf build/AppDir'
+	@printf '  $(C_OK)✔ Pacote AppImage gerado em: build/bin/Falaeh-x86_64.AppImage$(C_OFF)\n\n'
+
+desktop-windows: desktop-builder desktop-sync ## Compila o executável portátil Falaêh Desktop Windows (AMD64) via MinGW
+	@printf '\n  $(C_TITLE)Desktop Windows Portável (AMD64) — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace/backend/cmd/desktop \
+		-e HOME=/tmp -e GOPATH=/tmp/go -e GOCACHE=/tmp/go-build \
+		$(DESKTOP_BUILDER_IMAGE) \
+		wails build -s -skipbindings -platform windows/amd64 -o falaeh.exe
+	@cp -f backend/cmd/desktop/build/bin/falaeh.exe build/bin/falaeh.exe
+	@cp -f backend/cmd/desktop/build/bin/falaeh.exe build/bin/falaeh-portable.exe
+	@printf '  $(C_OK)✔ Executável Portátil Windows gerado em: build/bin/falaeh.exe e build/bin/falaeh-portable.exe$(C_OFF)\n\n'
+
+desktop-darwin: desktop-sync ## Prepara ou compila Falaêh Desktop macOS (requer macOS runner para .app/.dmg)
+	@printf '\n  $(C_TITLE)Desktop macOS — $(APP_NAME)$(C_OFF)\n\n'
+	@if [ "$$(uname -s)" = "Darwin" ]; then \
+		cd backend/cmd/desktop && wails build -s -skipbindings -platform darwin/universal -o falaeh; \
+		cp -rf backend/cmd/desktop/build/bin/falaeh.app build/bin/; \
+		printf '  $(C_OK)✔ Aplicativo macOS gerado em: build/bin/falaeh.app$(C_OFF)\n\n'; \
+	else \
+		printf '  $(C_WARN)⚠ O empacotamento oficial de macOS (.app/.dmg) requer Cocoa/WebKit nativos da Apple.$(C_OFF)\n'; \
+		printf '  $(C_DIM)A configuração está pronta e é executada no GitHub Actions runner macos-latest.$(C_OFF)\n\n'; \
+	fi
+
+desktop-all: desktop-linux desktop-appimage desktop-windows ## Compila todas as distribuições desktop suportadas no ambiente atual
+	@printf '\n  $(C_TITLE)Artefatos gerados em build/bin/:$(C_OFF)\n'
+	@file build/bin/* 2>/dev/null || true
+
+desktop-dev: desktop-builder desktop-sync ## Inicia wails dev para hot-reload da interface desktop
+	@printf '\n  $(C_TITLE)Wails Dev — $(APP_NAME)$(C_OFF)\n\n'
+	@docker run --rm -it --user $$(id -u):$$(id -g) \
+		-v $$(pwd):/workspace -w /workspace/backend/cmd/desktop \
+		-e HOME=/tmp -e GOPATH=/tmp/go -e GOCACHE=/tmp/go-build \
+		-p 34115:34115 \
+		$(DESKTOP_BUILDER_IMAGE) \
+		wails dev -s
+
+desktop-clean: ## Limpa os artefatos de build do desktop
+	@rm -rf backend/cmd/desktop/build backend/cmd/desktop/frontend backend/cmd/desktop/data build/bin/falaeh*
+	@printf '  $(C_OK)✔ Artefatos desktop limpos$(C_OFF)\n'
+
+wails-dev: desktop-dev ## Alias de desktop-dev
 
 ##@ Documentação
 

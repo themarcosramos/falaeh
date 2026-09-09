@@ -6,6 +6,7 @@ import (
 	"fmt"
 )
 
+// ErrEmptyAnswer indica que a resposta enviada pelo usuário está vazia.
 var ErrEmptyAnswer = errors.New("a resposta enviada não pode ser vazia")
 
 // PublicExercise representa a projeção pública do exercício enviada para o cliente,
@@ -94,7 +95,7 @@ func (s *Service) ListByLevel(ctx context.Context, level Level) ([]PublicExercis
 }
 
 // ValidateAnswer avalia a resposta do usuário sem expor dados sensíveis.
-func (s *Service) ValidateAnswer(ctx context.Context, exerciseID string, answer string) (ValidationResult, error) {
+func (s *Service) ValidateAnswer(ctx context.Context, exerciseID, answer string) (ValidationResult, error) {
 	if answer == "" {
 		return ValidationResult{}, ErrEmptyAnswer
 	}

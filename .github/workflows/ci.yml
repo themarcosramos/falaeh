@@ -1,0 +1,99 @@
+name: CI Quality Gate
+
+on:
+  pull_request:
+    branches:
+      - stage
+      - homolog
+      - production
+  push:
+    branches:
+      - stage
+      - homolog
+      - production
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  format-and-vet:
+    name: Formatação e Análise Estática (go vet)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Verificar Formatação de Código (gofmt)
+        run: |
+          make fmt
+          if ! git diff --quiet; then
+            echo "::error::Código não formatado conforme padrão gofmt. Execute 'make fmt' localmente e faça commit das alterações."
+            git diff
+            exit 1
+          fi
+
+      - name: Executar go vet
+        run: make vet
+
+  lint:
+    name: Linter (golangci-lint v2)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Executar golangci-lint
+        run: make lint
+
+  test-and-coverage:
+    name: Testes e Cobertura (>= 80%)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Executar Suíte de Testes (Unitários + Aceitação)
+        run: make test
+
+      - name: Validar Cobertura Mínima Global (>= 80%)
+        run: make coverage-check
+
+  build:
+    name: Build Docker de Produção
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Compilar Imagens Docker de Produção
+        run: make build
+
+  quality-gate:
+    name: Quality Gate Final
+    runs-on: ubuntu-latest
+    needs:
+      - format-and-vet
+      - lint
+      - test-and-coverage
+      - build
+    if: always()
+    steps:
+      - name: Auditar Status dos Checks Obrigatórios
+        run: |
+          echo "Status dos Checks:"
+          echo "  - format-and-vet:    ${{ needs.format-and-vet.result }}"
+          echo "  - lint:              ${{ needs.lint.result }}"
+          echo "  - test-and-coverage: ${{ needs.test-and-coverage.result }}"
+          echo "  - build:             ${{ needs.build.result }}"
+
+          if [ "${{ needs.format-and-vet.result }}" != "success" ] || \
+             [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.test-and-coverage.result }}" != "success" ] || \
+             [ "${{ needs.build.result }}" != "success" ]; then
+            echo "::error::Quality Gate FALHOU. O merge está bloqueado até que todos os checks passem."
+            exit 1
+          fi
+
+          echo "::notice::Quality Gate APROVADO! Todos os checks obrigatórios passaram com sucesso."
