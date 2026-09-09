@@ -26,6 +26,7 @@ flowchart TB
     subgraph Client["Cliente / Navegador (PWA)"]
         UI["Interface do Usuário (HTML5 / Bootstrap 5 / CSS)"]
         Speech["Web Speech API (Reconhecimento Local pt-BR)"]
+        Audio["Web Audio API (Síntese Sonora Procedural)"]
         SW["Service Worker (Cache versionado / Modo Offline)"]
         ReportClient["Exportação Local (PDF / Canvas PNG)"]
     end
@@ -172,3 +173,31 @@ Ao concluir um mundo, o relatório e o certificado são gerados exclusivamente n
 - **PDF**: formatado com CSS `@media print` para folha A4 com tipografia nítida e sem botões.
 - **Imagem PNG**: renderizada em alta resolução (1200x950px) em elemento `<canvas>` HTML5 com o nome personalizado do jogador, dados de XP, taxa de acerto e maior sequência.
 - **Privacidade**: o nome digitado não é enviado para o backend nem armazenado no servidor.
+
+---
+
+## 7. Design System e Ergonomia Visual (8pt Grid System)
+
+A interface da aplicação adota formalmente o **8-Point Grid System** (com subgrid de 4pt), fundamentando as decisões visuais em normas de IHC (Interação Humano-Computador) e nas diretrizes Google Material Design, Apple HIG e WCAG:
+
+### Tabela de Design Tokens no CSS (`:root`)
+
+| Token | Valor | Multiplicador | Uso Recomendado |
+| :--- | :--- | :--- | :--- |
+| `--space-1` | `4px` | $0.5 \times 8$ (Subgrid) | Espessura de foco acessível, microgaps inline |
+| `--space-2` | `8px` | $1 \times 8$ (Base) | Margem entre ícone e texto, gap compacto |
+| `--space-3` | `12px` | $1.5 \times 8$ (Subgrid) | Padding vertical de botões médios |
+| `--space-4` | `16px` | $2 \times 8$ ($1\text{rem}$) | Padding de containers, gap entre cards, base Bootstrap |
+| `--space-5` | `20px` | $2.5 \times 8$ | Padding interno de cards no mobile |
+| `--space-6` | `24px` | $3 \times 8$ | Padding interno de cards no desktop, gap de formulário |
+| `--space-7` | `32px` | $4 \times 8$ | Padding de telas comemorativas e modais |
+| `--space-8` | `40px` | $5 \times 8$ | Padding horizontal de botões primários |
+| `--space-9` | `48px` | $6 \times 8$ (`--target-touch-min`) | Alvo de toque mínimo WCAG AAA |
+| `--space-10` | `56px` | $7 \times 8$ (`--target-touch-lg`) | Altura de botões primários de ação ("Começar", "Próximo") |
+| `--size-badge-icon` | `72px` | $9 \times 8$ | Dimensão dos emblemas circulares dos mundos |
+| `--size-mic-btn` | `88px` | $11 \times 8$ | Botão central do microfone de voz |
+
+### Benefícios Técnicos e de UX
+1. **Prevenção de Subpixel Rendering**: Resoluções modernas em smartphones e tablets utilizam densidades de tela 2x, 3x ou 4x DPR. Múltiplos inteiros de 4 e 8 eliminam anti-aliasing borrado em bordas e ícones.
+2. **Ergonomia Infantil**: Crianças em fase de desenvolvimento motor se beneficiam de alvos de toque generosos ($\ge 48\text{px}$), reduzindo toques involuntários e frustrações.
+3. **Responsividade Previsível**: A largura da aplicação permanece 100% fluida (CSS Grid / Flexbox), enquanto os espaçamentos e alturas mínimas utilizam os degraus matemáticos da escala entre mobile e desktop.

@@ -1,6 +1,166 @@
 // Fala Eh - Jogo Educativo de Exercícios Fonoaudiológicos
 // Frontend moderno sem framework SPA (Vanilla JS + Fetch API + Web Speech API + PWA)
 
+
+// MÓDULO DE PREFERÊNCIAS LOCAIS & EFEITOS SONOROS
+const SOUND_STORAGE_KEY = "falaeh_sound_enabled";
+
+function getStoredSoundPreference() {
+    try {
+        const stored = localStorage.getItem(SOUND_STORAGE_KEY);
+        return stored !== "false"; // padrão: ativado
+    } catch (err) {
+        console.warn("Não foi possível acessar o localStorage para ler preferência de som:", err);
+        return true;
+    }
+}
+
+function saveSoundPreference(enabled) {
+    try {
+        localStorage.setItem(SOUND_STORAGE_KEY, enabled ? "true" : "false");
+    } catch (err) {
+        console.warn("Não foi possível persistir preferência de som no localStorage:", err);
+    }
+}
+
+let audioCtx = null;
+
+function getAudioContext() {
+    if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+        }
+    }
+    return audioCtx;
+}
+
+function unlockAudioContext() {
+    const ctx = getAudioContext();
+    if (ctx && ctx.state === "suspended") {
+        ctx.resume().catch((err) => {
+            console.warn("Não foi possível reativar o AudioContext:", err);
+        });
+    }
+    return ctx;
+}
+
+// Reproduz tom senoidal/triangular suave com envelope ADSR claro e audível
+function playTone({ freq, duration = 0.2, type = "sine", gainVal = 0.32, startOffset = 0, targetFreq = null }) {
+    if (!state.soundEnabled) return;
+    const ctx = unlockAudioContext();
+    if (!ctx) return;
+
+    const play = () => {
+        try {
+            const startTime = Math.max(ctx.currentTime, 0) + startOffset;
+            const stopTime = startTime + duration;
+
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, startTime);
+            if (targetFreq) {
+                osc.frequency.exponentialRampToValueAtTime(Math.max(20, targetFreq), stopTime);
+            }
+
+            // Envelope de volume audível e agradável (sem cliques e sem ruídos bruscos)
+            gainNode.gain.setValueAtTime(0.0001, startTime);
+            const attackTime = Math.min(0.02, duration * 0.2);
+            gainNode.gain.linearRampToValueAtTime(gainVal, startTime + attackTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+
+            osc.start(startTime);
+            osc.stop(stopTime + 0.05);
+
+            setTimeout(() => {
+                try {
+                    osc.disconnect();
+                    gainNode.disconnect();
+                } catch (cleanupErr) {
+                    console.warn("Aviso ao liberar nós de áudio:", cleanupErr);
+                }
+            }, Math.ceil((startOffset + duration + 0.1) * 1000));
+        } catch (err) {
+            console.warn("Falha ao sintetizar tom de áudio:", err);
+        }
+    };
+
+    if (ctx.state === "suspended") {
+        ctx.resume().then(play).catch((err) => {
+            console.warn("Falha ao resumir AudioContext antes de tocar:", err);
+            play();
+        });
+    } else {
+        play();
+    }
+}
+
+// 1. Som de acerto: acorde curto, alegre, positivo e harmonioso (tríade ascendente rápida C5 -> E5 -> G5)
+function playCorrectSound() {
+    playTone({ freq: 523.25, duration: 0.12, type: "sine", gainVal: 0.32, startOffset: 0 });
+    playTone({ freq: 659.25, duration: 0.14, type: "sine", gainVal: 0.34, startOffset: 0.08 });
+    playTone({ freq: 783.99, duration: 0.28, type: "sine", gainVal: 0.38, startOffset: 0.16 });
+}
+
+// 2. Som de erro / nova tentativa: dois tons suaves, macios e encorajadores (A4 -> F4, nunca agressivo)
+function playIncorrectSound() {
+    playTone({ freq: 440.00, duration: 0.15, type: "sine", gainVal: 0.28, startOffset: 0 });
+    playTone({ freq: 349.23, duration: 0.24, type: "sine", gainVal: 0.28, startOffset: 0.11 });
+}
+
+// 3. Som de conclusão de fase: sequência melódica alegre (C5 -> E5 -> G5 -> C6)
+function playPhaseCompleteSound() {
+    const notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach((freq, idx) => {
+        playTone({ freq, duration: 0.22, type: "sine", gainVal: 0.34, startOffset: idx * 0.09 });
+    });
+}
+
+// 4. Som de conclusão de mundo / nível: fanfarra festiva especial diferenciada
+function playWorldCompleteSound() {
+    const fanfare = [
+        { freq: 523.25, duration: 0.14, offset: 0 },
+        { freq: 659.25, duration: 0.14, offset: 0.12 },
+        { freq: 783.99, duration: 0.14, offset: 0.24 },
+        { freq: 1046.50, duration: 0.38, offset: 0.36 },
+        { freq: 1318.51, duration: 0.48, offset: 0.50 },
+    ];
+    fanfare.forEach(({ freq, duration, offset }) => {
+        playTone({ freq, duration, type: "sine", gainVal: 0.38, startOffset: offset });
+    });
+}
+
+// Mensagens Motivacionais Dinâmicas
+const MOTIVATIONAL_CORRECT_MESSAGES = [
+    "Muito bem! Resposta correta!",
+    "Incrível! Você mandou muito bem!",
+    "Sensacional! Acertou em cheio!",
+    "Parabéns! Excelente percepção!",
+    "Show de bola! Cada vez melhor!",
+    "Brilhante! Conexão estelar perfeita!",
+];
+
+const MOTIVATIONAL_RETRY_MESSAGES = [
+    "Quase lá! Tente novamente, você consegue!",
+    "Tudo bem errar! Vamos tentar mais uma vez?",
+    "Você está no caminho certo! Tente de novo!",
+    "Respira fundo e tente mais uma vez!",
+    "Persistir faz o campeão! Escolha outra opção.",
+];
+
+function getRandomMotivationalMessage(list) {
+    return list[Math.floor(Math.random() * list.length)];
+}
+
+function prefersReducedMotion() {
+    return Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
 const state = {
     sessionId: null,
     currentLevel: "beginner",
@@ -19,6 +179,7 @@ const state = {
     completion: null,
     xp: 0,
     streak: 0,
+    soundEnabled: getStoredSoundPreference(),
 };
 
 // Mapeamento dos Mundos
@@ -57,10 +218,23 @@ const toastEl = document.getElementById("toast-message");
 const toastIconEl = document.getElementById("toast-icon");
 const toastTextEl = document.getElementById("toast-text");
 
+// Header & Navegação
+const brandLogoBtn = document.getElementById("brand-logo-btn");
+const btnToggleSound = document.getElementById("btn-toggle-sound");
+const soundToggleIcon = document.getElementById("sound-toggle-icon");
+const soundToggleLabel = document.getElementById("sound-toggle-label");
+
+// Telas principais
 const screenHome = document.getElementById("screen-home");
 const screenGame = document.getElementById("screen-game");
 const screenCelebration = document.getElementById("screen-celebration");
 
+// Modal de Confirmação para evitar perda acidental
+const modalConfirmExit = document.getElementById("modal-confirm-exit");
+const btnModalCancelExit = document.getElementById("btn-modal-cancel-exit");
+const btnModalConfirmExit = document.getElementById("btn-modal-confirm-exit");
+
+// HUD do Jogo
 const hudWorldName = document.getElementById("hud-world-name");
 const hudXp = document.getElementById("hud-xp");
 const hudStreak = document.getElementById("hud-streak");
@@ -113,6 +287,11 @@ const btnInstallPwa = document.getElementById("btn-install-pwa");
 const btnExportPdf = document.getElementById("btn-export-pdf");
 const btnExportImage = document.getElementById("btn-export-image");
 
+const confettiContainer = document.getElementById("confetti-container");
+const celebrationUnlockBanner = document.getElementById("celebration-unlock-banner");
+const celebrationUnlockText = document.getElementById("celebration-unlock-text");
+const celebrationTitle = document.getElementById("celebration-title");
+
 let deferredInstallPrompt = null;
 let toastTimeoutId = null;
 
@@ -132,8 +311,97 @@ function showToast(icon, message) {
     }, 3500);
 }
 
+function updateSoundToggleUI() {
+    if (!btnToggleSound) return;
+
+    if (state.soundEnabled) {
+        if (soundToggleIcon) soundToggleIcon.textContent = "🔊";
+        if (soundToggleLabel) soundToggleLabel.textContent = "Som";
+        btnToggleSound.setAttribute("aria-label", "Efeitos sonoros ativados. Clique para desativar");
+        btnToggleSound.setAttribute("title", "Efeitos sonoros: Ativados");
+        btnToggleSound.setAttribute("aria-pressed", "true");
+        btnToggleSound.classList.remove("text-muted");
+    } else {
+        if (soundToggleIcon) soundToggleIcon.textContent = "🔇";
+        if (soundToggleLabel) soundToggleLabel.textContent = "Mudo";
+        btnToggleSound.setAttribute("aria-label", "Efeitos sonoros desativados. Clique para ativar");
+        btnToggleSound.setAttribute("title", "Efeitos sonoros: Desativados");
+        btnToggleSound.setAttribute("aria-pressed", "false");
+        btnToggleSound.classList.add("text-muted");
+    }
+}
+
+function toggleSound() {
+    state.soundEnabled = !state.soundEnabled;
+    saveSoundPreference(state.soundEnabled);
+    updateSoundToggleUI();
+    if (state.soundEnabled) {
+        getAudioContext();
+        playCorrectSound();
+        showToast("🔊", "Efeitos sonoros ativados!");
+    } else {
+        showToast("🔇", "Efeitos sonoros desativados.");
+    }
+}
+
+function showExitConfirmModal() {
+    if (!modalConfirmExit) {
+        showScreen(screenHome);
+        return;
+    }
+    modalConfirmExit.removeAttribute("hidden");
+    modalConfirmExit.classList.remove("d-none");
+    if (btnModalCancelExit) {
+        btnModalCancelExit.focus();
+    }
+}
+
+function hideExitConfirmModal() {
+    if (modalConfirmExit) {
+        modalConfirmExit.setAttribute("hidden", "");
+        modalConfirmExit.classList.add("d-none");
+    }
+}
+
+function handleNavigationToHomeRequest() {
+    // Se o usuário está em tela de jogo com partida ativa e antes de concluir a fase
+    if (screenGame && !screenGame.classList.contains("d-none") && state.sessionId && !state.phaseCompleted) {
+        showExitConfirmModal();
+    } else {
+        showScreen(screenHome);
+    }
+}
+
+function triggerConfetti() {
+    if (prefersReducedMotion()) return;
+    if (!confettiContainer) return;
+
+    confettiContainer.innerHTML = "";
+    const colors = ["#f59e0b", "#ec4899", "#38bdf8", "#4ade80", "#a78bfa", "#fef08a", "#fb7185"];
+    const particleCount = 36;
+
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement("div");
+        particle.className = "confetti-particle";
+        particle.style.left = `${Math.random() * 100}vw`;
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.animationDelay = `${Math.random() * 0.8}s`;
+        particle.style.animationDuration = `${2.2 + Math.random() * 1.5}s`;
+        const size = 8 + Math.floor(Math.random() * 8);
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.borderRadius = Math.random() > 0.5 ? "50%" : "2px";
+        confettiContainer.appendChild(particle);
+    }
+
+    setTimeout(() => {
+        if (confettiContainer) confettiContainer.innerHTML = "";
+    }, 4500);
+}
+
 function showScreen(screen) {
     stopVoiceRecognition();
+    hideExitConfirmModal();
 
     [screenHome, screenGame, screenCelebration].forEach((s) => {
         if (s) s.classList.add("d-none");
@@ -222,7 +490,8 @@ async function apiPost(path, body) {
     let payload = null;
     try {
         payload = await response.json();
-    } catch {
+    } catch (err) {
+        console.warn("Resposta da requisição não retornou JSON válido:", err);
         payload = null;
     }
 
@@ -242,8 +511,16 @@ function setGameLoading(isLoading, hasError = false) {
 }
 
 function updateHudStats() {
-    if (hudXp) hudXp.textContent = state.xp;
-    if (hudStreak) hudStreak.textContent = state.streak;
+    if (hudXp) {
+        hudXp.textContent = state.xp;
+        const hudXpStat = document.getElementById("hud-xp-stat");
+        if (hudXpStat) hudXpStat.setAttribute("aria-label", `XP acumulado: ${state.xp}`);
+    }
+    if (hudStreak) {
+        hudStreak.textContent = state.streak;
+        const hudStreakStat = document.getElementById("hud-streak-stat");
+        if (hudStreakStat) hudStreakStat.setAttribute("aria-label", `Sequência de acertos: ${state.streak}`);
+    }
 }
 
 function applyProgress(progress) {
@@ -268,6 +545,8 @@ function announceAchievements(achievements) {
 }
 
 async function startWorld(levelId) {
+    unlockAudioContext();
+
     if (!state.unlockedLevels.includes(levelId)) {
         showToast("🔒", `Conclua o mundo anterior para desbloquear este nível!`);
         return;
@@ -384,8 +663,8 @@ function setupVoiceRecognition() {
         };
 
         return recognition;
-    } catch (e) {
-        console.warn("Erro ao configurar SpeechRecognition:", e);
+    } catch (err) {
+        console.warn("Erro ao configurar SpeechRecognition:", err);
         return null;
     }
 }
@@ -403,13 +682,16 @@ function stopVoiceRecognition() {
     if (recognitionInstance && state.isRecording) {
         try {
             recognitionInstance.stop();
-        } catch { }
+        } catch (err) {
+            console.warn("Aviso ao parar reconhecimento de voz:", err);
+        }
     }
     state.isRecording = false;
     resetVoiceUIState();
 }
 
 function toggleVoiceRecognition() {
+    unlockAudioContext();
     if (state.isAnsweredCorrectly || state.isSubmitting) return;
 
     if (!isSpeechRecognitionSupported) {
@@ -430,7 +712,9 @@ function toggleVoiceRecognition() {
     if (state.isRecording) {
         try {
             recognitionInstance.stop();
-        } catch { }
+        } catch (err) {
+            console.warn("Aviso ao interromper reconhecimento de voz:", err);
+        }
         state.isRecording = false;
         resetVoiceUIState();
     } else {
@@ -441,12 +725,15 @@ function toggleVoiceRecognition() {
             try {
                 recognitionInstance.stop();
                 setTimeout(() => recognitionInstance.start(), 200);
-            } catch { }
+            } catch (retryErr) {
+                console.warn("Falha ao reiniciar reconhecimento de fala:", retryErr);
+            }
         }
     }
 }
 
 async function submitVoiceAnswer(spokenText) {
+    unlockAudioContext();
     if (!spokenText || state.isSubmitting || state.isAnsweredCorrectly) return;
 
     const currentEx = state.exercise;
@@ -575,7 +862,7 @@ function renderCurrentExercise() {
             btn.setAttribute("aria-label", `Opção ${index + 1}: ${optText}`);
 
             btn.innerHTML = `
-                <span class="option-letter badge bg-light text-dark rounded-circle me-2" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">
+                <span class="option-letter badge bg-light text-dark rounded-circle">
                     ${String.fromCharCode(65 + index)}
                 </span>
                 <span>${escapeHtml(optText)}</span>
@@ -604,7 +891,16 @@ function renderCurrentExercise() {
 }
 
 function selectOption(optText, clickedBtn) {
+    unlockAudioContext();
+
+    // Se o jogador clicar novamente na opção já selecionada, confirma a resposta imediatamente
+    if (state.selectedOption === optText && !state.isSubmitting && !state.isAnsweredCorrectly) {
+        submitAnswer();
+        return;
+    }
+
     state.selectedOption = optText;
+    playTone({ freq: 880, duration: 0.04, type: "sine", gainVal: 0.16, startOffset: 0 });
 
     const allButtons = optionsGrid.querySelectorAll(".option-btn");
     allButtons.forEach((btn) => {
@@ -621,6 +917,7 @@ function selectOption(optText, clickedBtn) {
 }
 
 async function submitAnswer() {
+    unlockAudioContext();
     if (!state.selectedOption || state.isSubmitting || state.isAnsweredCorrectly) return;
 
     const currentEx = state.exercise;
@@ -669,6 +966,13 @@ function handleAnswerResult(data) {
         state.report = data.report || null;
         state.completion = data.completion || null;
 
+        // Feedback sonoro: especial de fase se for o último da fase, ou positivo comum
+        if (state.phaseCompleted) {
+            playPhaseCompleteSound();
+        } else {
+            playCorrectSound();
+        }
+
         // Visual do botão correto
         if (selectedBtn) {
             selectedBtn.classList.remove("selected");
@@ -679,11 +983,13 @@ function handleAnswerResult(data) {
         allButtons.forEach((b) => (b.disabled = true));
         if (btnVoiceRecord) btnVoiceRecord.disabled = true;
 
-        // Feedback positivo
+        // Feedback positivo com mensagem motivacional dinâmica
         if (feedbackMessageContainer && feedbackBanner && feedbackIcon && feedbackText) {
             feedbackBanner.className = "d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill fw-bold feedback-banner-correct";
             feedbackIcon.textContent = "🎉";
-            feedbackText.textContent = `Muito bem! Resposta correta! (+${data.earnedXp ?? 0} XP)`;
+            const motivational = getRandomMotivationalMessage(MOTIVATIONAL_CORRECT_MESSAGES);
+            const xpText = (data.earnedXp ?? 0) > 0 ? ` (+${data.earnedXp} XP)` : "";
+            feedbackText.textContent = `${motivational}${xpText}`;
             feedbackMessageContainer.classList.remove("d-none");
         }
 
@@ -697,18 +1003,24 @@ function handleAnswerResult(data) {
             btnNextExercise.focus();
         }
     } else {
+        // Feedback sonoro suave e acolhedor (não agressivo)
+        playIncorrectSound();
+
         if (selectedBtn) {
             selectedBtn.classList.remove("selected");
             selectedBtn.classList.add("incorrect");
-            selectedBtn.classList.add("shake");
-            setTimeout(() => selectedBtn.classList.remove("shake"), 500);
+            if (!prefersReducedMotion()) {
+                selectedBtn.classList.add("shake");
+                setTimeout(() => selectedBtn.classList.remove("shake"), 500);
+            }
         }
 
-        // Feedback amigável de erro
+        // Feedback amigável com mensagem motivacional de nova tentativa
         if (feedbackMessageContainer && feedbackBanner && feedbackIcon && feedbackText) {
             feedbackBanner.className = "d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill fw-bold feedback-banner-incorrect";
             feedbackIcon.textContent = "💡";
-            feedbackText.textContent = "Quase lá! Tente novamente ou escolha outra opção.";
+            const retryMsg = getRandomMotivationalMessage(MOTIVATIONAL_RETRY_MESSAGES);
+            feedbackText.textContent = retryMsg;
             feedbackMessageContainer.classList.remove("d-none");
         }
 
@@ -733,14 +1045,21 @@ function goToNextExercise() {
 function finishWorld() {
     stopVoiceRecognition();
 
+    // Feedback sonoro e visual diferenciado ao concluir o mundo
+    playWorldCompleteSound();
+    triggerConfetti();
+
     const currentWorld = WORLDS[state.currentLevel];
     const report = state.report;
     const nextWorldId = state.completion?.nextLevel || null;
     const unlockedNext = Boolean(state.completion?.nextUnlocked);
 
     // Preenche cabeçalho e estatísticas do relatório final
+    const celebrationTitleEl = document.getElementById("celebration-title");
     const celebrationWorldName = document.getElementById("celebration-world-name");
     const celebrationSubtitle = document.getElementById("celebration-subtitle");
+    const celebrationUnlockBanner = document.getElementById("celebration-unlock-banner");
+    const celebrationUnlockText = document.getElementById("celebration-unlock-text");
     const reportWorldIcon = document.getElementById("report-world-icon");
     const reportLevel = document.getElementById("report-level");
     const reportPhaseCompleted = document.getElementById("report-phase-completed");
@@ -754,10 +1073,31 @@ function finishWorld() {
     const reportNextLevel = document.getElementById("report-next-level");
 
     if (celebrationWorldName) celebrationWorldName.textContent = currentWorld?.name || "Mundo";
+
+    if (celebrationTitleEl) {
+        celebrationTitleEl.textContent = !nextWorldId ? "Jornada Concluída! 👑" : "Mundo Concluído! 🏆";
+    }
+
+    if (celebrationUnlockBanner && celebrationUnlockText) {
+        if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
+            celebrationUnlockText.textContent = `NOVO MUNDO DESBLOQUEADO: ${WORLDS[nextWorldId].name.toUpperCase()}! 🔓`;
+            celebrationUnlockBanner.classList.remove("d-none");
+        } else if (!nextWorldId) {
+            celebrationUnlockText.textContent = `GRANDE MESTRE DA FALA! TODOS OS MUNDOS CONQUISTADOS! 🌟`;
+            celebrationUnlockBanner.classList.remove("d-none");
+        } else {
+            celebrationUnlockBanner.classList.add("d-none");
+        }
+    }
+
     if (celebrationSubtitle) {
-        celebrationSubtitle.textContent = unlockedNext
-            ? `Incrível! Você concluiu o ${currentWorld?.name} e desbloqueou o próximo nível!`
-            : `Parabéns! Você concluiu todos os desafios do ${currentWorld?.name}!`;
+        if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
+            celebrationSubtitle.textContent = `Incrível! Você concluiu todos os exercícios do ${currentWorld?.name} e desbloqueou o ${WORLDS[nextWorldId].name}!`;
+        } else if (!nextWorldId) {
+            celebrationSubtitle.textContent = `Sensacional! Você superou com maestria todos os exercícios e conquistou toda a galáxia da fala!`;
+        } else {
+            celebrationSubtitle.textContent = `Parabéns! Você concluiu todos os desafios do ${currentWorld?.name}!`;
+        }
     }
 
     if (reportWorldIcon) reportWorldIcon.textContent = currentWorld?.icon || "🌍";
@@ -1178,20 +1518,90 @@ function exportReportImage() {
 }
 
 function initEventHandlers() {
+    // Desbloqueia e ativa o AudioContext no primeiro gesto do usuário (conformidade com a política de autoplay)
+    ["click", "touchstart", "pointerdown", "keydown"].forEach((evtName) => {
+        window.addEventListener(evtName, () => unlockAudioContext(), { passive: true });
+    });
+
+    if (brandLogoBtn) {
+        brandLogoBtn.addEventListener("click", handleNavigationToHomeRequest);
+    }
+
+    if (btnToggleSound) {
+        btnToggleSound.addEventListener("click", toggleSound);
+    }
+
+    if (btnModalCancelExit) {
+        btnModalCancelExit.addEventListener("click", hideExitConfirmModal);
+    }
+
+    if (btnModalConfirmExit) {
+        btnModalConfirmExit.addEventListener("click", () => {
+            hideExitConfirmModal();
+            showScreen(screenHome);
+        });
+    }
+
+    if (modalConfirmExit) {
+        modalConfirmExit.addEventListener("click", (e) => {
+            if (e.target === modalConfirmExit) {
+                hideExitConfirmModal();
+            }
+        });
+    }
+
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modalConfirmExit && !modalConfirmExit.classList.contains("d-none")) {
+            hideExitConfirmModal();
+        }
+    });
+
+    window.addEventListener("beforeunload", (e) => {
+        if (screenGame && !screenGame.classList.contains("d-none") && state.sessionId && !state.phaseCompleted) {
+            e.preventDefault();
+            e.returnValue = "";
+        }
+    });
+
     if (btnStartAdventure) {
         btnStartAdventure.addEventListener("click", () => startWorld("beginner"));
     }
 
+    function handleWorldSelection(worldId) {
+        if (!worldId) return;
+        const card = document.getElementById(`card-${worldId}`);
+        if (state.unlockedLevels.includes(worldId)) {
+            startWorld(worldId);
+        } else {
+            if (card && !prefersReducedMotion()) {
+                card.classList.remove("shake");
+                void card.offsetWidth;
+                card.classList.add("shake");
+            }
+            const worldName = WORLDS[worldId]?.name || "este nível";
+            showToast("🔒", `Conclua o mundo anterior para desbloquear o ${worldName}!`);
+        }
+    }
+
     if (btnSelectBeginner) {
-        btnSelectBeginner.addEventListener("click", () => startWorld("beginner"));
+        btnSelectBeginner.addEventListener("click", (e) => {
+            e.stopPropagation();
+            handleWorldSelection("beginner");
+        });
     }
 
     if (btnSelectIntermediate) {
-        btnSelectIntermediate.addEventListener("click", () => startWorld("intermediate"));
+        btnSelectIntermediate.addEventListener("click", (e) => {
+            e.stopPropagation();
+            handleWorldSelection("intermediate");
+        });
     }
 
     if (btnSelectAdvanced) {
-        btnSelectAdvanced.addEventListener("click", () => startWorld("advanced"));
+        btnSelectAdvanced.addEventListener("click", (e) => {
+            e.stopPropagation();
+            handleWorldSelection("advanced");
+        });
     }
 
     if (btnVoiceRecord) {
@@ -1215,7 +1625,7 @@ function initEventHandlers() {
     }
 
     if (btnBackHome) {
-        btnBackHome.addEventListener("click", () => showScreen(screenHome));
+        btnBackHome.addEventListener("click", handleNavigationToHomeRequest);
     }
 
     if (btnRetryLoad) {
@@ -1226,17 +1636,19 @@ function initEventHandlers() {
         btnReplayWorld.addEventListener("click", () => startWorld(state.currentLevel));
     }
 
-    // Feedback para cards bloqueados
-    const lockedCards = document.querySelectorAll(".world-card");
-    lockedCards.forEach((card) => {
+    // Feedback e suporte a clique/teclado para toda a superfície dos cards dos mundos
+    const worldCards = document.querySelectorAll(".world-card");
+    worldCards.forEach((card) => {
         card.addEventListener("click", () => {
             const worldId = card.getAttribute("data-world");
-            if (worldId && !state.unlockedLevels.includes(worldId)) {
-                const worldName = WORLDS[worldId]?.name || "este nível";
-                card.classList.remove("shake");
-                void card.offsetWidth;
-                card.classList.add("shake");
-                showToast("🔒", `Conclua o mundo anterior para desbloquear o ${worldName}!`);
+            handleWorldSelection(worldId);
+        });
+
+        card.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                const worldId = card.getAttribute("data-world");
+                handleWorldSelection(worldId);
             }
         });
     });
@@ -1251,7 +1663,8 @@ async function checkAPI() {
         }
         statusEl.textContent = "API online";
         statusEl.className = "badge text-bg-success";
-    } catch {
+    } catch (err) {
+        console.warn("API indisponível ou inacessível no momento:", err);
         statusEl.textContent = "API indisponível";
         statusEl.className = "badge text-bg-secondary opacity-75";
     }
@@ -1311,14 +1724,15 @@ function initPWA() {
 
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("/sw.js").catch(() => {
-            /* PWA é progressivo: a aplicação continua funcionando sem service worker */
+        navigator.serviceWorker.register("/sw.js").catch((err) => {
+            console.warn("Falha ao registrar Service Worker (PWA continua funcionando em modo básico):", err);
         });
     });
 }
 
 initEventHandlers();
 initPWA();
+updateSoundToggleUI();
 updateWorldCardsUI();
 checkAPI();
 

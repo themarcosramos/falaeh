@@ -1,7 +1,7 @@
 // Fala Eh - Service Worker
 // Cache básico de assets essenciais e fallback offline simples para PWA
 
-const CACHE_NAME = "falaeh-v6";
+const CACHE_NAME = "falaeh-v8";
 const STATIC_ASSETS = [
     "/",
     "/index.html",
@@ -53,7 +53,8 @@ self.addEventListener("fetch", (event) => {
     // Requisições de API: prioriza rede (sem cache offline complexo)
     if (url.pathname.startsWith("/api/")) {
         event.respondWith(
-            fetch(request).catch(() => {
+            fetch(request).catch((err) => {
+                console.warn("Service Worker interceptou falha de rede na API:", err);
                 return new Response(
                     JSON.stringify({
                         error: "Você está sem conexão com a internet.",
@@ -72,7 +73,8 @@ self.addEventListener("fetch", (event) => {
     // Para navegação HTML (recarregamento/abertura offline), retorna cache do index.html se a rede falhar
     if (request.mode === "navigate") {
         event.respondWith(
-            fetch(request).catch(async () => {
+            fetch(request).catch(async (err) => {
+                console.warn("Service Worker em fallback offline de navegação HTML:", err);
                 const cached = (await caches.match("/index.html")) || (await caches.match("/"));
                 return (
                     cached ||
@@ -96,9 +98,14 @@ self.addEventListener("fetch", (event) => {
             return fetch(request).then((networkResponse) => {
                 if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
                     const responseClone = networkResponse.clone();
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(request, responseClone);
-                    });
+                    caches
+                        .open(CACHE_NAME)
+                        .then((cache) => {
+                            cache.put(request, responseClone);
+                        })
+                        .catch((err) => {
+                            console.warn("Falha ao atualizar cache em background:", err);
+                        });
                 }
                 return networkResponse;
             });

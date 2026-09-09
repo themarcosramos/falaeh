@@ -190,6 +190,33 @@ O reconhecimento ocorre **localmente no navegador** via Web Speech API (`SpeechR
 
 ---
 
+## Efeitos Sonoros, Navegação e Acessibilidade
+
+- **Feedback Sonoro Procedural**: Efeitos sintetizados localmente com a Web Audio API (sem arquivos MP3 externos pesados, garantindo carregamento instantâneo e suporte offline no PWA).
+  - *Acerto*: acorde suave ascendente e positivo;
+  - *Erro*: tom curto, quente e encorajador (nunca agressivo ou de punição);
+  - *Conclusão de Fase*: sequência melódica alegre;
+  - *Conclusão de Mundo*: fanfarra festiva diferenciada com animação de confetes;
+  - *Controle de Som*: botão de alternância (🔊 / 🔇) no cabeçalho, com persistência da preferência no `localStorage`;
+  - *Independência de Áudio*: o jogo funciona integralmente em modo silencioso ou caso o navegador não tenha suporte à API.
+- **Navegação Segura e Intuitiva**:
+  - O logo **Fala Eh** é navegável para a Home em qualquer momento;
+  - Caso haja uma missão em andamento, um diálogo modal acessível é exibido para evitar perda acidental de progresso;
+  - Elementos informativos do HUD (XP e Streak) são mantidos como badges puramente visuais, sem transformar indicadores em links desnecessários.
+- **Acessibilidade e UX Universal**:
+  - Navegação completa por teclado (Tab, Enter, Espaço, Esc);
+  - Foco visível de alto contraste (`:focus-visible` com espessura de 4px);
+  - Rótulos semânticos (`aria-label`, `role="status"`, `aria-live="polite"`);
+  - Respeito à preferência do sistema operacional por redução de movimento (`prefers-reduced-motion`);
+  - Feedbacks multissensoriais que não dependem exclusivamente de cor, som ou animação (texto motivacional dinâmico, ícones e pontuação explícita).
+- **Design System Ergonômico: 8pt Grid System (com Subgrid de 4pt)**:
+  - *Consistência Espacial*: Todos os espaçamentos, margens, gaps e paddings seguem múltiplos exatos de 8px e 4px através de design tokens (`--space-1` a `--space-13`), eliminando "números mágicos" no CSS;
+  - *Prevenção de Subpixel Rendering*: Elimina borrões em telas de alta densidade (Retina/AMOLED com multiplicadores 2x, 3x ou 4x);
+  - *Ergonomia para Crianças e Adolescentes*: Alvos de toque acessíveis padronizados em múltiplos de 8 (mínimo de 48px para botões secundários, 56px para botões primários e 88px para o microfone), superando as recomendações WCAG AAA e facilitando a interação de usuários com coordenação motora fina em desenvolvimento;
+  - *Sinergia com Bootstrap 5*: Harmonização direta com a escala de utilitários do framework (`$spacer = 16px`).
+
+---
+
 ## Relatório final e Certificado
 
 Ao concluir uma fase, o jogador recebe um relatório completo de desempenho com opção de personalizar seu nome:
