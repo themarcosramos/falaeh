@@ -774,6 +774,163 @@ body.bg-app {
     width: 100%;
 }
 
+/* ==========================================================
+   AVALIAÇÃO OPCIONAL DA EXPERIÊNCIA (ETAPA 13)
+   Card gamificado, amigável, anônimo e acessível
+   ========================================================== */
+.experience-evaluation-box {
+    background: rgba(30, 27, 75, 0.55);
+    border: 1px dashed rgba(167, 139, 250, 0.4);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.2s ease;
+}
+
+.experience-evaluation-box:hover {
+    border-color: rgba(245, 158, 11, 0.6);
+    background: rgba(30, 27, 75, 0.75);
+}
+
+.btn-eval-option {
+    min-width: 112px;
+    min-height: var(--target-touch-min);
+    padding: var(--space-2) var(--space-3);
+    background: rgba(15, 23, 42, 0.7);
+    border: 2px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-md);
+    color: #f8fafc;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    flex: 1 1 calc(25% - var(--space-2));
+    max-width: 136px;
+}
+
+.btn-eval-option .eval-emoji {
+    line-height: 1;
+    font-size: 1.75rem;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn-eval-option .eval-label {
+    font-size: 0.8125rem;
+    color: #cbd5e1;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.btn-eval-option:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.04);
+    border-color: #f59e0b;
+    background: rgba(49, 16, 66, 0.85);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+}
+
+.btn-eval-option:hover:not(:disabled) .eval-emoji {
+    transform: scale(1.15);
+}
+
+.btn-eval-option:hover:not(:disabled) .eval-label {
+    color: #ffffff;
+}
+
+.btn-eval-option:focus-visible {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 4px var(--app-accent-glow);
+}
+
+.btn-eval-option.selected {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(234, 88, 12, 0.3) 100%);
+    border-color: #f59e0b;
+    color: #fef08a;
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+    transform: scale(1.04);
+}
+
+.btn-eval-option:disabled {
+    cursor: default;
+    opacity: 0.8;
+}
+
+.eval-feedback-view {
+    animation: popSuccess 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    padding: var(--space-3) var(--space-4);
+}
+
+#btn-skip-evaluation {
+    min-height: var(--target-touch-min);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--app-text-muted);
+    transition: color 0.2s ease;
+}
+
+#btn-skip-evaluation:hover {
+    color: #cbd5e1;
+}
+
+#btn-skip-evaluation:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--app-accent-glow);
+}
+
+.eval-actions-container {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+#btn-toggle-comment {
+    min-height: 38px;
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fcd34d;
+    background: rgba(245, 158, 11, 0.1);
+    transition: all 0.2s ease;
+}
+
+#btn-toggle-comment:hover {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: #f59e0b;
+    color: #ffffff;
+}
+
+.eval-comment-container {
+    animation: fadeIn 0.3s ease-in-out;
+    max-width: 520px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#eval-comment {
+    resize: none;
+    border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    color: #f8fafc;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#eval-comment:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px var(--app-accent-glow);
+    background: rgba(15, 23, 42, 0.95);
+    color: #ffffff;
+}
+
+#btn-submit-evaluation {
+    min-height: var(--target-touch-min);
+}
+
 /* Estilos de Impressão / PDF Local */
 @media print {
     body, body.bg-app {
@@ -1041,6 +1198,12 @@ a:focus:not(:focus-visible),
         font-size: 0.9rem;
         padding: var(--space-2) var(--space-4);
     }
+
+    .btn-eval-option {
+        flex: 1 1 calc(50% - var(--space-2));
+        min-width: 120px;
+        max-width: none;
+    }
 }
 
 /* Acessibilidade: prefers-reduced-motion */
@@ -1066,7 +1229,10 @@ a:focus:not(:focus-visible),
     .confirm-modal-backdrop,
     .confirm-modal-box,
     .celebration-unlock-banner,
-    .confetti-particle {
+    .confetti-particle,
+    .eval-feedback-view,
+    .btn-eval-option,
+    .btn-eval-option .eval-emoji {
         animation: none !important;
         transition: none !important;
     }

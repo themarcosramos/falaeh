@@ -259,6 +259,24 @@ definitions:
         example: exercício não encontrado
         type: string
     type: object
+  httpapi.FeedbackRequest:
+    properties:
+      comment:
+        example: Adorei a missão dos sons!
+        type: string
+      rating:
+        example: gostei_muito
+        type: string
+    type: object
+  httpapi.FeedbackResponse:
+    properties:
+      message:
+        example: Muito obrigado pela sua avaliação!
+        type: string
+      status:
+        example: ok
+        type: string
+    type: object
   httpapi.GameAnswerRequest:
     properties:
       answer:
@@ -387,6 +405,33 @@ paths:
       summary: Valida a resposta de um exercício
       tags:
       - exercises
+  /api/v1/feedback:
+    post:
+      consumes:
+      - application/json
+      description: Recebe exclusivamente uma opção fechada de avaliação e comentário
+        opcional sem vincular qualquer identificador ou dado pessoal.
+      parameters:
+      - description: Opção de avaliação fechada e comentário opcional
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.FeedbackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avaliação registrada com sucesso
+          schema:
+            $ref: '#/definitions/httpapi.FeedbackResponse'
+        "400":
+          description: Opção de avaliação inválida ou vazia
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Envia uma avaliação anônima da experiência do Fala Eh
+      tags:
+      - feedback
   /api/v1/game/{sessionId}/answer:
     post:
       consumes:
