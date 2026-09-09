@@ -1,0 +1,232 @@
+name: Release Automation
+
+on:
+  push:
+    branches:
+      - production
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versão manual para release (ex: 1.0.0 ou v1.0.0)'
+        required: false
+        default: ''
+
+concurrency:
+  group: release-production
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  version-info:
+    name: Determinar Versão Dinâmica
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      tag: ${{ steps.ver.outputs.tag }}
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extrair Versão da Tag ou Branch
+        id: ver
+        run: |
+          MANUAL_INPUT="${{ github.event.inputs.version }}"
+          if [ -n "$MANUAL_INPUT" ]; then
+            TAG="v${MANUAL_INPUT#v}"
+            VERSION="${TAG#v}"
+          elif [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG="${{ github.ref_name }}"
+            VERSION="${TAG#v}"
+          else
+            TAG_ON_HEAD=$(git tag --points-at HEAD | head -1)
+            if [ -n "$TAG_ON_HEAD" ]; then
+              TAG="$TAG_ON_HEAD"
+              VERSION="${TAG#v}"
+            else
+              COMMIT_MSG=$(git log -1 --pretty=%B)
+              BRANCH_VER=$(echo "$COMMIT_MSG" | grep -oE '(rc|release)/v[0-9]+(\.[0-9]+)*(-[a-zA-Z0-9.]+)?' | head -1 | sed -E 's/(rc|release)\/v//')
+              if [ -n "$BRANCH_VER" ]; then
+                VERSION="$BRANCH_VER"
+                TAG="v${VERSION}"
+              else
+                FILE_VER=$(cat VERSION 2>/dev/null | tr -d '[:space:]')
+                [ -z "$FILE_VER" ] && FILE_VER="1.0.0"
+                VERSION="$FILE_VER"
+                TAG="v${VERSION}"
+              fi
+            fi
+          fi
+
+          echo "Versão detectada: ${VERSION}"
+          echo "Tag correspondente: ${TAG}"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+  quality-gate:
+    name: Quality Gate Pré-Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Executar Quality Gate (make check via Docker)
+        run: make check
+
+  build-web:
+    name: Build Web/PWA
+    needs:
+      - version-info
+      - quality-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Empacotar Web/PWA via Docker
+        run: make package-web VERSION=${{ needs.version-info.outputs.version }}
+
+      - name: Upload do Artefato Web/PWA
+        uses: actions/upload-artifact@v4
+        with:
+          name: falaeh-release-web
+          path: build/bin/falaeh-web-*.tar.gz
+          retention-days: 1
+
+  build-linux:
+    name: Build Desktop Linux (AMD64 & AppImage)
+    needs:
+      - version-info
+      - quality-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Compilar e Empacotar Desktop Linux via Docker
+        run: make package-linux VERSION=${{ needs.version-info.outputs.version }}
+
+      - name: Upload dos Artefatos Linux
+        uses: actions/upload-artifact@v4
+        with:
+          name: falaeh-release-linux
+          path: |
+            build/bin/falaeh-linux-*.tar.gz
+            build/bin/Falaeh-linux-*.AppImage
+          retention-days: 1
+
+  build-windows:
+    name: Build Desktop Windows (AMD64)
+    needs:
+      - version-info
+      - quality-gate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Compilar e Empacotar Desktop Windows via Docker
+        run: make package-windows VERSION=${{ needs.version-info.outputs.version }}
+
+      - name: Upload dos Artefatos Windows
+        uses: actions/upload-artifact@v4
+        with:
+          name: falaeh-release-windows
+          path: |
+            build/bin/falaeh-windows-*.zip
+            build/bin/falaeh-windows-*-portable-*.exe
+          retention-days: 1
+
+  build-macos:
+    name: Build Desktop macOS (Universal)
+    needs:
+      - version-info
+      - quality-gate
+    runs-on: macos-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache-dependency-path: backend/go.sum
+
+      - name: Instalar Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
+
+      - name: Sincronizar Assets do Desktop
+        run: make desktop-sync
+
+      - name: Compilar Falaêh Desktop macOS Universal (Intel + Apple Silicon)
+        run: |
+          cd backend/cmd/desktop
+          wails build -s -skipbindings -platform darwin/universal -o falaeh
+          mkdir -p ../../../build/bin
+          cp -rf build/bin/falaeh.app ../../../build/bin/
+
+      - name: Empacotar Aplicativo macOS (.zip)
+        run: |
+          VERSION="${{ needs.version-info.outputs.version }}"
+          cd build/bin
+          zip -r -9 "falaeh-macos-universal-v${VERSION}.zip" falaeh.app
+
+      - name: Upload do Artefato macOS
+        uses: actions/upload-artifact@v4
+        with:
+          name: falaeh-release-macos
+          path: build/bin/falaeh-macos-universal-*.zip
+          retention-days: 1
+
+  publish-release:
+    name: Publicar GitHub Release Oficial
+    needs:
+      - version-info
+      - build-web
+      - build-linux
+      - build-windows
+      - build-macos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Baixar Artefatos de Todas as Plataformas
+        uses: actions/download-artifact@v4
+        with:
+          path: release-dist
+          merge-multiple: true
+
+      - name: Gerar Checksums de Integridade (SHA-256)
+        run: |
+          cd release-dist
+          sha256sum ./* > SHA256SUMS.txt
+          echo "=== Checksums Gerados ==="
+          cat SHA256SUMS.txt
+
+      - name: Criar Tag Git e Publicar GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ needs.version-info.outputs.tag }}"
+
+          # Desambiguação de tag caso já exista e o evento não seja push de tag
+          if [ "${{ github.ref_type }}" != "tag" ]; then
+            if git rev-parse "$TAG" >/dev/null 2>&1 || git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
+              TAG="${TAG}-${{ github.run_number }}"
+              echo "Tag base já existente. Desambiguando para ${TAG}."
+            fi
+          fi
+
+          echo "Publicando release oficial para tag: ${TAG}"
+          gh release create "$TAG" release-dist/* \
+            --title "Falaêh ${TAG}" \
+            --generate-notes

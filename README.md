@@ -108,6 +108,9 @@ Use `make help` para listar todos os comandos disponíveis.
 | `make desktop-darwin`     | Instruções e build para macOS (runner macos-latest)  |
 | `make desktop-all`        | Compila todos os binários e pacotes desktop          |
 | `make desktop-clean`      | Limpa artefatos de build do desktop                  |
+| `make package-web`        | Empacota a versão Web/PWA estática (.tar.gz)         |
+| `make package-linux`      | Empacota os artefatos versionados Linux (AppImage + tar.gz) |
+| `make package-windows`    | Empacota os artefatos versionados Windows (zip + portable .exe) |
 | `make swagger` / `docs`   | Regenera a documentação Swagger                      |
 | `make clean`              | Remove artefatos de teste e cobertura                |
 | `make docker-down-volumes`| Derruba containers e remove volumes                  |
@@ -337,6 +340,40 @@ Os artefatos gerados ficam salvos em `build/bin/`:
 * **Single Binary Auto-Contido**: A interface estática (HTML5, Bootstrap 5, JS) e as bases de exercícios JSON são embutidas diretamente no executável via `//go:embed`;
 * **Fallback de Voz no WebView**: Caso o WebView nativo da plataforma não ofereça suporte à Web Speech API (`SpeechRecognition`), o Falaêh automaticamente chaveia para o modo alternativo por toque/clique (múltipla escolha), mantendo 100% da usabilidade;
 * **Exportação de Certificados**: A geração e download de relatórios em PDF e imagem PNG (HTML5 Canvas) funcionam identicamente no desktop.
+
+---
+
+## Fluxo Automático de Release
+
+O Falaêh possui pipeline automatizada de release contínuo via GitHub Actions (`.github/workflows/release.yml`).
+
+### Regras de Acionamento e Segurança
+* **Gatilho Único e Restrito:** O fluxo de release é executado **exclusivamente após o merge efetivo na branch `production`** (`on: push: branches: [production]`).
+* **PRs Não Geram Release:** Pull Requests abertas para `production`, mesmo com todos os quality gates e testes aprovados, **jamais geram releases ou binários oficiais**.
+* **Quality Gate Obrigatório:** O pipeline executa `make check` antes da compilação dos artefatos. Se houver falha de lint, vet, testes ou cobertura (< 80%), a release é abortada imediatamente.
+* **Bloqueio Total por Falha de Plataforma:** Os builds de todas as plataformas (`build-web`, `build-linux`, `build-windows`, `build-macos`) são obrigatórios. Se qualquer um falhar, o job final `publish-release` é bloqueado e nenhuma release é publicada.
+
+### Artefatos Publicados na GitHub Release
+| Plataforma / Alvo | Formato | Nome do Artefato |
+| :--- | :--- | :--- |
+| **Web/PWA** | Tarball (.tar.gz) | `falaeh-web-v<version>.tar.gz` |
+| **Linux (AMD64)** | Tarball (.tar.gz) | `falaeh-linux-amd64-v<version>.tar.gz` |
+| **Linux (AppImage)** | AppImage Portátil | `Falaeh-linux-amd64-v<version>.AppImage` |
+| **Windows (AMD64)** | Executável Portátil | `falaeh-windows-amd64-portable-v<version>.exe` |
+| **Windows (AMD64)** | Pacote Zip | `falaeh-windows-amd64-v<version>.zip` |
+| **macOS (Universal)** | Pacote Zip | `falaeh-macos-universal-v<version>.zip` |
+| **Integridade** | Checksums SHA-256 | `SHA256SUMS.txt` |
+
+### Versionamento Dinâmico por Tags Git
+A versão da aplicação é determinada dinamicamente através de tags semânticas do Git (`v<major>.<minor>.<patch>`):
+* **Via Tag Git (Recomendado):** Ao criar e subir uma tag (ex: `git tag v1.2.0 && git push origin v1.2.0`), o workflow extrai automaticamente a versão (`1.2.0`) e batiza todos os artefatos e a release no GitHub;
+* **Via Branch de Release:** Caso uma PR venha de uma branch no padrão `rc/v1.2.0` ou `release/v1.2.0`, o pipeline extrai dinamicamente a versão a partir do commit de merge;
+* **Via Arquivo VERSION:** Na ausência de tag ou branch padronizada, o pipeline utiliza como fallback o valor presente no arquivo `VERSION` na raiz do projeto.
+
+### Limitações Técnicas Conhecidas
+* **macOS Toolchain:** Devido a restrições de licenciamento da Apple e suporte do Wails v2, a compilação do bundle nativo `.app` para macOS não é suportada por cross-compilação em Linux/Docker e roda no runner oficial `macos-latest` do GitHub Actions;
+* **Certificados Comerciais:** O projeto não exige e não implementa certificados comerciais pagos de assinatura de código (como Apple Developer ID ou Microsoft Authenticode). Executáveis podem apresentar avisos do Windows SmartScreen ou macOS Gatekeeper dependendo das políticas de segurança locais do usuário;
+* **Infraestrutura Externa:** Nenhum secret de cloud, token externo de deploy ou serviço terceirizado é utilizado. Toda a autenticação é gerenciada nativamente pelo `GITHUB_TOKEN` do repositório.
 
 ---
 
