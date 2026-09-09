@@ -1,7 +1,7 @@
 // Fala Eh - Service Worker
 // Cache básico de assets essenciais e fallback offline simples para PWA
 
-const CACHE_NAME = "falaeh-v8";
+const CACHE_NAME = "falaeh-v9";
 const STATIC_ASSETS = [
     "/",
     "/index.html",
