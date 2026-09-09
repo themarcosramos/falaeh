@@ -101,6 +101,13 @@ Use `make help` para listar todos os comandos disponíveis.
 | `make audit`              | Procura vulnerabilidades com govulncheck             |
 | `make audit-image`        | Escaneia a imagem de produção com trivy              |
 | `make ci`                 | Quality gate: vet + lint + testes + cobertura        |
+| `make desktop-icons`      | Gera os ícones (PNG, ICO) a partir do SVG do navegador|
+| `make desktop-linux`      | Compila o Falaêh Desktop Linux AMD64 via Docker      |
+| `make desktop-appimage`   | Empacota o Falaêh Desktop Linux no formato AppImage  |
+| `make desktop-windows`    | Compila o executável portátil Windows AMD64 via MinGW|
+| `make desktop-darwin`     | Instruções e build para macOS (runner macos-latest)  |
+| `make desktop-all`        | Compila todos os binários e pacotes desktop          |
+| `make desktop-clean`      | Limpa artefatos de build do desktop                  |
 | `make swagger` / `docs`   | Regenera a documentação Swagger                      |
 | `make clean`              | Remove artefatos de teste e cobertura                |
 | `make docker-down-volumes`| Derruba containers e remove volumes                  |
@@ -164,16 +171,22 @@ Documentação interativa disponível em `http://localhost:8080/docs` (spec em `
 
 ---
 
-## Como testar
+## Qualidade e Testes
+
+Todos os comandos de validação e qualidade executam **100% dentro de containers Docker**, sem necessidade de instalar Go ou dependências no host:
 
 ```bash
-make test              # unitários + aceitação
-make test-unit
-make test-acceptance
-make test-run TEST=TestGameFlow_AcertoAvancaExercicio
-make coverage          # gera o relatório de cobertura em HTML
-make coverage-check    # valida se a cobertura está >= 80% (meta atingida: 97.5%)
-make ci                # pipeline completa de validação
+make fmt               # Formata o código Go (gofmt)
+make vet               # Executa análise estática padrão (go vet)
+make lint              # Executa golangci-lint (v2) com a configuração do .golangci.yml
+make test              # Executa todas as suítes (unitários + aceitação)
+make acceptance        # Executa exclusivamente a suíte de testes de aceitação
+make coverage          # Gera o relatório de cobertura em HTML (backend/tmp/tests/coverage.html)
+make coverage-check    # Valida se a cobertura global está >= 80% (meta atingida: 96.2%)
+make build             # Constrói as imagens de produção no Docker
+make check             # Quality Gate unificado (vet + lint + test + coverage-check)
+make ci                # Alias de make check para integração contínua
+make wails-dev         # Ambiente opcional de desenvolvimento com hot reload (Wails CLI)
 ```
 
 ---
@@ -271,6 +284,59 @@ Para consolidar as avaliações e comentários descritivos dos participantes na 
 4. **Resiliência e Tolerância a Falhas**:
    - Se essas variáveis não forem preenchidas, a aplicação funciona normalmente sem envio externo;
    - Se o Google Forms estiver indisponível ou retornar erro, a aplicação degrada graciosamente, **sem travar a partida ou afetar o relatório final do jogador**.
+
+---
+
+## Versão Desktop (Wails)
+
+O Falaêh também pode ser distribuído como aplicativo nativo para desktop através do [Wails v2](https://wails.io). A versão desktop **coexiste** com a versão Web/PWA, sem substituí-la.
+
+### Plataformas Suportadas e Distribuições:
+* **Linux (AMD64)**:
+  * **Binário Nativo ELF**: `build/bin/falaeh` (com suporte a WebKit2GTK 4.1 e GTK3);
+  * **Pacote Portátil AppImage**: `build/bin/Falaeh-x86_64.AppImage` (executável universal de clique duplo, sem necessidade de instalação);
+* **Windows (AMD64)**:
+  * **Executável Portátil Standalone**: `build/bin/falaeh.exe` (e alias `build/bin/falaeh-portable.exe`, executável autônomo sem instalador);
+* **macOS (Intel e Apple Silicon / Universal)**:
+  * **Aplicativo Nativo**: `build/bin/falaeh.app` (empacotado via runner macOS do GitHub Actions).
+
+### Ícone Unificado da Aplicação:
+O ícone do robozinho mascote do Falaêh (`frontend/assets/icons/icon.svg`), o mesmo exibido na aba e favoritos do navegador, é utilizado de forma padronizada em todos os formatos desktop:
+* **Linux & AppImage**: Renderizado em PNG 512×512 de alta resolução e embutido na janela nativa GTK e no arquivo `.desktop` do AppImage;
+* **Windows**: Convertido para formato multi-resolução (`icon.ico`: 16×16 até 256×256) e embutido nos recursos binários do `.exe` (visível no Windows Explorer e barra de tarefas);
+* **macOS**: Configurado no `Info.plist` e pacote `.app`.
+
+### Compilação 100% via Docker:
+Todos os builds desktop rodam através do container `falaeh-desktop-builder`, sem necessidade de instalar dependências CGO ou Wails na sua máquina host:
+
+```bash
+# Gerar os ícones PNG e ICO a partir do SVG do navegador
+make desktop-icons
+
+# Compilar o binário Linux AMD64
+make desktop-linux
+
+# Empacotar o Linux AppImage
+make desktop-appimage
+
+# Compilar o executável portátil Windows AMD64
+make desktop-windows
+
+# Compilar todas as distribuições e pacotes desktop locais
+make desktop-all
+```
+
+Os artefatos gerados ficam salvos em `build/bin/`:
+* `build/bin/Falaeh-x86_64.AppImage`
+* `build/bin/falaeh`
+* `build/bin/falaeh.exe`
+* `build/bin/falaeh-portable.exe`
+
+### Como Funciona a Arquitetura Desktop:
+* **In-Process AssetServer Handler**: O WebView do Wails entrega as chamadas de rede `/api/v1/...` diretamente ao `httpapi.NewRouter` em memória (Go). Não é aberto nenhum servidor TCP nem portas de rede na máquina do usuário, prevenindo bloqueios de firewall e conflitos de porta;
+* **Single Binary Auto-Contido**: A interface estática (HTML5, Bootstrap 5, JS) e as bases de exercícios JSON são embutidas diretamente no executável via `//go:embed`;
+* **Fallback de Voz no WebView**: Caso o WebView nativo da plataforma não ofereça suporte à Web Speech API (`SpeechRecognition`), o Falaêh automaticamente chaveia para o modo alternativo por toque/clique (múltipla escolha), mantendo 100% da usabilidade;
+* **Exportação de Certificados**: A geração e download de relatórios em PDF e imagem PNG (HTML5 Canvas) funcionam identicamente no desktop.
 
 ---
 

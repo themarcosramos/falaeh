@@ -8,3 +8,9 @@ backend/.tmp/
 backend/tmp/
 .tmp/
 tmp/
+build/bin/
+build/appicon.png
+build/windows/
+backend/cmd/desktop/build/
+backend/cmd/desktop/frontend/
+backend/cmd/desktop/data/

@@ -54,7 +54,7 @@ func TestRouter_Health(t *testing.T) {
 	router := newAcceptanceRouter(t)
 
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/health", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/health", http.NoBody)
 
 	router.ServeHTTP(rec, req)
 
@@ -73,7 +73,7 @@ func TestRouter_Health(t *testing.T) {
 
 	// Testa também rota com prefixo /api/health
 	recAPI := httptest.NewRecorder()
-	reqAPI := httptest.NewRequest(http.MethodGet, "/api/health", nil)
+	reqAPI := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/health", http.NoBody)
 	router.ServeHTTP(recAPI, reqAPI)
 	if recAPI.Code != http.StatusOK {
 		t.Fatalf("status code /api/health = %d, esperado %d", recAPI.Code, http.StatusOK)
@@ -93,7 +93,7 @@ func TestRouter_Docs(t *testing.T) {
 
 	t.Run("Swagger UI", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/docs", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/docs", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
@@ -103,7 +103,7 @@ func TestRouter_Docs(t *testing.T) {
 
 	t.Run("Swagger Spec", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/swagger.yaml", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/swagger.yaml", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
@@ -115,7 +115,7 @@ func TestRouter_Docs(t *testing.T) {
 	for _, path := range []string{"/api/docs", "/api/swagger.yaml"} {
 		t.Run(path, func(t *testing.T) {
 			rec := httptest.NewRecorder()
-			req := httptest.NewRequest(http.MethodGet, path, nil)
+			req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, path, http.NoBody)
 			router.ServeHTTP(rec, req)
 
 			if rec.Code != http.StatusOK {
@@ -129,7 +129,7 @@ func TestRouter_Levels(t *testing.T) {
 	router := newAcceptanceRouter(t)
 
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodGet, "/api/v1/levels", nil)
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels", http.NoBody)
 	router.ServeHTTP(rec, req)
 
 	if rec.Code != http.StatusOK {
@@ -154,7 +154,7 @@ func TestRouter_ListExercisesByLevel(t *testing.T) {
 
 	t.Run("nível válido iniciante", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/beginner/exercises", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels/beginner/exercises", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
@@ -184,7 +184,7 @@ func TestRouter_ListExercisesByLevel(t *testing.T) {
 
 	t.Run("nível inválido ou inexistente", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/levels/inexistente/exercises", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/levels/inexistente/exercises", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusNotFound {
@@ -206,7 +206,7 @@ func TestRouter_ListExercises(t *testing.T) {
 
 	t.Run("listar todos os exercícios", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
@@ -224,7 +224,7 @@ func TestRouter_ListExercises(t *testing.T) {
 
 	t.Run("listar com query param de nível válido", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=beginner", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises?level=beginner", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
@@ -244,7 +244,7 @@ func TestRouter_ListExercises(t *testing.T) {
 
 	t.Run("listar com query param de nível inválido", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises?level=invalido", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises?level=invalido", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusBadRequest {
@@ -258,7 +258,7 @@ func TestRouter_GetExercise(t *testing.T) {
 
 	t.Run("exercício existente", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/beg-001", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises/beg-001", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusOK {
@@ -285,7 +285,7 @@ func TestRouter_GetExercise(t *testing.T) {
 
 	t.Run("exercício inexistente", func(t *testing.T) {
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodGet, "/api/v1/exercises/inexistente-999", nil)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/api/v1/exercises/inexistente-999", http.NoBody)
 		router.ServeHTTP(rec, req)
 
 		if rec.Code != http.StatusNotFound {
@@ -300,7 +300,7 @@ func TestRouter_AnswerExercise(t *testing.T) {
 	t.Run("resposta correta", func(t *testing.T) {
 		body := bytes.NewBufferString(`{"answer":"Pato"}`)
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(rec, req)
 
@@ -320,7 +320,7 @@ func TestRouter_AnswerExercise(t *testing.T) {
 	t.Run("resposta incorreta", func(t *testing.T) {
 		body := bytes.NewBufferString(`{"answer":"Gato"}`)
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(rec, req)
 
@@ -340,7 +340,7 @@ func TestRouter_AnswerExercise(t *testing.T) {
 	t.Run("resposta com espaços e pontuação normalizada", func(t *testing.T) {
 		body := bytes.NewBufferString(`{"answer":"  pato! "}`)
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(rec, req)
 
@@ -360,7 +360,7 @@ func TestRouter_AnswerExercise(t *testing.T) {
 	t.Run("resposta vazia", func(t *testing.T) {
 		body := bytes.NewBufferString(`{"answer":"   "}`)
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(rec, req)
 
@@ -372,7 +372,7 @@ func TestRouter_AnswerExercise(t *testing.T) {
 	t.Run("corpo JSON inválido", func(t *testing.T) {
 		body := bytes.NewBufferString(`{invalido`)
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/beg-001/answer", body)
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(rec, req)
 
@@ -384,7 +384,7 @@ func TestRouter_AnswerExercise(t *testing.T) {
 	t.Run("exercício inexistente", func(t *testing.T) {
 		body := bytes.NewBufferString(`{"answer":"Pato"}`)
 		rec := httptest.NewRecorder()
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/exercises/inexistente-999/answer", body)
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/exercises/inexistente-999/answer", body)
 		req.Header.Set("Content-Type", "application/json")
 		router.ServeHTTP(rec, req)
 

@@ -10,6 +10,7 @@ import (
 // Level representa a dificuldade/mundo do exercício.
 type Level string
 
+// Níveis de dificuldade suportados pelo jogo.
 const (
 	LevelBeginner     Level = "beginner"
 	LevelIntermediate Level = "intermediate"
@@ -55,6 +56,7 @@ var AvailableLevels = []LevelInfo{
 // Type representa a modalidade de interação do exercício fonoaudiológico.
 type Type string
 
+// Modalidades de interação suportadas nos exercícios fonoaudiológicos.
 const (
 	TypeMultipleChoice      Type = "multiple_choice"
 	TypeImageWordMatch      Type = "image_word_match"
