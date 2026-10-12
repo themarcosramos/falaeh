@@ -1,2 +1,415 @@
 # falaeh
-Aplicação PWA gamificada para exercícios fonoaudiológicos, com progressão por níveis, interação por voz, gamificação e backend em Go.
+
+Aplicação PWA gamificada para exercícios fonoaudiológicos, com progressão por níveis, interação por voz, gamificação, geração de relatório final (PDF/PNG) e backend em Go.
+
+> Três mundos (iniciante, intermediário e avançado), quatro tipos de exercício (incluindo interação por voz com Web Speech API e fallback por toque), XP/streak/conquistas calculados centralmente no backend, suporte offline PWA e emissão local de certificados e relatórios em PDF e imagem PNG de alta resolução.
+
+---
+
+## Stack
+
+- **Frontend**: HTML5, CSS3, Bootstrap 5, JavaScript moderno (sem framework SPA), PWA (manifest + service worker)
+- **Backend**: Go 1.27 com biblioteca padrão `net/http` (Clean Architecture pragmática)
+- **Dados**: arquivos JSON versionados em `backend/data` (sem banco de dados relacional nesta versão)
+- **Infra local**: Docker, Docker Compose, Nginx e Make
+
+---
+
+## Arquitetura
+
+O projeto adota uma arquitetura limpa e pragmática, sem abstrações desnecessárias ou overengineering.
+Para detalhes conceituais, separação de camadas e diagramas Mermaid, consulte [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Pré-requisitos
+
+- Docker
+- Docker Compose v2
+- Make
+
+Não é necessário instalar Go localmente: tudo executa dentro dos containers.
+
+---
+
+## Como executar
+
+```bash
+git clone git@github.com:themarcosramos/falaeh.git
+cd falaeh
+cp .env.example .env
+make dev
+```
+
+Serviços disponíveis:
+
+| Serviço      | URL                                 |
+| ------------ | ----------------------------------- |
+| Frontend PWA | http://localhost:3000               |
+| API Health   | http://localhost:8080/health        |
+| Swagger UI   | http://localhost:8080/docs          |
+| Spec Swagger | http://localhost:8080/swagger.yaml  |
+
+O frontend consome a API pelo prefixo `/api/`, que o Nginx repassa para o backend Go. A documentação interativa também fica acessível em `http://localhost:3000/api/docs`.
+
+Para encerrar os containers:
+
+```bash
+make down
+```
+
+---
+
+## Documentação da API
+
+A especificação Swagger é gerada a partir das anotações no código:
+
+```bash
+make swagger
+```
+
+O comando lê as anotações em [backend/cmd/api/main.go](backend/cmd/api/main.go) e nos handlers em [backend/internal/httpapi/router.go](backend/internal/httpapi/router.go), gerando [backend/docs/swagger.yaml](backend/docs/swagger.yaml). O arquivo é embutido no binário e servido pelo pacote [backend/docs/docs.go](backend/docs/docs.go).
+
+---
+
+## Comandos
+
+Use `make help` para listar todos os comandos disponíveis.
+
+| Comando                   | Descrição                                            |
+| ------------------------- | ---------------------------------------------------- |
+| `make setup`              | Cria o `.env` a partir do `.env.example`             |
+| `make dev`                | Sobe a aplicação em desenvolvimento (foreground)     |
+| `make up`                 | Sobe a aplicação em desenvolvimento (background)     |
+| `make down`               | Derruba os containers                                |
+| `make stop`               | Para os containers sem removê-los                    |
+| `make restart`            | Reinicia os containers                               |
+| `make build`              | Constrói as imagens de produção                      |
+| `make logs`               | Acompanha os logs                                    |
+| `make bash`               | Abre um shell no container da api                    |
+| `make test`               | Executa testes unitários e de aceitação              |
+| `make test-unit`          | Executa apenas os testes unitários                   |
+| `make test-acceptance`    | Executa apenas os testes de aceitação                |
+| `make test-run`           | Executa um teste específico (`TEST=Nome [PKG=path]`) |
+| `make coverage`           | Gera o relatório de cobertura                        |
+| `make coverage-check`     | Falha se a cobertura ficar abaixo de `COVERAGE_MIN` (80%) |
+| `make fmt`                | Formata o código Go (`gofmt -w -s`)                  |
+| `make vet`                | Executa `go vet`                                     |
+| `make lint`               | Analisa o código com golangci-lint                   |
+| `make lint-fix`           | Corrige automaticamente o que o linter souber        |
+| `make tidy`               | Organiza e verifica as dependências do módulo        |
+| `make audit`              | Procura vulnerabilidades com govulncheck             |
+| `make audit-image`        | Escaneia a imagem de produção com trivy              |
+| `make ci`                 | Quality gate: vet + lint + testes + cobertura        |
+| `make desktop-icons`      | Gera os ícones (PNG, ICO) a partir do SVG do navegador|
+| `make desktop-linux`      | Compila o Falaêh Desktop Linux AMD64 via Docker      |
+| `make desktop-appimage`   | Empacota o Falaêh Desktop Linux no formato AppImage  |
+| `make desktop-windows`    | Compila o executável portátil Windows AMD64 via MinGW|
+| `make desktop-darwin`     | Instruções e build para macOS (runner macos-latest)  |
+| `make desktop-all`        | Compila todos os binários e pacotes desktop          |
+| `make desktop-clean`      | Limpa artefatos de build do desktop                  |
+| `make package-web`        | Empacota a versão Web/PWA estática (.tar.gz)         |
+| `make package-linux`      | Empacota os artefatos versionados Linux (AppImage + tar.gz) |
+| `make package-windows`    | Empacota os artefatos versionados Windows (zip + portable .exe) |
+| `make swagger` / `docs`   | Regenera a documentação Swagger                      |
+| `make clean`              | Remove artefatos de teste e cobertura                |
+| `make docker-down-volumes`| Derruba containers e remove volumes                  |
+| `make docker-clean`       | Derruba containers, volumes e imagens do projeto     |
+
+---
+
+## Estrutura de pastas
+
+```
+frontend/
+  index.html          # casca da aplicação PWA
+  manifest.json       # Web App Manifest (standalone, ícones, tema)
+  sw.js               # Service Worker (cache de assets essenciais + fallback offline)
+  nginx.conf          # servidor web estático + proxy reverso para /api
+  assets/
+    css/ app.css      # estilos do jogo, microanimações, HUD e regras @media print
+    js/ app.js        # lógica do cliente, SpeechRecognition, PWA e geração de relatórios
+    icons/ icon.svg   # ícone adaptável de alta definição
+
+backend/
+  cmd/api/main.go     # ponto de entrada HTTP e inicialização com injeção de dependência
+  docs/               # swagger.yaml gerado + Swagger UI (embed)
+  internal/
+    httpapi/          # camada delivery REST (rotas e handlers)
+    game/             # máquina de estados da partida em memória e relatório final
+    exercise/         # carregamento JSON, repositório e normalização textual
+    gamification/     # regras de XP, streak, bônus e conquistas
+  data/               # exercícios organizados por nível (JSON)
+
+docs/
+  architecture.md     # descrição detalhada da arquitetura e diagramas Mermaid
+
+docker-compose.yml      # configuração base para produção
+docker-compose.dev.yml  # volumes e hot-reload para desenvolvimento
+Makefile
+```
+
+---
+
+## API
+
+Documentação interativa disponível em `http://localhost:8080/docs` (spec em `/swagger.yaml`).
+
+| Método | Rota | Descrição |
+| --- | --- | --- |
+| `GET` | `/health` / `/api/health` | Verificação de disponibilidade |
+| `GET` | `/api/v1/levels` | Lista os mundos/níveis do jogo |
+| `GET` | `/api/v1/levels/{level}/exercises` | Exercícios públicos de um nível (sem gabarito) |
+| `GET` | `/api/v1/exercises` | Lista exercícios com filtro opcional `?level=` |
+| `GET` | `/api/v1/exercises/{id}` | Exercício por ID |
+| `POST` | `/api/v1/exercises/{id}/answer` | Valida uma resposta isolada |
+| `POST` | `/api/v1/game/start` | Inicia (ou retoma) uma partida e devolve o primeiro exercício |
+| `POST` | `/api/v1/game/{sessionId}/answer` | Responde o exercício atual e devolve XP, streak e o próximo exercício |
+
+### Fluxo da partida
+
+1. `POST /api/v1/game/start` cria a partida em memória e devolve `sessionId`, o primeiro exercício e o progresso.
+2. Cada resposta é submetida a `POST /api/v1/game/{sessionId}/answer`. O backend normaliza a entrada, valida contra o gabarito, calcula o XP (com bônus de 1ª tentativa e streak) e devolve o próximo exercício.
+3. Ao concluir todos os desafios do nível, o backend retorna `phaseCompleted: true`, desbloqueia o próximo mundo e anexa o `report` de desempenho.
+
+---
+
+## Qualidade e Testes
+
+Todos os comandos de validação e qualidade executam **100% dentro de containers Docker**, sem necessidade de instalar Go ou dependências no host:
+
+```bash
+make fmt               # Formata o código Go (gofmt)
+make vet               # Executa análise estática padrão (go vet)
+make lint              # Executa golangci-lint (v2) com a configuração do .golangci.yml
+make test              # Executa todas as suítes (unitários + aceitação)
+make acceptance        # Executa exclusivamente a suíte de testes de aceitação
+make coverage          # Gera o relatório de cobertura em HTML (backend/tmp/tests/coverage.html)
+make coverage-check    # Valida se a cobertura global está >= 80% (meta atingida: 96.2%)
+make build             # Constrói as imagens de produção no Docker
+make check             # Quality Gate unificado (vet + lint + test + coverage-check)
+make ci                # Alias de make check para integração contínua
+make wails-dev         # Ambiente opcional de desenvolvimento com hot reload (Wails CLI)
+```
+
+---
+
+## Modo por voz
+
+Exercícios do tipo `voice` desafiam a criança ou adolescente a pronunciar fonemas, palavras ou trava-línguas.
+O reconhecimento ocorre **localmente no navegador** via Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`), configurada para `pt-BR`.
+
+### Privacidade e Segurança da Fala:
+- **Nenhum áudio é gravado, armazenado ou transmitido para servidores.**
+- Apenas a transcrição textual é normalizada localmente e enviada para conferência no backend.
+- **Fallback total por toque**: opções de resposta por clique permanecem disponíveis caso o navegador não ofereça suporte a fala, a permissão do microfone seja recusada ou ocorra ruído ambiente.
+
+---
+
+## Efeitos Sonoros, Navegação e Acessibilidade
+
+- **Feedback Sonoro Procedural**: Efeitos sintetizados localmente com a Web Audio API (sem arquivos MP3 externos pesados, garantindo carregamento instantâneo e suporte offline no PWA).
+  - *Acerto*: acorde suave ascendente e positivo;
+  - *Erro*: tom curto, quente e encorajador (nunca agressivo ou de punição);
+  - *Conclusão de Fase*: sequência melódica alegre;
+  - *Conclusão de Mundo*: fanfarra festiva diferenciada com animação de confetes;
+  - *Controle de Som*: botão de alternância (🔊 / 🔇) no cabeçalho, com persistência da preferência no `localStorage`;
+  - *Independência de Áudio*: o jogo funciona integralmente em modo silencioso ou caso o navegador não tenha suporte à API.
+- **Navegação Segura e Intuitiva**:
+  - O logo **Fala Eh** é navegável para a Home em qualquer momento;
+  - Caso haja uma missão em andamento, um diálogo modal acessível é exibido para evitar perda acidental de progresso;
+  - Elementos informativos do HUD (XP e Streak) são mantidos como badges puramente visuais, sem transformar indicadores em links desnecessários.
+- **Acessibilidade e UX Universal**:
+  - Navegação completa por teclado (Tab, Enter, Espaço, Esc);
+  - Foco visível de alto contraste (`:focus-visible` com espessura de 4px);
+  - Rótulos semânticos (`aria-label`, `role="status"`, `aria-live="polite"`);
+  - Respeito à preferência do sistema operacional por redução de movimento (`prefers-reduced-motion`);
+  - Feedbacks multissensoriais que não dependem exclusivamente de cor, som ou animação (texto motivacional dinâmico, ícones e pontuação explícita).
+- **Design System Ergonômico: 8pt Grid System (com Subgrid de 4pt)**:
+  - *Consistência Espacial*: Todos os espaçamentos, margens, gaps e paddings seguem múltiplos exatos de 8px e 4px através de design tokens (`--space-1` a `--space-13`), eliminando "números mágicos" no CSS;
+  - *Prevenção de Subpixel Rendering*: Elimina borrões em telas de alta densidade (Retina/AMOLED com multiplicadores 2x, 3x ou 4x);
+  - *Ergonomia para Crianças e Adolescentes*: Alvos de toque acessíveis padronizados em múltiplos de 8 (mínimo de 48px para botões secundários, 56px para botões primários e 88px para o microfone), superando as recomendações WCAG AAA e facilitando a interação de usuários com coordenação motora fina em desenvolvimento;
+  - *Sinergia com Bootstrap 5*: Harmonização direta com a escala de utilitários do framework (`$spacer = 16px`).
+
+---
+
+## Relatório final e Certificado
+
+Ao concluir uma fase, o jogador recebe um relatório completo de desempenho com opção de personalizar seu nome:
+- **Nível** concluído;
+- **Total de Exercícios Realizados**, **Acertos** e **Tentativas** com taxa de acurácia;
+- **XP Total Conquistado** e **Maior Sequência (*Streak*)**;
+- **Status da Fase** e **Próximo Nível Desbloqueado**;
+- **Gerar PDF**: imprime ou salva localmente o certificado oficial em folha A4;
+- **Salvar Imagem**: gera e baixa instantaneamente um cartão comemorativo PNG em alta resolução via HTML5 Canvas.
+
+Toda a geração ocorre no cliente de forma privada, sem enviar informações pessoais a nenhum serviço.
+
+---
+
+## Avaliação Opcional da Experiência (Feedback Anônimo)
+
+Ao término de uma fase (tela de relatório final), o jogador tem a opção de responder a uma pergunta simples e rápida:
+> *"Você gostou de jogar o Falaêh?"*
+
+- **Opções Fechadas e Visuais**:
+  - 😄 **Gostei muito** (`gostei_muito`)
+  - 🙂 **Gostei** (`gostei`)
+  - 😐 **Foi mais ou menos** (`mais_ou_menos`)
+  - 🙁 **Não gostei** (`nao_gostei`)
+- **Caixa de Texto Opcional (Complemente sua avaliação)**:
+  - Ao selecionar um dos ícones, surge uma caixa de texto curta (até 200 caracteres) para a pessoa deixar um recadinho descritivo sobre o jogo se desejar;
+  - A caixa é **totalmente opcional**: é possível enviar a avaliação com comentário ou apenas com o ícone selecionado;
+  - Não solicita nem armazena dados pessoais;
+- **Acessibilidade e Usabilidade**:
+  - Cada opção possui rótulo textual explícito e emoji lúdico;
+  - Navegação completa por teclado (setas direcionais para seleção e Tab/Enter);
+  - Alvos de toque acessíveis ($\ge 48\text{px}$) e compatíveis com a escala de 8pt;
+  - Botão *"Pular avaliação"* disponível para prosseguir sem avaliar;
+  - Mensagem carinhosa de agradecimento imediata.
+- **Privacidade por Padrão**:
+  - A avaliação é **100% anônima**;
+  - Nenhum dado pessoal, identificador de sessão, pontuação ou histórico da partida é vinculado ou enviado;
+  - O Falaêh **não possui banco de dados** e não armazena dados de usuários.
+
+### Integração Opcional com Google Forms / Google Sheets
+
+Para consolidar as avaliações e comentários descritivos dos participantes na planilha do seu TCC:
+
+1. Crie um formulário no [Google Forms](https://forms.google.com) contendo 1 ou 2 perguntas;
+2. No arquivo `.env` da raiz do projeto, informe a URL do seu formulário:
+   ```bash
+   FEEDBACK_GOOGLE_FORMS_URL="https://docs.google.com/forms/d/e/SEU_FORM_ID/viewform"
+   ```
+3. **Formatação Inteligente**:
+   - **Formulário com 1 campo**: O Falaêh consolida o ícone escolhido, seu significado e o comentário em uma única resposta pronta para a planilha (ex: `😄 Gostei muito — Adorei os exercícios de voz!`, ou apenas `😄 Gostei muito` se o usuário optou por não escrever);
+   - **Formulário com campos separados**: Você também pode especificar opcionalmente o campo no `.env` (`FEEDBACK_GOOGLE_FORMS_ENTRY_ID="entry.123456789"`), ou deixar a aplicação detectar os campos automaticamente;
+4. **Resiliência e Tolerância a Falhas**:
+   - Se essas variáveis não forem preenchidas, a aplicação funciona normalmente sem envio externo;
+   - Se o Google Forms estiver indisponível ou retornar erro, a aplicação degrada graciosamente, **sem travar a partida ou afetar o relatório final do jogador**.
+
+---
+
+## Versão Desktop (Wails)
+
+O Falaêh também pode ser distribuído como aplicativo nativo para desktop através do [Wails v2](https://wails.io). A versão desktop **coexiste** com a versão Web/PWA, sem substituí-la.
+
+### Plataformas Suportadas e Distribuições:
+* **Linux (AMD64)**:
+  * **Binário Nativo ELF**: `build/bin/falaeh` (com suporte a WebKit2GTK 4.1 e GTK3);
+  * **Pacote Portátil AppImage**: `build/bin/Falaeh-x86_64.AppImage` (executável universal de clique duplo, sem necessidade de instalação);
+* **Windows (AMD64)**:
+  * **Executável Portátil Standalone**: `build/bin/falaeh.exe` (e alias `build/bin/falaeh-portable.exe`, executável autônomo sem instalador);
+* **macOS (Intel e Apple Silicon / Universal)**:
+  * **Aplicativo Nativo**: `build/bin/falaeh.app` (empacotado via runner macOS do GitHub Actions).
+
+### Ícone Unificado da Aplicação:
+O ícone do robozinho mascote do Falaêh (`frontend/assets/icons/icon.svg`), o mesmo exibido na aba e favoritos do navegador, é utilizado de forma padronizada em todos os formatos desktop:
+* **Linux & AppImage**: Renderizado em PNG 512×512 de alta resolução e embutido na janela nativa GTK e no arquivo `.desktop` do AppImage;
+* **Windows**: Convertido para formato multi-resolução (`icon.ico`: 16×16 até 256×256) e embutido nos recursos binários do `.exe` (visível no Windows Explorer e barra de tarefas);
+* **macOS**: Configurado no `Info.plist` e pacote `.app`.
+
+### Compilação 100% via Docker:
+Todos os builds desktop rodam através do container `falaeh-desktop-builder`, sem necessidade de instalar dependências CGO ou Wails na sua máquina host:
+
+```bash
+# Gerar os ícones PNG e ICO a partir do SVG do navegador
+make desktop-icons
+
+# Compilar o binário Linux AMD64
+make desktop-linux
+
+# Empacotar o Linux AppImage
+make desktop-appimage
+
+# Compilar o executável portátil Windows AMD64
+make desktop-windows
+
+# Compilar todas as distribuições e pacotes desktop locais
+make desktop-all
+```
+
+Os artefatos gerados ficam salvos em `build/bin/`:
+* `build/bin/Falaeh-x86_64.AppImage`
+* `build/bin/falaeh`
+* `build/bin/falaeh.exe`
+* `build/bin/falaeh-portable.exe`
+
+### Como Funciona a Arquitetura Desktop:
+* **In-Process AssetServer Handler**: O WebView do Wails entrega as chamadas de rede `/api/v1/...` diretamente ao `httpapi.NewRouter` em memória (Go). Não é aberto nenhum servidor TCP nem portas de rede na máquina do usuário, prevenindo bloqueios de firewall e conflitos de porta;
+* **Single Binary Auto-Contido**: A interface estática (HTML5, Bootstrap 5, JS) e as bases de exercícios JSON são embutidas diretamente no executável via `//go:embed`;
+* **Fallback de Voz no WebView**: Caso o WebView nativo da plataforma não ofereça suporte à Web Speech API (`SpeechRecognition`), o Falaêh automaticamente chaveia para o modo alternativo por toque/clique (múltipla escolha), mantendo 100% da usabilidade;
+* **Exportação de Certificados**: A geração e download de relatórios em PDF e imagem PNG (HTML5 Canvas) funcionam identicamente no desktop.
+
+---
+
+## Fluxo Automático de Release
+
+O Falaêh possui pipeline automatizada de release contínuo via GitHub Actions (`.github/workflows/release.yml`).
+
+### Regras de Acionamento e Segurança
+* **Gatilho Único e Restrito:** O fluxo de release é executado **exclusivamente após o merge efetivo na branch `production`** (`on: push: branches: [production]`).
+* **PRs Não Geram Release:** Pull Requests abertas para `production`, mesmo com todos os quality gates e testes aprovados, **jamais geram releases ou binários oficiais**.
+* **Quality Gate Obrigatório:** O pipeline executa `make check` antes da compilação dos artefatos. Se houver falha de lint, vet, testes ou cobertura (< 80%), a release é abortada imediatamente.
+* **Bloqueio Total por Falha de Plataforma:** Os builds de todas as plataformas (`build-web`, `build-linux`, `build-windows`, `build-macos`) são obrigatórios. Se qualquer um falhar, o job final `publish-release` é bloqueado e nenhuma release é publicada.
+
+### Artefatos Publicados na GitHub Release
+| Plataforma / Alvo | Formato | Nome do Artefato |
+| :--- | :--- | :--- |
+| **Web/PWA** | Tarball (.tar.gz) | `falaeh-web-v<version>.tar.gz` |
+| **Linux (AMD64)** | Tarball (.tar.gz) | `falaeh-linux-amd64-v<version>.tar.gz` |
+| **Linux (AppImage)** | AppImage Portátil | `Falaeh-linux-amd64-v<version>.AppImage` |
+| **Windows (AMD64)** | Executável Portátil | `falaeh-windows-amd64-portable-v<version>.exe` |
+| **Windows (AMD64)** | Pacote Zip | `falaeh-windows-amd64-v<version>.zip` |
+| **macOS (Universal)** | Pacote Zip | `falaeh-macos-universal-v<version>.zip` |
+| **Integridade** | Checksums SHA-256 | `SHA256SUMS.txt` |
+
+### Versionamento Dinâmico por Tags Git
+A versão da aplicação é determinada dinamicamente através de tags semânticas do Git (`v<major>.<minor>.<patch>`):
+* **Via Tag Git (Recomendado):** Ao criar e subir uma tag (ex: `git tag v1.2.0 && git push origin v1.2.0`), o workflow extrai automaticamente a versão (`1.2.0`) e batiza todos os artefatos e a release no GitHub;
+* **Via Branch de Release:** Caso uma PR venha de uma branch no padrão `rc/v1.2.0` ou `release/v1.2.0`, o pipeline extrai dinamicamente a versão a partir do commit de merge;
+* **Via Arquivo VERSION:** Na ausência de tag ou branch padronizada, o pipeline utiliza como fallback o valor presente no arquivo `VERSION` na raiz do projeto.
+
+### Limitações Técnicas Conhecidas
+* **macOS Toolchain:** Devido a restrições de licenciamento da Apple e suporte do Wails v2, a compilação do bundle nativo `.app` para macOS não é suportada por cross-compilação em Linux/Docker e roda no runner oficial `macos-latest` do GitHub Actions;
+* **Certificados Comerciais:** O projeto não exige e não implementa certificados comerciais pagos de assinatura de código (como Apple Developer ID ou Microsoft Authenticode). Executáveis podem apresentar avisos do Windows SmartScreen ou macOS Gatekeeper dependendo das políticas de segurança locais do usuário;
+* **Infraestrutura Externa:** Nenhum secret de cloud, token externo de deploy ou serviço terceirizado é utilizado. Toda a autenticação é gerenciada nativamente pelo `GITHUB_TOKEN` do repositório.
+
+---
+
+## Como estender o jogo
+
+### Adicionar um novo exercício
+
+Edite o arquivo do nível desejado em `backend/data/` (`beginner.json`, `intermediate.json` ou `advanced.json`):
+
+```json
+{
+    "id": "beg-007",
+    "level": "beginner",
+    "type": "voice",
+    "instruction": "Pronuncie a palavra SAPO em voz alta:",
+    "targetWord": "Sapo",
+    "options": ["Sapo", "Pato", "Gato"],
+    "correctAnswer": "Sapo"
+}
+```
+
+### Alterar as regras de XP
+
+As constantes de pontuação ficam centralizadas em [backend/internal/gamification/rules.go](backend/internal/gamification/rules.go):
+
+| Regra | Constante | Valor padrão |
+| --- | --- | --- |
+| Resposta correta | `DefaultBaseCorrectXP` | 100 |
+| Acerto na 1ª tentativa | `DefaultFirstAttemptBonusXP` | +50 |
+| Sequência de 3 acertos | `DefaultStreak3BonusXP` | +50 |
+| Sequência de 5 acertos | `DefaultStreak5BonusXP` | +100 |
+| Conclusão de fase | `DefaultPhaseCompletionBonusXP` | +300 |
+| Conclusão de nível | `DefaultLevelCompletionBonusXP` | +500 |
+
+---
+
+## Licença
+
+Ver [LICENSE](LICENSE).

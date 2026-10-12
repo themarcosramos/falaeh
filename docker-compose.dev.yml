@@ -1,0 +1,13 @@
+services:
+  api:
+    build:
+      target: dev
+    # Tag própria para o build de dev não sobrescrever a imagem de produção.
+    image: falaeh-api-dev
+    volumes:
+      - ./backend:/app
+
+  web:
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro

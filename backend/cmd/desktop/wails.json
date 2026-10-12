@@ -1,0 +1,18 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "falaeh",
+  "outputfilename": "falaeh",
+  "frontend:dir": "./frontend",
+  "version": "2",
+  "author": {
+    "name": "Falaêh Team",
+    "email": "dev@falaeh.local"
+  },
+  "info": {
+    "companyName": "Falaêh",
+    "productName": "Falaêh",
+    "productVersion": "1.0.0",
+    "copyright": "Falaêh",
+    "comments": "PWA gamificada de exercícios fonoaudiológicos"
+  }
+}

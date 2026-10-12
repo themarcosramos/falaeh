@@ -1,0 +1,575 @@
+basePath: /
+definitions:
+  exercise.Level:
+    enum:
+    - beginner
+    - intermediate
+    - advanced
+    type: string
+    x-enum-varnames:
+    - LevelBeginner
+    - LevelIntermediate
+    - LevelAdvanced
+  exercise.LevelInfo:
+    properties:
+      description:
+        example: 'Mundo 1: Sons e palavras fundamentais'
+        type: string
+      id:
+        allOf:
+        - $ref: '#/definitions/exercise.Level'
+        example: beginner
+      name:
+        example: Iniciante
+        type: string
+    type: object
+  exercise.PublicExercise:
+    properties:
+      id:
+        type: string
+      instruction:
+        type: string
+      level:
+        $ref: '#/definitions/exercise.Level'
+      options:
+        items:
+          type: string
+        type: array
+      targetWord:
+        type: string
+      type:
+        $ref: '#/definitions/exercise.Type'
+    type: object
+  exercise.Type:
+    enum:
+    - multiple_choice
+    - image_word_match
+    - sound_identification
+    - voice
+    type: string
+    x-enum-varnames:
+    - TypeMultipleChoice
+    - TypeImageWordMatch
+    - TypeSoundIdentification
+    - TypeVoice
+  exercise.ValidationResult:
+    properties:
+      correct:
+        type: boolean
+      exerciseId:
+        type: string
+    type: object
+  game.AnswerResult:
+    properties:
+      breakdown:
+        $ref: '#/definitions/gamification.XPBreakdown'
+      completion:
+        $ref: '#/definitions/gamification.LevelCompletionResult'
+      correct:
+        type: boolean
+      earnedXp:
+        type: integer
+      exerciseId:
+        type: string
+      exerciseIndex:
+        type: integer
+      newAchievements:
+        items:
+          $ref: '#/definitions/gamification.Achievement'
+        type: array
+      nextExercise:
+        $ref: '#/definitions/exercise.PublicExercise'
+      phaseCompleted:
+        type: boolean
+      progress:
+        $ref: '#/definitions/gamification.Progress'
+      report:
+        $ref: '#/definitions/game.Report'
+      streak:
+        type: integer
+      totalExercises:
+        type: integer
+      totalXp:
+        type: integer
+    type: object
+  game.Report:
+    properties:
+      accuracy:
+        type: integer
+      attempts:
+        type: integer
+      bestStreak:
+        type: integer
+      exercisesTotal:
+        type: integer
+      hits:
+        type: integer
+      level:
+        $ref: '#/definitions/exercise.Level'
+      levelName:
+        type: string
+      misses:
+        type: integer
+      nextLevel:
+        $ref: '#/definitions/exercise.Level'
+      nextLevelUnlocked:
+        type: boolean
+      phaseCompleted:
+        type: boolean
+      totalXp:
+        type: integer
+    type: object
+  game.StartResult:
+    properties:
+      exercise:
+        $ref: '#/definitions/exercise.PublicExercise'
+      exerciseIndex:
+        type: integer
+      level:
+        $ref: '#/definitions/exercise.Level'
+      levelName:
+        type: string
+      progress:
+        $ref: '#/definitions/gamification.Progress'
+      rules:
+        $ref: '#/definitions/gamification.Rules'
+      sessionId:
+        type: string
+      totalExercises:
+        type: integer
+    type: object
+  gamification.Achievement:
+    properties:
+      description:
+        type: string
+      icon:
+        type: string
+      id:
+        $ref: '#/definitions/gamification.AchievementID'
+      title:
+        type: string
+    type: object
+  gamification.AchievementID:
+    enum:
+    - first_correct
+    - streak_3
+    - streak_5
+    - beginner_complete
+    - intermediate_complete
+    - advanced_complete
+    type: string
+    x-enum-varnames:
+    - AchievementFirstCorrect
+    - AchievementStreak3
+    - AchievementStreak5
+    - AchievementBeginnerComplete
+    - AchievementIntermediateComplete
+    - AchievementAdvancedComplete
+  gamification.LevelCompletionResult:
+    properties:
+      breakdown:
+        $ref: '#/definitions/gamification.XPBreakdown'
+      earnedXp:
+        type: integer
+      level:
+        $ref: '#/definitions/exercise.Level'
+      newAchievements:
+        items:
+          $ref: '#/definitions/gamification.Achievement'
+        type: array
+      nextLevel:
+        $ref: '#/definitions/exercise.Level'
+      nextUnlocked:
+        type: boolean
+      totalXp:
+        type: integer
+    type: object
+  gamification.Progress:
+    properties:
+      achievements:
+        items:
+          $ref: '#/definitions/gamification.Achievement'
+        type: array
+      bestStreak:
+        type: integer
+      completedLevels:
+        items:
+          $ref: '#/definitions/exercise.Level'
+        type: array
+      currentLevel:
+        $ref: '#/definitions/exercise.Level'
+      currentStreak:
+        type: integer
+      totalAttempts:
+        type: integer
+      totalHits:
+        type: integer
+      totalMisses:
+        type: integer
+      totalXp:
+        type: integer
+      unlockedLevels:
+        items:
+          $ref: '#/definitions/exercise.Level'
+        type: array
+    type: object
+  gamification.Rules:
+    properties:
+      baseCorrectXp:
+        type: integer
+      firstAttemptBonusXp:
+        type: integer
+      levelCompletionBonusXp:
+        type: integer
+      phaseCompletionBonusXp:
+        type: integer
+      streak3BonusXp:
+        type: integer
+      streak3Threshold:
+        type: integer
+      streak5BonusXp:
+        type: integer
+      streak5Threshold:
+        type: integer
+    type: object
+  gamification.XPBreakdown:
+    properties:
+      baseXp:
+        type: integer
+      firstAttemptBonus:
+        type: integer
+      levelBonus:
+        type: integer
+      phaseBonus:
+        type: integer
+      streakBonus:
+        type: integer
+      total:
+        type: integer
+    type: object
+  httpapi.AnswerRequest:
+    properties:
+      answer:
+        example: pato
+        type: string
+    type: object
+  httpapi.ErrorResponse:
+    properties:
+      error:
+        example: exercício não encontrado
+        type: string
+    type: object
+  httpapi.FeedbackRequest:
+    properties:
+      comment:
+        example: Adorei a missão dos sons!
+        type: string
+      rating:
+        example: gostei_muito
+        type: string
+    type: object
+  httpapi.FeedbackResponse:
+    properties:
+      message:
+        example: Muito obrigado pela sua avaliação!
+        type: string
+      status:
+        example: ok
+        type: string
+    type: object
+  httpapi.GameAnswerRequest:
+    properties:
+      answer:
+        example: pato
+        type: string
+      exerciseId:
+        example: beg-001
+        type: string
+    type: object
+  httpapi.HealthResponse:
+    properties:
+      status:
+        example: ok
+        type: string
+    type: object
+  httpapi.StartGameRequest:
+    properties:
+      level:
+        example: beginner
+        type: string
+      sessionId:
+        example: 9f1c2b3a4d5e6f708192a3b4c5d6e7f8
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API do jogo educativo de exercícios fonoaudiológicos. Não possui autenticação
+    nem armazena dados pessoais.
+  license:
+    name: MIT
+    url: https://github.com/themarcosramos/falaeh/blob/main/LICENSE
+  title: Fala Eh API
+  version: 0.1.0
+paths:
+  /api/v1/exercises:
+    get:
+      description: Retorna a lista de exercícios públicos do jogo, podendo filtrar
+        por nível via query param.
+      parameters:
+      - description: Filtro opcional por nível
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        in: query
+        name: level
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exercise.PublicExercise'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Lista exercícios com filtro opcional por nível
+      tags:
+      - exercises
+  /api/v1/exercises/{id}:
+    get:
+      description: Retorna os dados públicos de um exercício específico. A resposta
+        correta nunca é exposta.
+      parameters:
+      - description: 'ID do exercício (ex: beg-001)'
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/exercise.PublicExercise'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Obtém um exercício por ID
+      tags:
+      - exercises
+  /api/v1/exercises/{id}/answer:
+    post:
+      consumes:
+      - application/json
+      description: Avalia se a resposta enviada pelo usuário está correta segundo
+        regras fonéticas e normalização do domínio.
+      parameters:
+      - description: ID do exercício
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Resposta do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.AnswerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/exercise.ValidationResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Valida a resposta de um exercício
+      tags:
+      - exercises
+  /api/v1/feedback:
+    post:
+      consumes:
+      - application/json
+      description: Recebe exclusivamente uma opção fechada de avaliação e comentário
+        opcional sem vincular qualquer identificador ou dado pessoal.
+      parameters:
+      - description: Opção de avaliação fechada e comentário opcional
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.FeedbackRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Avaliação registrada com sucesso
+          schema:
+            $ref: '#/definitions/httpapi.FeedbackResponse'
+        "400":
+          description: Opção de avaliação inválida ou vazia
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Envia uma avaliação anônima da experiência do Fala Eh
+      tags:
+      - feedback
+  /api/v1/game/{sessionId}/answer:
+    post:
+      consumes:
+      - application/json
+      description: Valida a resposta no backend e devolve XP, streak, conquistas e
+        o próximo exercício. A pontuação nunca é calculada pelo cliente.
+      parameters:
+      - description: Identificador da partida
+        in: path
+        name: sessionId
+        required: true
+        type: string
+      - description: Resposta do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.GameAnswerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/game.AnswerResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Responde o exercício atual da partida
+      tags:
+      - game
+  /api/v1/game/start:
+    post:
+      consumes:
+      - application/json
+      description: Cria (ou retoma, informando sessionId) uma partida em memória e
+        devolve o primeiro exercício do nível. Nenhum dado pessoal é armazenado.
+      parameters:
+      - description: Nível a iniciar e sessão opcional a retomar
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/httpapi.StartGameRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/game.StartResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Inicia uma fase da partida
+      tags:
+      - game
+  /api/v1/levels:
+    get:
+      description: Retorna a lista de níveis de dificuldade e mundos suportados no
+        jogo.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exercise.LevelInfo'
+            type: array
+      summary: Lista os níveis disponíveis
+      tags:
+      - levels
+  /api/v1/levels/{level}/exercises:
+    get:
+      description: Retorna a lista de exercícios públicos de um determinado nível.
+        A resposta correta nunca é exposta.
+      parameters:
+      - description: Nível (beginner, intermediate, advanced)
+        enum:
+        - beginner
+        - intermediate
+        - advanced
+        in: path
+        name: level
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/exercise.PublicExercise'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httpapi.ErrorResponse'
+      summary: Lista os exercícios de um nível
+      tags:
+      - exercises
+  /health:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpapi.HealthResponse'
+      summary: Verifica se a API está disponível
+      tags:
+      - health
+schemes:
+- http
+- https
+swagger: "2.0"
