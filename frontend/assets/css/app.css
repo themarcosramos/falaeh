@@ -10,6 +10,41 @@
     --app-card-border: rgba(139, 92, 246, 0.25);
     --app-card-border-active: rgba(245, 158, 11, 0.8);
     --app-text-muted: #94a3b8;
+
+    /* ==========================================================
+       ESCALA DE ESPAÇAMENTO: 8pt Grid System (com subgrid de 4pt)
+       Multiplicadores: 4px, 8px, 12px, 16px, 20px, 24px, 
+       32px, 40px, 48px, 56px, 64px, 80px, 96px.
+       Garante nitidez em telas de alta densidade (Retina/AMOLED)
+       e harmonia visual entre mobile, tablet e desktop.
+       ========================================================== */
+    --space-1: 4px;   /* 0.5x (subgrid 4pt para microajustes e bordas) */
+    --space-2: 8px;   /* 1x   (base 8pt) */
+    --space-3: 12px;  /* 1.5x (subgrid 4pt) */
+    --space-4: 16px;  /* 2x   (equivalente a $spacer / 1rem no Bootstrap) */
+    --space-5: 20px;  /* 2.5x */
+    --space-6: 24px;  /* 3x   */
+    --space-7: 32px;  /* 4x   */
+    --space-8: 40px;  /* 5x   */
+    --space-9: 48px;  /* 6x   (alvo de toque mínimo recomendado WCAG AAA) */
+    --space-10: 56px; /* 7x   (alvo de toque confortável para crianças) */
+    --space-11: 64px; /* 8x   */
+    --space-12: 80px; /* 10x  */
+    --space-13: 96px; /* 12x  */
+
+    /* Dimensões Padrão de Elementos Interativos (Múltiplos de 8) */
+    --target-touch-min: 48px;  /* 6x8: Altura mínima de toque acessível */
+    --target-touch-lg: 56px;   /* 7x8: Botões primários de ação */
+    --size-badge-icon: 72px;   /* 9x8: Ícones dos planetas/mundos */
+    --size-mic-btn: 88px;      /* 11x8: Botão principal do microfone */
+
+    /* Raios de Borda Harmônicos */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-xl: 32px;
+    --radius-full: 9999px;
 }
 
 body.bg-app {
@@ -46,11 +81,11 @@ body.bg-app {
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-    padding: 0.5rem 1.25rem;
-    border-radius: 9999px;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-full);
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 /* Mascote Eco com microanimação de flutuação */
@@ -61,7 +96,7 @@ body.bg-app {
 }
 
 .mascot-svg {
-    width: clamp(140px, 20vw, 190px);
+    width: clamp(144px, 20vw, 192px);
     height: auto;
     animation: float 4s ease-in-out infinite;
 }
@@ -80,8 +115,9 @@ body.bg-app {
     font-weight: 800;
     font-size: 1.25rem;
     border: none;
-    border-radius: 9999px;
-    padding: 0.9rem 2.5rem;
+    min-height: var(--target-touch-lg);
+    border-radius: var(--radius-full);
+    padding: var(--space-4) var(--space-8);
     box-shadow: 0 10px 25px var(--app-accent-glow), 0 0 0 2px rgba(255, 255, 255, 0.2) inset;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     animation: pulse-glow 3s infinite;
@@ -104,10 +140,10 @@ body.bg-app {
 .world-card {
     background: var(--app-card-bg);
     border: 2px solid var(--app-card-border);
-    border-radius: 1.75rem;
+    border-radius: var(--radius-lg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    padding: 1.75rem 1.5rem;
+    padding: var(--space-6) var(--space-5);
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
     position: relative;
     overflow: hidden;
@@ -150,13 +186,13 @@ body.bg-app {
 
 /* Ícone do mundo com container circular estilizado */
 .world-badge-icon {
-    width: 76px;
-    height: 76px;
+    width: var(--size-badge-icon);
+    height: var(--size-badge-icon);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1.25rem;
+    margin: 0 auto var(--space-5);
     transition: transform 0.3s ease;
 }
 
@@ -181,8 +217,8 @@ body.bg-app {
     color: #34d399;
     font-size: 0.82rem;
     font-weight: 700;
-    padding: 0.4rem 0.9rem;
-    border-radius: 9999px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
 }
 
 .badge-status-locked {
@@ -191,21 +227,22 @@ body.bg-app {
     color: #94a3b8;
     font-size: 0.82rem;
     font-weight: 600;
-    padding: 0.4rem 0.9rem;
-    border-radius: 9999px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
 }
 
 /* Botões dos Mundos */
 .btn-world {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: 1rem;
+    min-height: var(--target-touch-min);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 1rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     transition: all 0.2s ease;
 }
 
@@ -240,7 +277,7 @@ body.bg-app {
 /* Toast de Feedback Interativo amigável */
 .friendly-toast {
     position: fixed;
-    bottom: 2rem;
+    bottom: var(--space-7);
     left: 50%;
     transform: translateX(-50%) translateY(100px);
     background: rgba(30, 27, 75, 0.95);
@@ -249,8 +286,8 @@ body.bg-app {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     color: #f8fafc;
-    padding: 0.85rem 1.75rem;
-    border-radius: 9999px;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full);
     font-weight: 600;
     font-size: 0.95rem;
     z-index: 1050;
@@ -259,7 +296,7 @@ body.bg-app {
     transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
     display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: var(--space-2);
     max-width: 90vw;
     text-align: center;
 }
@@ -322,9 +359,11 @@ body.bg-app {
 .game-hud {
     background: rgba(30, 27, 75, 0.85);
     border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-md);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    padding: var(--space-4);
 }
 
 .hud-badge-world {
@@ -333,21 +372,23 @@ body.bg-app {
     color: #ede9fe;
     font-weight: 700;
     font-size: 0.95rem;
-    padding: 0.4rem 1rem;
-    border-radius: 9999px;
+    min-height: var(--target-touch-min);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
 .hud-stat {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: var(--space-1);
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(148, 163, 184, 0.2);
-    padding: 0.35rem 0.85rem;
-    border-radius: 9999px;
+    min-height: 40px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-full);
     font-size: 0.95rem;
 }
 
@@ -359,14 +400,14 @@ body.bg-app {
 .game-progress {
     height: 12px;
     background-color: rgba(15, 23, 42, 0.8);
-    border-radius: 9999px;
+    border-radius: var(--radius-full);
     overflow: hidden;
     border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
 .game-progress-bar {
     background: linear-gradient(90deg, #10b981 0%, #06b6d4 50%, #8b5cf6 100%);
-    border-radius: 9999px;
+    border-radius: var(--radius-full);
     transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
 }
@@ -375,6 +416,8 @@ body.bg-app {
 .exercise-card {
     background: var(--app-card-bg);
     border: 2px solid var(--app-card-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-7) var(--space-6);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 30px rgba(139, 92, 246, 0.15);
@@ -387,8 +430,8 @@ body.bg-app {
     color: #c4b5fd;
     font-size: 0.85rem;
     font-weight: 700;
-    padding: 0.35rem 0.85rem;
-    border-radius: 9999px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
     text-transform: uppercase;
     letter-spacing: 0.04em;
 }
@@ -412,8 +455,9 @@ body.bg-app {
     background: linear-gradient(135deg, rgba(139, 92, 246, 0.3) 0%, rgba(236, 72, 153, 0.2) 100%);
     border: 2px solid rgba(167, 139, 250, 0.5);
     color: #fef08a;
-    padding: 0.65rem 1.75rem;
-    border-radius: 1.5rem;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-lg);
+    gap: var(--space-2);
     box-shadow: 0 8px 20px rgba(139, 92, 246, 0.25);
     animation: target-pulse 3s infinite ease-in-out;
 }
@@ -427,22 +471,33 @@ body.bg-app {
 .option-btn {
     width: 100%;
     min-height: 72px;
-    padding: 1rem 1.5rem;
+    padding: var(--space-4) var(--space-6);
     background: rgba(15, 23, 42, 0.7);
     border: 2px solid rgba(139, 92, 246, 0.35);
-    border-radius: 1.25rem;
+    border-radius: var(--radius-md);
     color: #f8fafc;
     font-size: 1.25rem;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
+    gap: var(--space-3);
     text-align: center;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
     user-select: none;
+}
+
+.option-letter {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+    border-radius: var(--radius-full);
+    margin-right: var(--space-2);
 }
 
 .option-btn:hover:not(:disabled) {
@@ -498,6 +553,9 @@ body.bg-app {
     font-weight: 800;
     font-size: 1.2rem;
     border: none;
+    min-height: var(--target-touch-lg);
+    border-radius: var(--radius-full);
+    padding: var(--space-4) var(--space-8);
     box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -516,6 +574,9 @@ body.bg-app {
     background: rgba(16, 185, 129, 0.25);
     border: 2px solid #10b981;
     color: #6ee7b7;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-full);
+    gap: var(--space-2);
     box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
 }
 
@@ -523,6 +584,9 @@ body.bg-app {
     background: rgba(245, 158, 11, 0.2);
     border: 2px solid #f59e0b;
     color: #fde68a;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-full);
+    gap: var(--space-2);
     box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
 }
 
@@ -530,6 +594,8 @@ body.bg-app {
 .celebration-card {
     background: var(--app-card-bg);
     border: 2px solid rgba(245, 158, 11, 0.5);
+    border-radius: var(--radius-xl);
+    padding: var(--space-7) var(--space-6);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 40px rgba(245, 158, 11, 0.25);
@@ -544,6 +610,8 @@ body.bg-app {
 .summary-pill {
     background: rgba(15, 23, 42, 0.65);
     border: 1px solid rgba(148, 163, 184, 0.2);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
 }
 
 /* Microanimações gerais */
@@ -574,8 +642,8 @@ body.bg-app {
 .voice-container {
     background: rgba(15, 23, 42, 0.45);
     border: 1px dashed rgba(167, 139, 250, 0.35);
-    border-radius: 2rem;
-    padding: 1.75rem 1.25rem;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6) var(--space-4);
     transition: all 0.3s ease;
 }
 
@@ -587,9 +655,9 @@ body.bg-app {
 }
 
 .btn-mic {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
+    width: var(--size-mic-btn);
+    height: var(--size-mic-btn);
+    border-radius: var(--radius-full);
     background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
     border: 3px solid rgba(255, 255, 255, 0.25);
     color: #ffffff;
@@ -625,7 +693,7 @@ body.bg-app {
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: 3px solid #f43f5e;
     opacity: 0;
     pointer-events: none;
@@ -658,11 +726,12 @@ body.bg-app {
     color: #e2e8f0;
     font-size: 0.95rem;
     font-weight: 600;
-    padding: 0.45rem 1.25rem;
-    border-radius: 9999px;
+    min-height: 40px;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     transition: all 0.25s ease;
 }
 
@@ -675,9 +744,9 @@ body.bg-app {
 .voice-transcript-bubble {
     background: rgba(15, 23, 42, 0.85);
     border: 2px solid rgba(245, 158, 11, 0.5);
-    border-radius: 1.25rem;
-    padding: 0.6rem 1.25rem;
-    max-width: 420px;
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-5);
+    max-width: 448px;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
@@ -695,7 +764,14 @@ body.bg-app {
 .report-details-box {
     background: rgba(15, 23, 42, 0.75);
     border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.player-name-wrapper {
+    max-width: 448px;
+    width: 100%;
 }
 
 /* Estilos de Impressão / PDF Local */
@@ -724,7 +800,7 @@ body.bg-app {
         border: 2px solid #cbd5e1 !important;
         color: #0f172a !important;
         box-shadow: none !important;
-        padding: 1.5rem !important;
+        padding: var(--space-6) !important;
     }
 
     .game-title {
@@ -756,9 +832,9 @@ body.bg-app {
     #report-player-display {
         background: #f5f3ff !important;
         border: 2px solid #8b5cf6 !important;
-        border-radius: 12px !important;
-        padding: 12px 20px !important;
-        margin-bottom: 16px !important;
+        border-radius: var(--radius-md) !important;
+        padding: var(--space-3) var(--space-5) !important;
+        margin-bottom: var(--space-4) !important;
     }
 
     #report-player-display .text-muted {
@@ -776,6 +852,194 @@ body.bg-app {
 
     .text-muted, .text-secondary {
         color: #64748b !important;
+    }
+}
+
+/* ==========================================================
+   NAVEGAÇÃO, ACESSIBILIDADE & UX (ETAPA 11)
+   ========================================================== */
+
+/* Logo / Marca navegável */
+.brand-logo-btn {
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: var(--space-2) var(--space-3);
+    color: inherit;
+    min-height: var(--target-touch-min);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+}
+
+.brand-logo-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    transform: scale(1.02);
+}
+
+.brand-logo-btn:active {
+    transform: scale(0.98);
+}
+
+/* Botão de Som e Ações no Header */
+.header-sound-btn,
+.header-action-btn {
+    min-height: var(--target-touch-min);
+    min-width: var(--target-touch-min);
+    font-weight: 600;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    gap: var(--space-1);
+    border-color: rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+}
+
+.header-sound-btn:hover,
+.header-sound-btn:focus-visible {
+    border-color: #f59e0b;
+    color: #fef08a;
+    background-color: rgba(245, 158, 11, 0.18);
+}
+
+/* Foco Visível Acessível em Todos os Elementos Interativos (Múltiplo de 4) */
+:focus-visible {
+    outline: 4px solid #f59e0b !important;
+    outline-offset: 4px !important;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+[tabindex]:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Utilitário essencial para garantir ocultação mesmo sem Bootstrap */
+.d-none,
+[hidden] {
+    display: none !important;
+}
+
+/* Modal de Confirmação para Evitar Perda Acidental */
+.confirm-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 1060;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    animation: fadeIn 0.25s ease-out;
+}
+
+.confirm-modal-backdrop:not(.d-none):not([hidden]) {
+    display: flex;
+}
+
+.confirm-modal-box {
+    background: rgba(30, 27, 75, 0.95);
+    border: 2px solid rgba(245, 158, 11, 0.6);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(245, 158, 11, 0.35);
+    border-radius: var(--radius-lg);
+    max-width: 480px;
+    width: 100%;
+    padding: var(--space-6);
+    animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Banner de Desbloqueio Especial na Celebração */
+.celebration-unlock-banner {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.3) 0%, rgba(236, 72, 153, 0.3) 100%);
+    border: 2px solid #f59e0b;
+    border-radius: var(--radius-full);
+    padding: var(--space-3) var(--space-6);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 800;
+    color: #fef08a;
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.4);
+    animation: pulse-glow 2.5s infinite;
+}
+
+/* Efeito Visual de Confetes na Celebração */
+.confetti-container {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1040;
+    overflow: hidden;
+}
+
+.confetti-particle {
+    position: absolute;
+    top: -20px;
+    border-radius: 2px;
+    animation: confetti-fall 3.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(0) rotate(0deg) scale(0.8);
+        opacity: 1;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(105vh) rotate(720deg) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Ajustes de Responsividade Mobile e Áreas de Toque (8pt/4pt) */
+@media (max-width: 576px) {
+    .game-title {
+        font-size: 2.2rem;
+    }
+
+    .exercise-card {
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .celebration-card {
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .btn-game-primary,
+    .btn-game-success {
+        width: 100%;
+        min-height: var(--target-touch-lg);
+        padding: var(--space-4) var(--space-5);
+    }
+
+    .hud-stat {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.85rem;
+    }
+
+    .confirm-modal-box {
+        padding: var(--space-5) var(--space-4);
+    }
+
+    .celebration-unlock-banner {
+        font-size: 0.9rem;
+        padding: var(--space-2) var(--space-4);
     }
 }
 
@@ -798,7 +1062,12 @@ body.bg-app {
     .voice-pulse-ring,
     .shake,
     .target-word-bubble,
-    .celebration-trophy {
+    .celebration-trophy,
+    .confirm-modal-backdrop,
+    .confirm-modal-box,
+    .celebration-unlock-banner,
+    .confetti-particle {
         animation: none !important;
+        transition: none !important;
     }
 }
