@@ -28,156 +28,310 @@
     </header>
 
     <main class="container my-auto py-4 py-lg-5">
-        <!-- Hero Section -->
-        <section class="text-center mb-5">
-            <div class="mb-3">
-                <div class="mascot-container">
-                    <!-- Mascote "Eco": robozinho espacial amigável com fones de ouvido -->
-                    <svg class="mascot-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mascote Eco, o guia espacial">
-                        <!-- Antena -->
-                        <line x1="100" y1="36" x2="100" y2="18" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round" />
-                        <circle cx="100" cy="14" r="10" fill="#f59e0b" />
-                        <circle cx="100" cy="14" r="5" fill="#fef08a" />
-                        <!-- Fone de Ouvido -->
-                        <path d="M40 98 C40 54 66 38 100 38 C134 38 160 54 160 98" stroke="#f59e0b" stroke-width="12" stroke-linecap="round" fill="none" />
-                        <rect x="30" y="86" width="22" height="42" rx="11" fill="#ec4899" />
-                        <rect x="148" y="86" width="22" height="42" rx="11" fill="#ec4899" />
-                        <!-- Cabeça do Robô -->
-                        <rect x="48" y="52" width="104" height="92" rx="34" fill="#38bdf8" stroke="#0284c7" stroke-width="4" />
-                        <!-- Visor / Rosto -->
-                        <rect x="62" y="68" width="76" height="56" rx="20" fill="#0f172a" />
-                        <!-- Olhos Expressivos brilhantes -->
-                        <circle cx="82" cy="94" r="10" fill="#4ade80" />
-                        <circle cx="85" cy="91" r="3.5" fill="#ffffff" />
-                        <circle cx="118" cy="94" r="10" fill="#4ade80" />
-                        <circle cx="121" cy="91" r="3.5" fill="#ffffff" />
-                        <!-- Sorriso Amigável -->
-                        <path d="M92 108 Q100 116 108 108" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" fill="none" />
-                        <!-- Bochechinhas coradas -->
-                        <circle cx="72" cy="106" r="4.5" fill="#f43f5e" opacity="0.75" />
-                        <circle cx="128" cy="106" r="4.5" fill="#f43f5e" opacity="0.75" />
-                        <!-- Corpo / Roupinha espacial -->
-                        <rect x="68" y="146" width="64" height="44" rx="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4" />
-                        <circle cx="100" cy="164" r="9" fill="#8b5cf6" />
-                    </svg>
-                    <!-- Estrela cintilante -->
-                    <span class="mascot-sparkle fs-3" aria-hidden="true">✨</span>
+        <!-- TELA 1: Seleção de Mundos / Início -->
+        <div id="screen-home" class="screen-view">
+            <!-- Hero Section -->
+            <section class="text-center mb-5">
+                <div class="mb-3">
+                    <div class="mascot-container">
+                        <!-- Mascote "Eco": robozinho espacial amigável com fones de ouvido -->
+                        <svg class="mascot-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mascote Eco, o guia espacial">
+                            <!-- Antena -->
+                            <line x1="100" y1="36" x2="100" y2="18" stroke="#cbd5e1" stroke-width="6" stroke-linecap="round" />
+                            <circle cx="100" cy="14" r="10" fill="#f59e0b" />
+                            <circle cx="100" cy="14" r="5" fill="#fef08a" />
+                            <!-- Fone de Ouvido -->
+                            <path d="M40 98 C40 54 66 38 100 38 C134 38 160 54 160 98" stroke="#f59e0b" stroke-width="12" stroke-linecap="round" fill="none" />
+                            <rect x="30" y="86" width="22" height="42" rx="11" fill="#ec4899" />
+                            <rect x="148" y="86" width="22" height="42" rx="11" fill="#ec4899" />
+                            <!-- Cabeça do Robô -->
+                            <rect x="48" y="52" width="104" height="92" rx="34" fill="#38bdf8" stroke="#0284c7" stroke-width="4" />
+                            <!-- Visor / Rosto -->
+                            <rect x="62" y="68" width="76" height="56" rx="20" fill="#0f172a" />
+                            <!-- Olhos Expressivos brilhantes -->
+                            <circle cx="82" cy="94" r="10" fill="#4ade80" />
+                            <circle cx="85" cy="91" r="3.5" fill="#ffffff" />
+                            <circle cx="118" cy="94" r="10" fill="#4ade80" />
+                            <circle cx="121" cy="91" r="3.5" fill="#ffffff" />
+                            <!-- Sorriso Amigável -->
+                            <path d="M92 108 Q100 116 108 108" stroke="#f8fafc" stroke-width="4" stroke-linecap="round" fill="none" />
+                            <!-- Bochechinhas coradas -->
+                            <circle cx="72" cy="106" r="4.5" fill="#f43f5e" opacity="0.75" />
+                            <circle cx="128" cy="106" r="4.5" fill="#f43f5e" opacity="0.75" />
+                            <!-- Corpo / Roupinha espacial -->
+                            <rect x="68" y="146" width="64" height="44" rx="18" fill="#e2e8f0" stroke="#94a3b8" stroke-width="4" />
+                            <circle cx="100" cy="164" r="9" fill="#8b5cf6" />
+                        </svg>
+                        <!-- Estrela cintilante -->
+                        <span class="mascot-sparkle fs-3" aria-hidden="true">✨</span>
+                    </div>
                 </div>
+
+                <div class="mb-3">
+                    <span class="badge-tagline">
+                        <span aria-hidden="true">🌟</span> Treino Divertido da Fala
+                    </span>
+                </div>
+
+                <h1 class="game-title mb-3">Fala Eh!</h1>
+                <p class="game-subtitle mb-4">
+                    Embarque em uma jornada pelo espaço sonoro! Pratique pronúncia, identifique sons e vença desafios para conquistar mundos incríveis.
+                </p>
+
+                <div>
+                    <button type="button" id="btn-start-adventure" class="btn btn-game-primary btn-lg" aria-label="Começar jornada pelo nível Iniciante">
+                        🚀 Começar Aventura
+                    </button>
+                </div>
+            </section>
+
+            <!-- Seção dos Mundos / Níveis -->
+            <section aria-labelledby="worlds-heading" class="pt-2">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <h2 id="worlds-heading" class="h4 fw-bold mb-0 text-white d-flex align-items-center gap-2">
+                        <span>🗺️</span> Escolha o seu Mundo
+                    </h2>
+                    <span class="text-secondary small">Complete um mundo para liberar o próximo!</span>
+                </div>
+
+                <div class="row g-4 justify-content-center">
+                    <!-- Mundo 1: Iniciante (Liberado) -->
+                    <div class="col-12 col-md-4">
+                        <article class="world-card unlocked" id="card-beginner" data-world="beginner" tabindex="0" role="region" aria-label="Mundo 1: Planeta Sons, nível iniciante, liberado">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge-status-unlocked">✨ NÍVEL 1</span>
+                                <span class="badge text-bg-success px-2 py-1">Disponível</span>
+                            </div>
+
+                            <div class="world-badge-icon">
+                                <span class="fs-1" aria-hidden="true">🌱</span>
+                            </div>
+
+                            <div class="text-center flex-grow-1">
+                                <h3 class="h5 fw-bold text-white mb-2">Planeta Sons</h3>
+                                <p class="text-muted small mb-4">
+                                    Descubra sílabas iniciais, identifique sons divertidos e dê os primeiros passos na fala!
+                                </p>
+                            </div>
+
+                            <div class="mt-auto">
+                                <button type="button" class="btn btn-world btn-world-unlocked" id="btn-select-beginner">
+                                    <span>Explorar Mundo</span>
+                                    <span aria-hidden="true">➔</span>
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Mundo 2: Intermediário (Bloqueado Inicialmente) -->
+                    <div class="col-12 col-md-4">
+                        <article class="world-card locked" id="card-intermediate" data-world="intermediate" aria-label="Mundo 2: Vale das Palavras, nível intermediário">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge-status-locked" id="badge-status-intermediate">🔒 NÍVEL 2</span>
+                                <span class="badge text-bg-secondary px-2 py-1 opacity-75" id="badge-pill-intermediate">Bloqueado</span>
+                            </div>
+
+                            <div class="world-badge-icon">
+                                <span class="fs-1" aria-hidden="true">🌊</span>
+                            </div>
+
+                            <div class="text-center flex-grow-1">
+                                <h3 class="h5 fw-bold text-white mb-2">Vale das Palavras</h3>
+                                <p class="text-muted small mb-4">
+                                    Associação de palavras, figuras e desafios de dicção com novos fonemas.
+                                </p>
+                            </div>
+
+                            <div class="mt-auto">
+                                <button type="button" class="btn btn-world btn-world-locked" id="btn-select-intermediate" data-locked-name="Vale das Palavras">
+                                    <span aria-hidden="true">🔒</span>
+                                    <span>Bloqueado</span>
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- Mundo 3: Avançado (Bloqueado Inicialmente) -->
+                    <div class="col-12 col-md-4">
+                        <article class="world-card locked" id="card-advanced" data-world="advanced" aria-label="Mundo 3: Galáxia da Fala, nível avançado">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge-status-locked" id="badge-status-advanced">🔒 NÍVEL 3</span>
+                                <span class="badge text-bg-secondary px-2 py-1 opacity-75" id="badge-pill-advanced">Bloqueado</span>
+                            </div>
+
+                            <div class="world-badge-icon">
+                                <span class="fs-1" aria-hidden="true">🪐</span>
+                            </div>
+
+                            <div class="text-center flex-grow-1">
+                                <h3 class="h5 fw-bold text-white mb-2">Galáxia da Fala</h3>
+                                <p class="text-muted small mb-4">
+                                    Frases completas, desafios de articulação e ritmos para se tornar um mestre comunicador!
+                                </p>
+                            </div>
+
+                            <div class="mt-auto">
+                                <button type="button" class="btn btn-world btn-world-locked" id="btn-select-advanced" data-locked-name="Galáxia da Fala">
+                                    <span aria-hidden="true">🔒</span>
+                                    <span>Bloqueado</span>
+                                </button>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- TELA 2: Partida e Exercícios -->
+        <div id="screen-game" class="screen-view d-none">
+            <!-- HUD Superior -->
+            <section class="game-hud mb-4 p-3 rounded-4" aria-label="Status do jogo">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <button type="button" id="btn-back-home" class="btn btn-sm btn-outline-light rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1">
+                        <span>🗺️</span> <span>Mundos</span>
+                    </button>
+
+                    <div class="hud-badge-world" id="hud-world-name">
+                        🌱 Planeta Sons
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="hud-stat" id="hud-xp-stat" title="XP acumulado">
+                            <span class="hud-stat-icon" aria-hidden="true">⭐</span>
+                            <span class="hud-stat-value fw-bold text-warning" id="hud-xp">0</span>
+                            <span class="hud-stat-label small text-muted">XP</span>
+                        </div>
+                        <div class="hud-stat" id="hud-streak-stat" title="Sequência de acertos">
+                            <span class="hud-stat-icon" aria-hidden="true">🔥</span>
+                            <span class="hud-stat-value fw-bold text-danger" id="hud-streak">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de Progresso da Fase -->
+                <div class="mt-3">
+                    <div class="d-flex justify-content-between small text-secondary mb-1">
+                        <span id="hud-progress-text">Exercício 1 de 4</span>
+                        <span id="hud-progress-percent" class="fw-bold text-light">25%</span>
+                    </div>
+                    <div class="progress game-progress" role="progressbar" aria-label="Progresso da missão" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar game-progress-bar" id="hud-progress-bar" style="width: 25%"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading de Exercícios -->
+            <div id="game-loading" class="text-center py-5 d-none">
+                <div class="spinner-border text-warning mb-3" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Carregando exercício…</span>
+                </div>
+                <h3 class="h5 text-white">Preparando próximo desafio…</h3>
+                <p class="text-muted small">Ajustando o transmissor estelar.</p>
             </div>
 
-            <div class="mb-3">
-                <span class="badge-tagline">
-                    <span aria-hidden="true">🌟</span> Treino Divertido da Fala
-                </span>
-            </div>
-
-            <h1 class="game-title mb-3">Fala Eh!</h1>
-            <p class="game-subtitle mb-4">
-                Embarque em uma jornada pelo espaço sonoro! Pratique pronúncia, identifique sons e vença desafios para conquistar mundos incríveis.
-            </p>
-
-            <div>
-                <button type="button" id="btn-start-adventure" class="btn btn-game-primary btn-lg" aria-label="Começar jornada pelo nível Iniciante">
-                    🚀 Começar Aventura
+            <!-- Erro de Conexão no Jogo -->
+            <div id="game-error" class="text-center py-5 d-none">
+                <div class="fs-1 mb-2">📡</div>
+                <h3 class="h5 text-white">Não foi possível carregar o exercício</h3>
+                <p class="text-muted small mb-3">Verifique a conexão e tente novamente.</p>
+                <button type="button" id="btn-retry-load" class="btn btn-outline-light rounded-pill px-4">
+                    Tentar Novamente
                 </button>
             </div>
-        </section>
 
-        <!-- Seção dos Mundos / Níveis -->
-        <section aria-labelledby="worlds-heading" class="pt-2">
-            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-                <h2 id="worlds-heading" class="h4 fw-bold mb-0 text-white d-flex align-items-center gap-2">
-                    <span>🗺️</span> Escolha o seu Mundo
+            <!-- Card Principal do Exercício -->
+            <section id="exercise-card" class="exercise-card p-4 p-md-5 rounded-5" aria-live="polite">
+                <!-- Cabeçalho do Exercício -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="exercise-type-badge" id="exercise-type-badge">🎯 Múltipla Escolha</span>
+                    <span class="exercise-step-indicator" id="exercise-step-indicator">Missão 1</span>
+                </div>
+
+                <!-- Instrução Principal -->
+                <h2 class="exercise-instruction text-center mb-3" id="exercise-instruction">
+                    Qual palavra começa com o som /P/?
                 </h2>
-                <span class="text-secondary small">Complete um mundo para liberar o próximo!</span>
-            </div>
 
-            <div class="row g-4 justify-content-center">
-                <!-- Mundo 1: Iniciante (Liberado) -->
-                <div class="col-12 col-md-4">
-                    <article class="world-card unlocked" id="card-beginner" data-world="beginner" tabindex="0" role="region" aria-label="Mundo 1: Planeta Sons, nível iniciante, liberado">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge-status-unlocked">✨ NÍVEL 1</span>
-                            <span class="badge text-bg-success px-2 py-1">Disponível</span>
-                        </div>
-
-                        <div class="world-badge-icon">
-                            <span class="fs-1" aria-hidden="true">🌱</span>
-                        </div>
-
-                        <div class="text-center flex-grow-1">
-                            <h3 class="h5 fw-bold text-white mb-2">Planeta Sons</h3>
-                            <p class="text-muted small mb-4">
-                                Descubra sílabas iniciais, identifique sons divertidos e dê os primeiros passos na fala!
-                            </p>
-                        </div>
-
-                        <div class="mt-auto">
-                            <button type="button" class="btn btn-world btn-world-unlocked" id="btn-select-beginner">
-                                <span>Explorar Mundo</span>
-                                <span aria-hidden="true">➔</span>
-                            </button>
-                        </div>
-                    </article>
+                <!-- Palavra-alvo com destaque visual -->
+                <div class="text-center mb-4" id="target-word-container">
+                    <div class="target-word-bubble d-inline-flex align-items-center gap-2">
+                        <span class="fs-4">🗣️</span>
+                        <span class="fw-bold fs-4 tracking-wide" id="exercise-target-word">Pato</span>
+                    </div>
                 </div>
 
-                <!-- Mundo 2: Intermediário (Bloqueado) -->
-                <div class="col-12 col-md-4">
-                    <article class="world-card locked" id="card-intermediate" data-world="intermediate" aria-label="Mundo 2: Vale das Palavras, nível intermediário, bloqueado">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge-status-locked">🔒 NÍVEL 2</span>
-                            <span class="badge text-bg-secondary px-2 py-1 opacity-75">Bloqueado</span>
-                        </div>
-
-                        <div class="world-badge-icon">
-                            <span class="fs-1" aria-hidden="true">🌊</span>
-                        </div>
-
-                        <div class="text-center flex-grow-1">
-                            <h3 class="h5 fw-bold text-white mb-2">Vale das Palavras</h3>
-                            <p class="text-muted small mb-4">
-                                Associação de palavras, figuras e desafios de dicção com novos fonemas.
-                            </p>
-                        </div>
-
-                        <div class="mt-auto">
-                            <button type="button" class="btn btn-world btn-world-locked" data-locked-name="Vale das Palavras">
-                                <span aria-hidden="true">🔒</span>
-                                <span>Bloqueado</span>
-                            </button>
-                        </div>
-                    </article>
+                <!-- Opções de Resposta -->
+                <div class="row g-3 justify-content-center mb-4" id="options-grid" role="radiogroup" aria-label="Opções de resposta">
+                    <!-- Opções inseridas dinamicamente via app.js -->
                 </div>
 
-                <!-- Mundo 3: Avançado (Bloqueado) -->
-                <div class="col-12 col-md-4">
-                    <article class="world-card locked" id="card-advanced" data-world="advanced" aria-label="Mundo 3: Galáxia da Fala, nível avançado, bloqueado">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span class="badge-status-locked">🔒 NÍVEL 3</span>
-                            <span class="badge text-bg-secondary px-2 py-1 opacity-75">Bloqueado</span>
+                <!-- Painel de Feedback e Ações -->
+                <div class="exercise-feedback-panel text-center" id="feedback-panel">
+                    <div id="feedback-message-container" class="feedback-message mb-3 d-none">
+                        <div class="d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill fw-bold" id="feedback-banner">
+                            <span id="feedback-icon" class="fs-4">🎉</span>
+                            <span id="feedback-text">Muito bem! Resposta correta!</span>
                         </div>
+                    </div>
 
-                        <div class="world-badge-icon">
-                            <span class="fs-1" aria-hidden="true">🪐</span>
-                        </div>
-
-                        <div class="text-center flex-grow-1">
-                            <h3 class="h5 fw-bold text-white mb-2">Galáxia da Fala</h3>
-                            <p class="text-muted small mb-4">
-                                Frases completas, desafios de voz e ritmos para se tornar um mestre comunicador!
-                            </p>
-                        </div>
-
-                        <div class="mt-auto">
-                            <button type="button" class="btn btn-world btn-world-locked" data-locked-name="Galáxia da Fala">
-                                <span aria-hidden="true">🔒</span>
-                                <span>Bloqueado</span>
-                            </button>
-                        </div>
-                    </article>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <button type="button" id="btn-submit-answer" class="btn btn-game-primary btn-lg rounded-pill px-5" disabled>
+                            ✨ Confirmar Resposta
+                        </button>
+                        <button type="button" id="btn-next-exercise" class="btn btn-game-success btn-lg rounded-pill px-5 d-none">
+                            <span>Próximo Exercício</span> <span aria-hidden="true">➔</span>
+                        </button>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
+
+        <!-- TELA 3: Comemoração e Conclusão do Mundo -->
+        <div id="screen-celebration" class="screen-view d-none">
+            <section class="celebration-card p-4 p-md-5 text-center rounded-5">
+                <div class="celebration-trophy mb-3">
+                    <span class="fs-1">🏆</span>
+                </div>
+
+                <h2 class="game-title h2 mb-2">Mundo Concluído!</h2>
+                <p class="game-subtitle mb-4" id="celebration-subtitle">
+                    Incrível! Você concluiu todos os exercícios do <strong id="celebration-world-name">Planeta Sons</strong>!
+                </p>
+
+                <div class="row g-3 justify-content-center mb-4">
+                    <div class="col-6 col-sm-4">
+                        <div class="summary-pill p-3 rounded-4">
+                            <div class="fs-3 mb-1">⭐</div>
+                            <div class="fw-bold fs-4 text-warning" id="summary-xp">400 XP</div>
+                            <div class="small text-muted">Pontos da missão</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="summary-pill p-3 rounded-4">
+                            <div class="fs-3 mb-1">🎯</div>
+                            <div class="fw-bold fs-4 text-success" id="summary-accuracy">100%</div>
+                            <div class="small text-muted">Acertos</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-sm-4">
+                        <div class="summary-pill p-3 rounded-4">
+                            <div class="fs-3 mb-1">🔥</div>
+                            <div class="fw-bold fs-4 text-danger" id="summary-streak">4</div>
+                            <div class="small text-muted">Maior sequência</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <button type="button" id="btn-replay-world" class="btn btn-outline-light rounded-pill px-4 py-2">
+                        🔄 Jogar Novamente
+                    </button>
+                    <button type="button" id="btn-next-world" class="btn btn-game-primary rounded-pill px-4 py-2">
+                        🚀 Próximo Mundo
+                    </button>
+                </div>
+            </section>
+        </div>
     </main>
 
     <!-- Feedback interativo amigável em toast -->

@@ -15,6 +15,8 @@ import (
 	"time"
 
 	"github.com/themarcosramos/falaeh/backend/internal/exercise"
+	"github.com/themarcosramos/falaeh/backend/internal/game"
+	"github.com/themarcosramos/falaeh/backend/internal/gamification"
 	"github.com/themarcosramos/falaeh/backend/internal/httpapi"
 )
 
@@ -49,10 +51,11 @@ func run(logger *slog.Logger) error {
 		return fmt.Errorf("falha ao carregar repositório de exercícios: %w", err)
 	}
 	exerciseService := exercise.NewService(repo)
+	gameManager := game.NewManager(exerciseService, gamification.DefaultRules(), game.Config{})
 
 	server := &http.Server{
 		Addr:         ":" + port(),
-		Handler:      httpapi.NewRouter(logger, exerciseService),
+		Handler:      httpapi.NewRouter(logger, exerciseService, gameManager),
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 		IdleTimeout:  idleTimeout,

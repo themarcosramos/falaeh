@@ -22,7 +22,7 @@ TESTS_DIR := $(TMP_DIR)/tests
 COVERAGE  := $(TESTS_DIR)/coverage.out
 
 # Pacotes de teste por suíte.
-UNIT_PKGS       ?= internal/exercise internal/httpapi internal/gamification
+UNIT_PKGS       ?= internal/exercise internal/httpapi internal/gamification internal/game
 ACCEPTANCE_PKGS ?= internal/exercise internal/httpapi
 
 # Executa comandos Go no container com o usuário do host, para não gerar
@@ -229,8 +229,9 @@ ci: vet lint test coverage-check ## Quality gate: vet + lint + testes + cobertur
 swagger: ## Regenera a documentação Swagger a partir das anotações
 	$(GO_RUN) sh -c 'go install github.com/swaggo/swag/cmd/swag@$(SWAG_VERSION) && \
 		$$GOPATH/bin/swag init \
-			--generalInfo main.go \
-			--dir cmd/api,internal/httpapi,internal/exercise \
+			--generalInfo cmd/api/main.go \
+			--dir ./ \
+			--exclude tmp,test \
 			--output docs \
 			--outputTypes yaml \
 			--generatedTime=false'
