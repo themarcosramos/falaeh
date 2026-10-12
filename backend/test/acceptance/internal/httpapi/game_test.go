@@ -20,7 +20,7 @@ func postGameJSON(t *testing.T, router http.Handler, path string, body any) *htt
 	}
 
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, path, bytes.NewReader(payload))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, path, bytes.NewReader(payload))
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(rec, req)
 

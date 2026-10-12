@@ -11,7 +11,7 @@ type XPBreakdown struct {
 }
 
 // CalculateAnswerXP calcula o XP total e detalhado ganho ao responder um exercício.
-func CalculateAnswerXP(rules Rules, isCorrect bool, isFirstAttempt bool, currentStreak int) XPBreakdown {
+func CalculateAnswerXP(rules Rules, isCorrect, isFirstAttempt bool, currentStreak int) XPBreakdown {
 	if !isCorrect {
 		return XPBreakdown{}
 	}

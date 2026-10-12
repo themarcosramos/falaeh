@@ -42,7 +42,7 @@ func TestHandleFeedback(t *testing.T) {
 		}
 		payload, _ := json.Marshal(body)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 
@@ -74,7 +74,7 @@ func TestHandleFeedback(t *testing.T) {
 		body := map[string]string{"rating": ""}
 		payload, _ := json.Marshal(body)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 
@@ -92,7 +92,7 @@ func TestHandleFeedback(t *testing.T) {
 		body := map[string]string{"rating": "nao_sei"}
 		payload, _ := json.Marshal(body)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 
@@ -107,7 +107,7 @@ func TestHandleFeedback(t *testing.T) {
 		mockSvc := &mockFeedbackService{}
 		router := httpapi.NewRouter(logger, nil, nil, mockSvc)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader([]byte("{invalid-json")))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader([]byte("{invalid-json")))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 
@@ -125,7 +125,7 @@ func TestHandleFeedback(t *testing.T) {
 		body := map[string]string{"rating": "gostei"}
 		payload, _ := json.Marshal(body)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 
@@ -142,7 +142,7 @@ func TestHandleFeedback(t *testing.T) {
 		body := map[string]string{"rating": "gostei"}
 		payload, _ := json.Marshal(body)
 
-		req := httptest.NewRequest(http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
+		req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/api/v1/feedback", bytes.NewReader(payload))
 		req.Header.Set("Content-Type", "application/json")
 		rec := httptest.NewRecorder()
 

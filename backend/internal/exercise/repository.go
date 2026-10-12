@@ -9,6 +9,7 @@ import (
 	"sync"
 )
 
+// Erros sentinela retornados pelo repositório de exercícios.
 var (
 	ErrExerciseNotFound = errors.New("exercício não encontrado")
 	ErrLevelNotFound    = errors.New("nível não encontrado")

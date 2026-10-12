@@ -1,0 +1,79 @@
+name: Desktop Multiplatform Build
+
+on:
+  pull_request:
+    branches:
+      - stage
+      - homolog
+      - production
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'build/desktop/**'
+      - 'Makefile'
+      - '.github/workflows/desktop.yml'
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build Desktop Linux (AMD64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Compilar Falaêh Desktop Linux e AppImage via Docker
+        run: make desktop-appimage
+
+      - name: Verificar Artefatos Linux (Binário e AppImage)
+        run: |
+          file build/bin/falaeh
+          test -s build/bin/falaeh
+          file build/bin/Falaeh-x86_64.AppImage
+          test -s build/bin/Falaeh-x86_64.AppImage
+
+  build-windows:
+    name: Build Desktop Windows (AMD64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Compilar Falaêh Desktop Windows via Docker
+        run: make desktop-windows
+
+      - name: Verificar Artefato Windows
+        run: |
+          file build/bin/falaeh.exe
+          test -s build/bin/falaeh.exe
+
+  build-macos:
+    name: Build Desktop macOS (Universal)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout do Repositório
+        uses: actions/checkout@v4
+
+      - name: Configurar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.27.x'
+          cache-dependency-path: backend/go.sum
+
+      - name: Instalar Wails CLI
+        run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
+
+      - name: Sincronizar Assets do Desktop
+        run: make desktop-sync
+
+      - name: Compilar Falaêh Desktop macOS Universal
+        run: |
+          cd backend/cmd/desktop
+          wails build -s -skipbindings -platform darwin/universal -o falaeh
+          mkdir -p ../../../build/bin
+          cp -rf build/bin/falaeh.app ../../../build/bin/
+
+      - name: Verificar Artefato macOS
+        run: |
+          test -d build/bin/falaeh.app
+          file build/bin/falaeh.app/Contents/MacOS/falaeh

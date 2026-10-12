@@ -3,6 +3,7 @@ package gamification
 // AchievementID identifica unicamente uma conquista do jogo.
 type AchievementID string
 
+// Conquistas desbloqueáveis na jornada do jogador.
 const (
 	AchievementFirstCorrect         AchievementID = "first_correct"
 	AchievementStreak3              AchievementID = "streak_3"

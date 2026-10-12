@@ -44,7 +44,7 @@ func postJSON(t *testing.T, router http.Handler, path, body string) *httptest.Re
 	t.Helper()
 
 	rec := httptest.NewRecorder()
-	req := httptest.NewRequest(http.MethodPost, path, bytes.NewBufferString(body))
+	req := httptest.NewRequestWithContext(t.Context(), http.MethodPost, path, bytes.NewBufferString(body))
 	req.Header.Set("Content-Type", "application/json")
 	router.ServeHTTP(rec, req)
 

@@ -19,6 +19,7 @@ import (
 // Rating representa uma opção fechada de avaliação da experiência.
 type Rating string
 
+// Opções válidas de avaliação da experiência pelo usuário.
 const (
 	RatingLoved    Rating = "gostei_muito"
 	RatingLiked    Rating = "gostei"
@@ -29,6 +30,7 @@ const (
 	MaxCommentLength = 200
 )
 
+// Erros sentinela retornados na validação de feedback.
 var (
 	ErrInvalidRating = errors.New("avaliação inválida: opções permitidas são gostei_muito, gostei, mais_ou_menos ou nao_gostei")
 	ErrEmptyRating   = errors.New("a avaliação não pode ser vazia")
@@ -143,7 +145,7 @@ func (s *Service) Submit(ctx context.Context, rawRating, rawComment string) erro
 	return nil
 }
 
-var entryRegex = regexp.MustCompile(`entry\.[0-9]+`)
+var entryRegex = regexp.MustCompile(`entry\.\d+`)
 
 // GoogleFormsSender encaminha a avaliação anônima para um formulário Google Forms configurado.
 type GoogleFormsSender struct {
@@ -200,7 +202,7 @@ func (g *GoogleFormsSender) discoverEntryIDs(ctx context.Context) {
 	}
 
 	viewURL := strings.Replace(g.formURL, "/formResponse", "/viewform", 1)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, viewURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, viewURL, http.NoBody)
 	if err != nil {
 		return
 	}

@@ -24,7 +24,7 @@ func (f *fakeProvider) ListByLevel(_ context.Context, level exercise.Level) ([]e
 	return f.byLevel[level], nil
 }
 
-func (f *fakeProvider) ValidateAnswer(_ context.Context, exerciseID string, answer string) (exercise.ValidationResult, error) {
+func (f *fakeProvider) ValidateAnswer(_ context.Context, exerciseID, answer string) (exercise.ValidationResult, error) {
 	expected, ok := f.answers[exerciseID]
 	if !ok {
 		return exercise.ValidationResult{}, exercise.ErrExerciseNotFound
