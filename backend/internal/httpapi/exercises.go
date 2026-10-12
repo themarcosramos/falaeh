@@ -2,7 +2,6 @@ package httpapi
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"log/slog"
 	"net/http"
@@ -173,8 +172,7 @@ func handleAnswerExercise(logger *slog.Logger, svc ExerciseService) http.Handler
 		}
 
 		var req AnswerRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			writeError(w, logger, http.StatusBadRequest, "corpo da requisição inválido")
+		if !decodeJSONBody(w, r, logger, &req) {
 			return
 		}
 

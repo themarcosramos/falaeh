@@ -578,7 +578,7 @@ function renderCurrentExercise() {
                 <span class="option-letter badge bg-light text-dark rounded-circle me-2" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.85rem;">
                     ${String.fromCharCode(65 + index)}
                 </span>
-                <span>${optText}</span>
+                <span>${escapeHtml(optText)}</span>
             `;
 
             btn.addEventListener("click", () => {

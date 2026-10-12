@@ -110,6 +110,19 @@ func TestRouter_Docs(t *testing.T) {
 			t.Fatalf("status code = %d, esperado %d", rec.Code, http.StatusOK)
 		}
 	})
+
+	// Rotas equivalentes sob /api, únicas alcançáveis pelo proxy do frontend.
+	for _, path := range []string{"/api/docs", "/api/swagger.yaml"} {
+		t.Run(path, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			router.ServeHTTP(rec, req)
+
+			if rec.Code != http.StatusOK {
+				t.Fatalf("status code = %d, esperado %d", rec.Code, http.StatusOK)
+			}
+		})
+	}
 }
 
 func TestRouter_Levels(t *testing.T) {
