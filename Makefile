@@ -186,7 +186,7 @@ coverage-check: coverage ## Falha se a cobertura global ficar abaixo de COVERAGE
 fmt: ## Formata o código Go
 	$(GO_RUN) sh -c 'gofmt -w -s cmd internal test docs'
 
-vet: ## Executa go vet no backend
+vet: desktop-sync ## Sincroniza os assets desktop e executa go vet no backend
 	$(GO_RUN) go vet ./cmd/... ./internal/... ./docs/... ./test/...
 
 tidy: ## Organiza e verifica as dependências do módulo
@@ -195,7 +195,7 @@ tidy: ## Organiza e verifica as dependências do módulo
 generate: ## Executa go generate no backend
 	$(GO_RUN) go generate ./cmd/... ./internal/... ./docs/... ./test/...
 
-lint: ## Analisa o código com golangci-lint
+lint: desktop-sync ## Sincroniza os assets desktop e analisa o código com golangci-lint
 	@printf '\n  $(C_TITLE)Lint — $(APP_NAME)$(C_OFF)\n\n'
 	@$(LINT_RUN) golangci-lint run -c /app/.golangci.yml --show-stats ./cmd/... ./internal/... ./docs/... ./test/...
 
