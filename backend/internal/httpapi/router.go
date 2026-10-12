@@ -8,7 +8,7 @@ import (
 )
 
 // NewRouter monta as rotas da API. Novos domínios devem registrar suas rotas aqui.
-func NewRouter(logger *slog.Logger, exerciseService ExerciseService, gameService GameService) http.Handler {
+func NewRouter(logger *slog.Logger, exerciseService ExerciseService, gameService GameService, feedbackService ...FeedbackService) http.Handler {
 	mux := http.NewServeMux()
 
 	// Infraestrutura e documentação (os prefixos /api são os acessíveis pelo proxy do frontend)
@@ -32,6 +32,12 @@ func NewRouter(logger *slog.Logger, exerciseService ExerciseService, gameService
 	if gameService != nil {
 		mux.HandleFunc("POST /api/v1/game/start", handleStartGame(logger, gameService))
 		mux.HandleFunc("POST /api/v1/game/{sessionId}/answer", handleGameAnswer(logger, gameService))
+	}
+
+	// Domínio de Avaliação da Experiência (Etapa 13 - Totalmente desacoplado e anônimo)
+	if len(feedbackService) > 0 && feedbackService[0] != nil {
+		mux.HandleFunc("POST /api/v1/feedback", handleFeedback(logger, feedbackService[0]))
+		mux.HandleFunc("POST /api/feedback", handleFeedback(logger, feedbackService[0]))
 	}
 
 	return securityHeaders(mux)

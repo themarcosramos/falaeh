@@ -231,6 +231,49 @@ Toda a geração ocorre no cliente de forma privada, sem enviar informações pe
 
 ---
 
+## Avaliação Opcional da Experiência (Feedback Anônimo)
+
+Ao término de uma fase (tela de relatório final), o jogador tem a opção de responder a uma pergunta simples e rápida:
+> *"Você gostou de jogar o Falaêh?"*
+
+- **Opções Fechadas e Visuais**:
+  - 😄 **Gostei muito** (`gostei_muito`)
+  - 🙂 **Gostei** (`gostei`)
+  - 😐 **Foi mais ou menos** (`mais_ou_menos`)
+  - 🙁 **Não gostei** (`nao_gostei`)
+- **Caixa de Texto Opcional (Complemente sua avaliação)**:
+  - Ao selecionar um dos ícones, surge uma caixa de texto curta (até 200 caracteres) para a pessoa deixar um recadinho descritivo sobre o jogo se desejar;
+  - A caixa é **totalmente opcional**: é possível enviar a avaliação com comentário ou apenas com o ícone selecionado;
+  - Não solicita nem armazena dados pessoais;
+- **Acessibilidade e Usabilidade**:
+  - Cada opção possui rótulo textual explícito e emoji lúdico;
+  - Navegação completa por teclado (setas direcionais para seleção e Tab/Enter);
+  - Alvos de toque acessíveis ($\ge 48\text{px}$) e compatíveis com a escala de 8pt;
+  - Botão *"Pular avaliação"* disponível para prosseguir sem avaliar;
+  - Mensagem carinhosa de agradecimento imediata.
+- **Privacidade por Padrão**:
+  - A avaliação é **100% anônima**;
+  - Nenhum dado pessoal, identificador de sessão, pontuação ou histórico da partida é vinculado ou enviado;
+  - O Falaêh **não possui banco de dados** e não armazena dados de usuários.
+
+### Integração Opcional com Google Forms / Google Sheets
+
+Para consolidar as avaliações e comentários descritivos dos participantes na planilha do seu TCC:
+
+1. Crie um formulário no [Google Forms](https://forms.google.com) contendo 1 ou 2 perguntas;
+2. No arquivo `.env` da raiz do projeto, informe a URL do seu formulário:
+   ```bash
+   FEEDBACK_GOOGLE_FORMS_URL="https://docs.google.com/forms/d/e/SEU_FORM_ID/viewform"
+   ```
+3. **Formatação Inteligente**:
+   - **Formulário com 1 campo**: O Falaêh consolida o ícone escolhido, seu significado e o comentário em uma única resposta pronta para a planilha (ex: `😄 Gostei muito — Adorei os exercícios de voz!`, ou apenas `😄 Gostei muito` se o usuário optou por não escrever);
+   - **Formulário com campos separados**: Você também pode especificar opcionalmente o campo no `.env` (`FEEDBACK_GOOGLE_FORMS_ENTRY_ID="entry.123456789"`), ou deixar a aplicação detectar os campos automaticamente;
+4. **Resiliência e Tolerância a Falhas**:
+   - Se essas variáveis não forem preenchidas, a aplicação funciona normalmente sem envio externo;
+   - Se o Google Forms estiver indisponível ou retornar erro, a aplicação degrada graciosamente, **sem travar a partida ou afetar o relatório final do jogador**.
+
+---
+
 ## Como estender o jogo
 
 ### Adicionar um novo exercício

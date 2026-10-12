@@ -287,6 +287,19 @@ const btnInstallPwa = document.getElementById("btn-install-pwa");
 const btnExportPdf = document.getElementById("btn-export-pdf");
 const btnExportImage = document.getElementById("btn-export-image");
 
+const experienceEvaluationBox = document.getElementById("experience-evaluation-box");
+const evalFormView = document.getElementById("eval-form-view");
+const evalFeedbackView = document.getElementById("eval-feedback-view");
+const evalActionsContainer = document.getElementById("eval-actions-container");
+const btnToggleComment = document.getElementById("btn-toggle-comment");
+const evalCommentContainer = document.getElementById("eval-comment-container");
+const evalComment = document.getElementById("eval-comment");
+const evalCharCount = document.getElementById("eval-char-count");
+const btnSubmitEvaluation = document.getElementById("btn-submit-evaluation");
+const btnSkipEvaluation = document.getElementById("btn-skip-evaluation");
+
+let selectedEvaluationRating = null;
+
 const confettiContainer = document.getElementById("confetti-container");
 const celebrationUnlockBanner = document.getElementById("celebration-unlock-banner");
 const celebrationUnlockText = document.getElementById("celebration-unlock-text");
@@ -1154,7 +1167,164 @@ function finishWorld() {
         }
     }
 
+    resetEvaluationUI();
     showScreen(screenCelebration);
+}
+
+// ==========================================================
+// AVALIAÇÃO OPCIONAL E ANÔNIMA DA EXPERIÊNCIA (ETAPA 13)
+// ==========================================================
+function resetEvaluationUI() {
+    selectedEvaluationRating = null;
+    if (experienceEvaluationBox) {
+        experienceEvaluationBox.classList.remove("d-none");
+    }
+    if (evalFormView) {
+        evalFormView.classList.remove("d-none");
+    }
+    if (evalFeedbackView) {
+        evalFeedbackView.classList.add("d-none");
+    }
+    if (evalActionsContainer) {
+        evalActionsContainer.classList.add("d-none");
+    }
+    if (evalCommentContainer) {
+        evalCommentContainer.classList.add("d-none");
+    }
+    if (btnToggleComment) {
+        btnToggleComment.setAttribute("aria-expanded", "false");
+        btnToggleComment.disabled = false;
+        btnToggleComment.innerHTML = "💬 Complemente sua avaliação, caso desejar (opcional)";
+    }
+    if (evalComment) {
+        evalComment.value = "";
+        evalComment.disabled = false;
+    }
+    if (evalCharCount) {
+        evalCharCount.textContent = "0/200";
+    }
+    if (btnSubmitEvaluation) {
+        btnSubmitEvaluation.disabled = false;
+        btnSubmitEvaluation.innerHTML = "Concluir Avaliação ✨";
+    }
+
+    const evalButtons = document.querySelectorAll(".btn-eval-option");
+    evalButtons.forEach((btn) => {
+        btn.disabled = false;
+        btn.classList.remove("selected");
+        btn.setAttribute("aria-checked", "false");
+    });
+}
+
+function selectEvaluationRating(rating) {
+    const validRatings = ["gostei_muito", "gostei", "mais_ou_menos", "nao_gostei"];
+    if (!validRatings.includes(rating)) {
+        console.warn("Classificação de avaliação inválida ignorada:", rating);
+        return;
+    }
+
+    selectedEvaluationRating = rating;
+
+    const evalButtons = document.querySelectorAll(".btn-eval-option");
+    evalButtons.forEach((btn) => {
+        if (btn.getAttribute("data-rating") === rating) {
+            btn.classList.add("selected");
+            btn.setAttribute("aria-checked", "true");
+        } else {
+            btn.classList.remove("selected");
+            btn.setAttribute("aria-checked", "false");
+        }
+    });
+
+    // Exibe as ações de avaliação (complemento opcional e conclusão) para qualquer ícone escolhido
+    if (evalActionsContainer) {
+        evalActionsContainer.classList.remove("d-none");
+    }
+}
+
+function toggleEvaluationComment() {
+    if (!evalCommentContainer) return;
+    const isHidden = evalCommentContainer.classList.contains("d-none");
+    if (isHidden) {
+        evalCommentContainer.classList.remove("d-none");
+        if (btnToggleComment) {
+            btnToggleComment.setAttribute("aria-expanded", "true");
+            btnToggleComment.innerHTML = "💬 Fechar caixinha de comentário";
+        }
+        if (evalComment) {
+            evalComment.focus();
+        }
+    } else {
+        evalCommentContainer.classList.add("d-none");
+        if (btnToggleComment) {
+            btnToggleComment.setAttribute("aria-expanded", "false");
+            btnToggleComment.innerHTML = "💬 Complemente sua avaliação, caso desejar (opcional)";
+        }
+    }
+}
+
+async function submitEvaluation() {
+    if (!selectedEvaluationRating) {
+        showToast("⭐", "Escolha um dos ícones antes de concluir a avaliação!");
+        return;
+    }
+
+    const rating = selectedEvaluationRating;
+    const comment = (evalComment?.value || "").trim().slice(0, 200);
+
+    const evalButtons = document.querySelectorAll(".btn-eval-option");
+    evalButtons.forEach((btn) => {
+        btn.disabled = true;
+    });
+
+    if (btnSubmitEvaluation) {
+        btnSubmitEvaluation.disabled = true;
+        btnSubmitEvaluation.innerHTML = "Enviando... ✨";
+    }
+    if (btnToggleComment) {
+        btnToggleComment.disabled = true;
+    }
+    if (evalComment) {
+        evalComment.disabled = true;
+    }
+
+    try {
+        const response = await fetch("/api/v1/feedback", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ rating, comment }),
+        });
+
+        if (!response.ok) {
+            console.warn("Resposta não-200 no envio anônimo da avaliação:", response.status);
+        }
+    } catch (err) {
+        console.warn("Falha de rede ao enviar avaliação anônima (degradação suave mantida):", err);
+    } finally {
+        showEvaluationFeedback();
+    }
+}
+
+function showEvaluationFeedback() {
+    if (evalFormView) {
+        evalFormView.classList.add("d-none");
+    }
+    if (evalFeedbackView) {
+        evalFeedbackView.classList.remove("d-none");
+    }
+    if (state.soundEnabled) {
+        playCorrectSound();
+    }
+    showToast("💖", "Obrigado por avaliar o Falaêh!");
+}
+
+function skipEvaluation() {
+    if (experienceEvaluationBox) {
+        experienceEvaluationBox.classList.add("d-none");
+    }
+    showToast("🚀", "Tudo bem! Obrigado por jogar o Falaêh.");
 }
 
 // Nome opcional digitado pelo jogador; permanece apenas no navegador.
@@ -1652,6 +1822,47 @@ function initEventHandlers() {
             }
         });
     });
+
+    // Avaliação opcional e anônima da experiência (ETAPA 13)
+    const evalButtons = Array.from(document.querySelectorAll(".btn-eval-option"));
+    evalButtons.forEach((btn, idx) => {
+        btn.addEventListener("click", () => {
+            const rating = btn.getAttribute("data-rating");
+            if (rating) {
+                selectEvaluationRating(rating);
+            }
+        });
+
+        btn.addEventListener("keydown", (e) => {
+            if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+                e.preventDefault();
+                const nextIdx = (idx + 1) % evalButtons.length;
+                evalButtons[nextIdx]?.focus();
+            } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+                e.preventDefault();
+                const prevIdx = (idx - 1 + evalButtons.length) % evalButtons.length;
+                evalButtons[prevIdx]?.focus();
+            }
+        });
+    });
+
+    if (evalComment && evalCharCount) {
+        evalComment.addEventListener("input", () => {
+            evalCharCount.textContent = `${evalComment.value.length}/200`;
+        });
+    }
+
+    if (btnToggleComment) {
+        btnToggleComment.addEventListener("click", toggleEvaluationComment);
+    }
+
+    if (btnSubmitEvaluation) {
+        btnSubmitEvaluation.addEventListener("click", submitEvaluation);
+    }
+
+    if (btnSkipEvaluation) {
+        btnSkipEvaluation.addEventListener("click", skipEvaluation);
+    }
 }
 
 async function checkAPI() {

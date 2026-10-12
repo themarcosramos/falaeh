@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/themarcosramos/falaeh/backend/internal/exercise"
+	"github.com/themarcosramos/falaeh/backend/internal/feedback"
 	"github.com/themarcosramos/falaeh/backend/internal/game"
 	"github.com/themarcosramos/falaeh/backend/internal/gamification"
 	"github.com/themarcosramos/falaeh/backend/internal/httpapi"
@@ -53,9 +54,17 @@ func run(logger *slog.Logger) error {
 	exerciseService := exercise.NewService(repo)
 	gameManager := game.NewManager(exerciseService, gamification.DefaultRules(), game.Config{})
 
+	var feedbackSender feedback.Sender
+	if formURL := os.Getenv("FEEDBACK_GOOGLE_FORMS_URL"); formURL != "" {
+		entryRatingID := os.Getenv("FEEDBACK_GOOGLE_FORMS_ENTRY_ID")
+		entryCommentID := os.Getenv("FEEDBACK_GOOGLE_FORMS_COMMENT_ENTRY_ID")
+		feedbackSender = feedback.NewGoogleFormsSender(formURL, entryRatingID, entryCommentID, nil)
+	}
+	feedbackService := feedback.NewService(feedbackSender, logger)
+
 	server := &http.Server{
 		Addr:         ":" + port(),
-		Handler:      httpapi.NewRouter(logger, exerciseService, gameManager),
+		Handler:      httpapi.NewRouter(logger, exerciseService, gameManager, feedbackService),
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 		IdleTimeout:  idleTimeout,
