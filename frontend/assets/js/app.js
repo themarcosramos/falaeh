@@ -1,5 +1,5 @@
 // Fala Eh - Jogo Educativo de Exercícios Fonoaudiológicos
-// Frontend moderno sem framework SPA (Vanilla JS + Fetch API + PWA)
+// Frontend moderno sem framework SPA (Vanilla JS + Fetch API + Web Speech API + PWA)
 
 const state = {
     sessionId: null,
@@ -13,6 +13,7 @@ const state = {
     selectedOption: null,
     isSubmitting: false,
     isAnsweredCorrectly: false,
+    isRecording: false,
     phaseCompleted: false,
     report: null,
     completion: null,
@@ -45,6 +46,11 @@ const WORLDS = {
     },
 };
 
+// Suporte à Web Speech API
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const isSpeechRecognitionSupported = Boolean(SpeechRecognition);
+let recognitionInstance = null;
+
 // Elementos do DOM
 const statusEl = document.getElementById("api-status");
 const toastEl = document.getElementById("toast-message");
@@ -72,6 +78,18 @@ const exerciseInstruction = document.getElementById("exercise-instruction");
 const targetWordContainer = document.getElementById("target-word-container");
 const exerciseTargetWord = document.getElementById("exercise-target-word");
 const optionsGrid = document.getElementById("options-grid");
+
+// Componentes de Voz
+const voiceInteractionArea = document.getElementById("voice-interaction-area");
+const btnVoiceRecord = document.getElementById("btn-voice-record");
+const voiceStatusBadge = document.getElementById("voice-status-badge");
+const voiceStatusIcon = document.getElementById("voice-status-icon");
+const voiceStatusText = document.getElementById("voice-status-text");
+const voiceTranscriptContainer = document.getElementById("voice-transcript-container");
+const voiceTranscriptText = document.getElementById("voice-transcript-text");
+const voiceUnsupportedMsg = document.getElementById("voice-unsupported-msg");
+const voiceFallbackLabel = document.getElementById("voice-fallback-label");
+const voiceDisclaimer = document.getElementById("voice-disclaimer");
 
 const feedbackMessageContainer = document.getElementById("feedback-message-container");
 const feedbackBanner = document.getElementById("feedback-banner");
@@ -106,10 +124,12 @@ function showToast(icon, message) {
 
     toastTimeoutId = setTimeout(() => {
         toastEl.classList.remove("show");
-    }, 3200);
+    }, 3500);
 }
 
 function showScreen(screen) {
+    stopVoiceRecognition();
+
     [screenHome, screenGame, screenCelebration].forEach((s) => {
         if (s) s.classList.add("d-none");
     });
@@ -117,6 +137,15 @@ function showScreen(screen) {
         screen.classList.remove("d-none");
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
+}
+
+function normalizeSpeechText(text) {
+    if (!text) return "";
+    return text
+        .trim()
+        .toLowerCase()
+        .replace(/[.,/#!$%^&*;:{}=\-_`~()?"'!\\]/g, "")
+        .replace(/\s+/g, " ");
 }
 
 function getTypeMeta(type) {
@@ -177,7 +206,7 @@ function updateWorldCardsUI() {
     });
 }
 
-// Toda a pontuação, progressão e desbloqueio vêm do backend: o cliente apenas exibe.
+// Requisições à API REST
 async function apiPost(path, body) {
     const response = await fetch(path, {
         method: "POST",
@@ -284,10 +313,183 @@ async function startWorld(levelId) {
     }
 }
 
+// Configuração e ciclo de vida do Reconhecimento de Voz (Web Speech API)
+function setupVoiceRecognition() {
+    if (!isSpeechRecognitionSupported) return null;
+
+    try {
+        const recognition = new SpeechRecognition();
+        recognition.lang = "pt-BR";
+        recognition.continuous = false;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+            state.isRecording = true;
+            if (btnVoiceRecord) btnVoiceRecord.classList.add("listening");
+            if (voiceStatusBadge) {
+                voiceStatusBadge.classList.add("listening");
+                if (voiceStatusIcon) voiceStatusIcon.textContent = "🔴";
+                if (voiceStatusText) voiceStatusText.textContent = "Ouvindo... Fale agora!";
+            }
+            if (voiceTranscriptContainer) voiceTranscriptContainer.classList.add("d-none");
+        };
+
+        recognition.onresult = (event) => {
+            state.isRecording = false;
+            resetVoiceUIState();
+
+            if (!event.results || !event.results[0] || !event.results[0][0]) return;
+
+            const rawTranscript = event.results[0][0].transcript;
+
+            if (voiceTranscriptContainer && voiceTranscriptText) {
+                voiceTranscriptText.textContent = `"${rawTranscript}"`;
+                voiceTranscriptContainer.classList.remove("d-none");
+            }
+
+            // Submete o texto reconhecido normalizado para a API (sem gravar áudio)
+            submitVoiceAnswer(rawTranscript);
+        };
+
+        recognition.onerror = (event) => {
+            state.isRecording = false;
+            resetVoiceUIState();
+
+            let friendlyMessage = "Não conseguimos ouvir com clareza. Tente novamente ou escolha uma opção abaixo.";
+            if (event.error === "no-speech") {
+                friendlyMessage = "Nenhuma fala detectada. Toque no microfone e tente falar mais perto.";
+            } else if (event.error === "not-allowed" || event.error === "permission-denied") {
+                friendlyMessage = "Permissão de microfone não concedida. Você pode responder tocando nas opções abaixo!";
+                if (voiceUnsupportedMsg) {
+                    voiceUnsupportedMsg.textContent = "ℹ️ Microfone indisponível ou permissão não concedida. Você pode responder tocando nas opções abaixo!";
+                    voiceUnsupportedMsg.classList.remove("d-none");
+                }
+            } else if (event.error === "network") {
+                friendlyMessage = "Falha temporária de rede no reconhecimento. Tente novamente ou use as opções de toque.";
+            }
+
+            showToast("🎙️", friendlyMessage);
+            if (voiceStatusText) voiceStatusText.textContent = "Toque no microfone para tentar de novo";
+        };
+
+        recognition.onend = () => {
+            state.isRecording = false;
+            resetVoiceUIState();
+        };
+
+        return recognition;
+    } catch (e) {
+        console.warn("Erro ao configurar SpeechRecognition:", e);
+        return null;
+    }
+}
+
+function resetVoiceUIState() {
+    if (btnVoiceRecord) btnVoiceRecord.classList.remove("listening");
+    if (voiceStatusBadge) {
+        voiceStatusBadge.classList.remove("listening");
+        if (voiceStatusIcon) voiceStatusIcon.textContent = "🎙️";
+        if (voiceStatusText) voiceStatusText.textContent = "Toque no microfone para falar";
+    }
+}
+
+function stopVoiceRecognition() {
+    if (recognitionInstance && state.isRecording) {
+        try {
+            recognitionInstance.stop();
+        } catch {}
+    }
+    state.isRecording = false;
+    resetVoiceUIState();
+}
+
+function toggleVoiceRecognition() {
+    if (state.isAnsweredCorrectly || state.isSubmitting) return;
+
+    if (!isSpeechRecognitionSupported) {
+        if (voiceUnsupportedMsg) voiceUnsupportedMsg.classList.remove("d-none");
+        showToast("ℹ️", "Reconhecimento de voz não suportado neste navegador. Escolha uma das opções por toque!");
+        return;
+    }
+
+    if (!recognitionInstance) {
+        recognitionInstance = setupVoiceRecognition();
+    }
+
+    if (!recognitionInstance) {
+        if (voiceUnsupportedMsg) voiceUnsupportedMsg.classList.remove("d-none");
+        return;
+    }
+
+    if (state.isRecording) {
+        try {
+            recognitionInstance.stop();
+        } catch {}
+        state.isRecording = false;
+        resetVoiceUIState();
+    } else {
+        try {
+            recognitionInstance.start();
+        } catch (err) {
+            console.warn("Aviso ao iniciar reconhecimento de fala:", err);
+            try {
+                recognitionInstance.stop();
+                setTimeout(() => recognitionInstance.start(), 200);
+            } catch {}
+        }
+    }
+}
+
+async function submitVoiceAnswer(spokenText) {
+    if (!spokenText || state.isSubmitting || state.isAnsweredCorrectly) return;
+
+    const currentEx = state.exercise;
+    if (!currentEx || !state.sessionId) return;
+
+    state.selectedOption = spokenText;
+    state.isSubmitting = true;
+
+    if (btnSubmitAnswer) {
+        btnSubmitAnswer.disabled = true;
+        btnSubmitAnswer.textContent = "Verificando…";
+    }
+
+    // Se o texto dito corresponder a uma das opções, destaca a respectiva opção visualmente
+    const normalizedSpoken = normalizeSpeechText(spokenText);
+    const allButtons = optionsGrid.querySelectorAll(".option-btn");
+    allButtons.forEach((btn) => {
+        const optText = btn.querySelector("span:last-child")?.textContent || "";
+        if (normalizeSpeechText(optText) === normalizedSpoken) {
+            btn.classList.add("selected");
+            btn.setAttribute("aria-checked", "true");
+        }
+    });
+
+    try {
+        const data = await apiPost(`/api/v1/game/${encodeURIComponent(state.sessionId)}/answer`, {
+            exerciseId: currentEx.id,
+            answer: spokenText,
+        });
+
+        handleAnswerResult(data);
+    } catch (err) {
+        console.error("Falha ao submeter resposta por voz:", err);
+        showToast("⚠️", "Erro ao conectar com a API. Tente novamente.");
+        if (btnSubmitAnswer) {
+            btnSubmitAnswer.disabled = false;
+            btnSubmitAnswer.textContent = "✨ Confirmar Resposta";
+        }
+    } finally {
+        state.isSubmitting = false;
+    }
+}
+
 function renderCurrentExercise() {
     const currentEx = state.exercise;
     if (!currentEx) return;
 
+    stopVoiceRecognition();
     state.selectedOption = null;
     state.isAnsweredCorrectly = false;
 
@@ -320,7 +522,38 @@ function renderCurrentExercise() {
         }
     }
 
-    // Renderiza opções
+    // Tratamento de Exercício por Voz vs Múltipla Escolha
+    const isVoiceType = currentEx.type === "voice";
+
+    if (voiceInteractionArea) {
+        if (isVoiceType) {
+            voiceInteractionArea.classList.remove("d-none");
+            resetVoiceUIState();
+            if (voiceTranscriptContainer) voiceTranscriptContainer.classList.add("d-none");
+
+            if (!isSpeechRecognitionSupported) {
+                if (voiceUnsupportedMsg) voiceUnsupportedMsg.classList.remove("d-none");
+                if (btnVoiceRecord) btnVoiceRecord.disabled = true;
+                if (voiceStatusText) voiceStatusText.textContent = "Reconhecimento de voz não suportado neste navegador";
+            } else {
+                if (voiceUnsupportedMsg) voiceUnsupportedMsg.classList.add("d-none");
+                if (btnVoiceRecord) btnVoiceRecord.disabled = false;
+            }
+
+            if (voiceFallbackLabel) {
+                voiceFallbackLabel.classList.remove("d-none");
+            }
+        } else {
+            voiceInteractionArea.classList.add("d-none");
+            if (voiceFallbackLabel) voiceFallbackLabel.classList.add("d-none");
+        }
+    }
+
+    if (voiceDisclaimer) {
+        voiceDisclaimer.classList.toggle("d-none", !isVoiceType);
+    }
+
+    // Renderiza opções manuais (sempre disponíveis como opção primária ou fallback)
     if (optionsGrid) {
         optionsGrid.innerHTML = "";
         const options = currentEx.options || [];
@@ -388,7 +621,9 @@ async function submitAnswer() {
     const currentEx = state.exercise;
     if (!currentEx || !state.sessionId) return;
 
+    stopVoiceRecognition();
     state.isSubmitting = true;
+
     if (btnSubmitAnswer) {
         btnSubmitAnswer.disabled = true;
         btnSubmitAnswer.textContent = "Verificando…";
@@ -435,8 +670,9 @@ function handleAnswerResult(data) {
             selectedBtn.classList.add("correct");
         }
 
-        // Desabilita botões para evitar duplo clique
+        // Desabilita botões para evitar cliques extras
         allButtons.forEach((b) => (b.disabled = true));
+        if (btnVoiceRecord) btnVoiceRecord.disabled = true;
 
         // Feedback positivo
         if (feedbackMessageContainer && feedbackBanner && feedbackIcon && feedbackText) {
@@ -467,7 +703,7 @@ function handleAnswerResult(data) {
         if (feedbackMessageContainer && feedbackBanner && feedbackIcon && feedbackText) {
             feedbackBanner.className = "d-inline-flex align-items-center gap-2 px-4 py-2 rounded-pill fw-bold feedback-banner-incorrect";
             feedbackIcon.textContent = "💡";
-            feedbackText.textContent = "Quase lá! Tente novamente com outra opção.";
+            feedbackText.textContent = "Quase lá! Tente novamente ou escolha outra opção.";
             feedbackMessageContainer.classList.remove("d-none");
         }
 
@@ -490,6 +726,8 @@ function goToNextExercise() {
 }
 
 function finishWorld() {
+    stopVoiceRecognition();
+
     const currentWorld = WORLDS[state.currentLevel];
     const report = state.report;
     const nextWorldId = state.completion?.nextLevel || null;
@@ -541,6 +779,10 @@ function initEventHandlers() {
 
     if (btnSelectAdvanced) {
         btnSelectAdvanced.addEventListener("click", () => startWorld("advanced"));
+    }
+
+    if (btnVoiceRecord) {
+        btnVoiceRecord.addEventListener("click", toggleVoiceRecognition);
     }
 
     if (btnSubmitAnswer) {
