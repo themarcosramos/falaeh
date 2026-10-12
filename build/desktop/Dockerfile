@@ -15,6 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     rsync \
     file \
+    zip \
     && rm -rf /var/lib/apt/lists/*
 
 # Instala Wails CLI v2 oficial
