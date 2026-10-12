@@ -1,4 +1,24 @@
 {
     "level": "advanced",
-    "exercises": []
+    "exercises": [
+        {
+            "id": "adv-001",
+            "level": "advanced",
+            "type": "multiple_choice",
+            "instruction": "Qual palavra completa a rima fonética: 'O dragão voa no ___'?",
+            "targetWord": "Vulcão",
+            "options": ["Vulcão", "Castelo", "Jardim"],
+            "correctAnswer": "Vulcão"
+        },
+        {
+            "id": "adv-002",
+            "level": "advanced",
+            "type": "voice",
+            "instruction": "Pronuncie a frase trava-línguas: 'O sapo dentro do saco'.",
+            "targetWord": "O sapo dentro do saco",
+            "options": ["O sapo dentro do saco", "O pato dentro do saco"],
+            "correctAnswer": "O sapo dentro do saco"
+        }
+    ]
 }
+
