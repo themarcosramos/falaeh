@@ -110,6 +110,9 @@ const btnReplayWorld = document.getElementById("btn-replay-world");
 const btnNextWorld = document.getElementById("btn-next-world");
 const btnInstallPwa = document.getElementById("btn-install-pwa");
 
+const btnExportPdf = document.getElementById("btn-export-pdf");
+const btnExportImage = document.getElementById("btn-export-image");
+
 let deferredInstallPrompt = null;
 let toastTimeoutId = null;
 
@@ -400,7 +403,7 @@ function stopVoiceRecognition() {
     if (recognitionInstance && state.isRecording) {
         try {
             recognitionInstance.stop();
-        } catch {}
+        } catch { }
     }
     state.isRecording = false;
     resetVoiceUIState();
@@ -427,7 +430,7 @@ function toggleVoiceRecognition() {
     if (state.isRecording) {
         try {
             recognitionInstance.stop();
-        } catch {}
+        } catch { }
         state.isRecording = false;
         resetVoiceUIState();
     } else {
@@ -438,7 +441,7 @@ function toggleVoiceRecognition() {
             try {
                 recognitionInstance.stop();
                 setTimeout(() => recognitionInstance.start(), 200);
-            } catch {}
+            } catch { }
         }
     }
 }
@@ -735,12 +738,20 @@ function finishWorld() {
     const nextWorldId = state.completion?.nextLevel || null;
     const unlockedNext = Boolean(state.completion?.nextUnlocked);
 
-    // Preenche tela de celebração
+    // Preenche cabeçalho e estatísticas do relatório final
     const celebrationWorldName = document.getElementById("celebration-world-name");
     const celebrationSubtitle = document.getElementById("celebration-subtitle");
+    const reportWorldIcon = document.getElementById("report-world-icon");
+    const reportLevel = document.getElementById("report-level");
+    const reportPhaseCompleted = document.getElementById("report-phase-completed");
+
     const summaryXp = document.getElementById("summary-xp");
     const summaryAccuracy = document.getElementById("summary-accuracy");
     const summaryStreak = document.getElementById("summary-streak");
+    const reportExercisesCount = document.getElementById("report-exercises-count");
+    const reportHits = document.getElementById("report-hits");
+    const reportAttempts = document.getElementById("report-attempts");
+    const reportNextLevel = document.getElementById("report-next-level");
 
     if (celebrationWorldName) celebrationWorldName.textContent = currentWorld?.name || "Mundo";
     if (celebrationSubtitle) {
@@ -749,9 +760,49 @@ function finishWorld() {
             : `Parabéns! Você concluiu todos os desafios do ${currentWorld?.name}!`;
     }
 
-    if (summaryXp) summaryXp.textContent = `${report?.totalXp ?? state.xp} XP`;
-    if (summaryAccuracy) summaryAccuracy.textContent = `${report?.accuracy ?? 0}%`;
-    if (summaryStreak) summaryStreak.textContent = `${report?.bestStreak ?? 0}`;
+    if (reportWorldIcon) reportWorldIcon.textContent = currentWorld?.icon || "🌍";
+    if (reportLevel) reportLevel.textContent = `${currentWorld?.name || "Iniciante"} (${currentWorld?.badge || "NÍVEL 1"})`;
+    if (reportPhaseCompleted) {
+        reportPhaseCompleted.textContent = "Sim 🏆";
+        reportPhaseCompleted.className = "badge text-bg-success px-3 py-2 fw-bold";
+    }
+
+    const totalXpVal = report?.totalXp ?? state.xp;
+    const accuracyVal = report?.accuracy ?? 100;
+    const bestStreakVal = report?.bestStreak ?? state.streak;
+    const exercisesCountVal = report?.exercisesTotal ?? state.totalExercises;
+    const hitsVal = report?.hits ?? state.totalExercises;
+    const attemptsVal = report?.attempts ?? state.totalExercises;
+
+    if (summaryXp) summaryXp.textContent = `${totalXpVal} XP`;
+    if (summaryAccuracy) summaryAccuracy.textContent = `${accuracyVal}%`;
+    if (summaryStreak) summaryStreak.textContent = `${bestStreakVal}`;
+    if (reportExercisesCount) reportExercisesCount.textContent = `${exercisesCountVal}`;
+    if (reportHits) reportHits.textContent = `${hitsVal}`;
+    if (reportAttempts) reportAttempts.textContent = `${attemptsVal}`;
+
+    if (reportNextLevel) {
+        if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
+            reportNextLevel.textContent = `${WORLDS[nextWorldId].name} (${WORLDS[nextWorldId].badge})`;
+            reportNextLevel.className = "badge text-bg-primary px-2 py-1 fw-bold";
+        } else if (!nextWorldId) {
+            reportNextLevel.textContent = "Mestre da Fala! 🎖️";
+            reportNextLevel.className = "badge text-bg-success px-2 py-1 fw-bold";
+        } else {
+            reportNextLevel.textContent = `${WORLDS[nextWorldId]?.name || "Próximo"}`;
+            reportNextLevel.className = "badge text-bg-secondary px-2 py-1 fw-bold";
+        }
+    }
+
+    const reportPlayerName = document.getElementById("report-player-name");
+    const reportPlayerNameDisplay = document.getElementById("report-player-name-display");
+
+    if (reportPlayerName && reportPlayerNameDisplay) {
+        reportPlayerName.oninput = () => {
+            const val = reportPlayerName.value.trim();
+            reportPlayerNameDisplay.textContent = val ? `⭐ ${val} ⭐` : "⭐ Astronauta da Fala ⭐";
+        };
+    }
 
     if (btnNextWorld) {
         if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
@@ -764,6 +815,366 @@ function finishWorld() {
     }
 
     showScreen(screenCelebration);
+}
+
+// Nome opcional digitado pelo jogador; permanece apenas no navegador.
+function getReportPlayerName() {
+    const input = document.getElementById("report-player-name");
+    return (input?.value || "").trim() || "Astronauta da Fala";
+}
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (char) => {
+        switch (char) {
+            case "&": return "&amp;";
+            case "<": return "&lt;";
+            case ">": return "&gt;";
+            case "\"": return "&quot;";
+            default: return "&#39;";
+        }
+    });
+}
+
+// Helper universal para desenhar retângulos arredondados compatível com todos os navegadores
+function drawRoundRect(ctx, x, y, width, height, radius) {
+    // beginPath é obrigatório: ctx.roundRect apenas acrescenta ao path atual.
+    ctx.beginPath();
+    if (typeof ctx.roundRect === "function") {
+        ctx.roundRect(x, y, width, height, radius);
+        return;
+    }
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + width - radius, y);
+    ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+    ctx.lineTo(x + width, y + height - radius);
+    ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    ctx.lineTo(x + radius, y + height);
+    ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+}
+
+// Geração local de PDF através de documento limpo e impressão estilizada
+function exportReportPDF() {
+    try {
+        showToast("📄", "Preparando relatório em PDF...");
+        const currentWorld = WORLDS[state.currentLevel] || { name: "Iniciante (Planeta Sons)", badge: "NÍVEL 1", icon: "🌱" };
+        const report = state.report;
+        const totalXp = report?.totalXp ?? state.xp ?? 0;
+        const accuracy = report?.accuracy ?? 100;
+        const bestStreak = report?.bestStreak ?? state.streak ?? 0;
+        const exercisesCompleted = report?.exercisesTotal ?? state.totalExercises ?? 0;
+        const hits = report?.hits ?? state.totalExercises ?? 0;
+        const attempts = report?.attempts ?? state.totalExercises ?? 0;
+        const nextLevelName = state.completion?.nextLevel && WORLDS[state.completion.nextLevel]
+            ? WORLDS[state.completion.nextLevel].name
+            : "Missão Final Concluída! 🎖️";
+        const dataStr = new Date().toLocaleDateString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+
+        const playerName = getReportPlayerName();
+
+        // Abre visualização de impressão formatada em A4
+        const printWin = window.open("", "_blank", "width=850,height=1000");
+        if (printWin) {
+            printWin.document.open();
+            printWin.document.write(`
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <title>Fala Eh - Relatório de Missão</title>
+    <style>
+        @page { size: A4 portrait; margin: 1.5cm; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #0f172a; margin: 0; padding: 24px; background: #ffffff; }
+        .header { text-align: center; border-bottom: 2px solid #8b5cf6; padding-bottom: 16px; margin-bottom: 20px; }
+        .logo { font-size: 32px; font-weight: 800; color: #4c1d95; }
+        .tagline { font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; margin-top: 4px; }
+        .date { font-size: 13px; color: #94a3b8; margin-top: 6px; }
+        .player-banner { text-align: center; margin: 15px 0 22px 0; padding: 14px; background: #f5f3ff; border-radius: 10px; border: 2px solid #8b5cf6; }
+        .player-label { font-size: 13px; color: #6d28d9; text-transform: uppercase; font-weight: 700; display: block; margin-bottom: 4px; }
+        .player-name { font-size: 26px; color: #4c1d95; text-transform: uppercase; letter-spacing: 1px; }
+        .card { border: 1px solid #cbd5e1; border-radius: 12px; padding: 18px; margin-bottom: 20px; background: #f8fafc; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; text-align: center; background: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .stat-val { font-size: 28px; font-weight: 800; color: #4c1d95; margin-bottom: 4px; }
+        .stat-label { font-size: 12px; color: #64748b; text-transform: uppercase; font-weight: 700; }
+        .row-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #e2e8f0; font-size: 15px; }
+        .row-item:last-child { border-bottom: none; }
+        .status-ok { color: #059669; font-weight: 700; }
+        .footer { text-align: center; margin-top: 36px; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 16px; line-height: 1.5; }
+        .print-btn { display: inline-block; padding: 10px 20px; background: #7c3aed; color: #ffffff; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        @media print { .print-btn { display: none; } }
+    </style>
+</head>
+<body>
+    <div style="text-align: right;">
+        <button class="print-btn" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    </div>
+    <div class="header">
+        <div class="logo">🎙️ Fala Eh!</div>
+        <div class="tagline">Certificado de Desempenho e Relatório de Missão</div>
+        <div class="date">Emitido em: ${dataStr}</div>
+    </div>
+
+    <div class="player-banner">
+        <span class="player-label">Certificado de Conclusão de Missão concedido a:</span>
+        <strong class="player-name">⭐ ${escapeHtml(playerName)} ⭐</strong>
+    </div>
+
+    <div class="card">
+        <div class="row-item"><strong>Mundo / Nível:</strong> <span>${currentWorld.icon} ${currentWorld.name} (${currentWorld.badge})</span></div>
+        <div class="row-item"><strong>Fase Concluída:</strong> <span class="status-ok">Sim 🏆 (100%)</span></div>
+        <div class="row-item"><strong>Próximo Nível Desbloqueado:</strong> <span style="color: #2563eb; font-weight: 700;">${nextLevelName}</span></div>
+    </div>
+
+    <div class="grid">
+        <div class="stat-box">
+            <div class="stat-val">⭐ ${totalXp} XP</div>
+            <div class="stat-label">Pontuação Total Conquistada</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val">🎯 ${accuracy}%</div>
+            <div class="stat-label">Taxa de Acertos (Acurácia)</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val">🔥 ${bestStreak}</div>
+            <div class="stat-label">Maior Sequência de Acertos</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-val">📝 ${exercisesCompleted}</div>
+            <div class="stat-label">Exercícios Realizados</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="row-item"><strong>Total de Acertos:</strong> <span>${hits} acertos</span></div>
+        <div class="row-item"><strong>Total de Tentativas:</strong> <span>${attempts} tentativas</span></div>
+    </div>
+
+    <div class="footer">
+        🌱 <strong>Fala Eh</strong> — Jogo Educativo de Exercícios Fonoaudiológicos<br/>
+        Ambiente gamificado para desenvolvimento e treino lúdico da fala.
+    </div>
+
+    <script>
+        setTimeout(function() {
+            window.print();
+        }, 300);
+    </script>
+</body>
+</html>
+            `);
+            printWin.document.close();
+        } else {
+            window.print();
+        }
+    } catch (err) {
+        console.error("Falha ao abrir visualização de PDF:", err);
+        window.print();
+    }
+}
+
+// Geração local de imagem PNG em alta resolução utilizando HTML5 Canvas
+function exportReportImage() {
+    try {
+        showToast("🖼️", "Gerando imagem do relatório...");
+        const currentWorld = WORLDS[state.currentLevel] || { name: "Iniciante", badge: "NÍVEL 1", icon: "🌱" };
+        const report = state.report;
+        const totalXp = report?.totalXp ?? state.xp ?? 0;
+        const accuracy = report?.accuracy ?? 100;
+        const bestStreak = report?.bestStreak ?? state.streak ?? 0;
+        const exercisesCompleted = report?.exercisesTotal ?? state.totalExercises ?? 0;
+        const hits = report?.hits ?? state.totalExercises ?? 0;
+        const attempts = report?.attempts ?? state.totalExercises ?? 0;
+        const nextLevelName = state.completion?.nextLevel && WORLDS[state.completion.nextLevel]
+            ? WORLDS[state.completion.nextLevel].name
+            : "Missão Final Concluída! 🎖️";
+
+        const playerName = getReportPlayerName();
+
+        const canvas = document.createElement("canvas");
+        canvas.width = 1200;
+        canvas.height = 950;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+            throw new Error("Canvas 2D context não suportado");
+        }
+
+        // 1. Fundo Espacial com Gradiente
+        const bgGrad = ctx.createRadialGradient(600, 200, 50, 600, 475, 750);
+        bgGrad.addColorStop(0, "#311042");
+        bgGrad.addColorStop(0.5, "#1e1b4b");
+        bgGrad.addColorStop(1, "#0f172a");
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 1200, 950);
+
+        // 2. Borda Estilizada
+        ctx.strokeStyle = "rgba(139, 92, 246, 0.4)";
+        ctx.lineWidth = 8;
+        ctx.strokeRect(30, 30, 1140, 890);
+
+        ctx.strokeStyle = "rgba(245, 158, 11, 0.6)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(40, 40, 1120, 870);
+
+        // 3. Estrelas decorativas
+        ctx.fillStyle = "#fef08a";
+        const stars = [
+            [100, 100, 3], [1100, 120, 4], [150, 850, 2], [1050, 830, 3],
+            [250, 200, 2], [950, 220, 3], [120, 480, 2], [1080, 510, 2]
+        ];
+        stars.forEach(([x, y, r]) => {
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // 4. Cabeçalho
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#a78bfa";
+        ctx.font = "bold 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText("✨ FALA EH • RELATÓRIO DA MISSÃO", 600, 75);
+
+        ctx.fillStyle = "#f59e0b";
+        ctx.font = "900 38px system-ui, -apple-system, sans-serif";
+        ctx.fillText("CERTIFICADO DE CONCLUSÃO", 600, 118);
+
+        // Banner Destaque do Nome Personalizado
+        const nameBannerW = 860;
+        const nameBannerH = 70;
+        const nameBannerX = 600 - nameBannerW / 2;
+        const nameBannerY = 140;
+
+        ctx.fillStyle = "rgba(76, 29, 149, 0.85)";
+        ctx.strokeStyle = "#fbbf24";
+        ctx.lineWidth = 3;
+        drawRoundRect(ctx, nameBannerX, nameBannerY, nameBannerW, nameBannerH, 16);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
+        ctx.fillText("CONFERIDO COM HONRAS A:", 600, nameBannerY + 22);
+
+        ctx.fillStyle = "#fef08a";
+        const nameLine = `⭐ ${playerName.toUpperCase()} ⭐`;
+        let nameFontSize = 28;
+        ctx.font = `900 ${nameFontSize}px system-ui, -apple-system, sans-serif`;
+        while (nameFontSize > 14 && ctx.measureText(nameLine).width > nameBannerW - 60) {
+            nameFontSize -= 1;
+            ctx.font = `900 ${nameFontSize}px system-ui, -apple-system, sans-serif`;
+        }
+        ctx.fillText(nameLine, 600, nameBannerY + 54);
+
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "500 20px system-ui, -apple-system, sans-serif";
+        ctx.fillText(`Mundo: ${currentWorld.name} (${currentWorld.badge})`, 600, 240);
+
+        // 5. Grid de Cards de Estatísticas com drawRoundRect seguro
+        const drawCard = (x, y, w, h, icon, label, val, color) => {
+            ctx.fillStyle = "rgba(30, 27, 75, 0.75)";
+            ctx.strokeStyle = "rgba(139, 92, 246, 0.35)";
+            ctx.lineWidth = 3;
+            drawRoundRect(ctx, x, y, w, h, 20);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.textAlign = "center";
+            ctx.font = "34px system-ui, -apple-system, sans-serif";
+            ctx.fillText(icon, x + w / 2, y + 55);
+
+            ctx.fillStyle = color;
+            ctx.font = "bold 38px system-ui, -apple-system, sans-serif";
+            ctx.fillText(val, x + w / 2, y + 110);
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "600 18px system-ui, -apple-system, sans-serif";
+            ctx.fillText(label, x + w / 2, y + 145);
+        };
+
+        const cardW = 240;
+        const cardH = 175;
+        const startY = 260;
+        const gap = 30;
+        const startX = 600 - (cardW * 4 + gap * 3) / 2;
+
+        drawCard(startX, startY, cardW, cardH, "⭐", "XP CONQUISTADO", `${totalXp} XP`, "#fbbf24");
+        drawCard(startX + cardW + gap, startY, cardW, cardH, "🎯", "ACURÁCIA", `${accuracy}%`, "#34d399");
+        drawCard(startX + (cardW + gap) * 2, startY, cardW, cardH, "🔥", "MAIOR SEQUÊNCIA", `${bestStreak}`, "#f87171");
+        drawCard(startX + (cardW + gap) * 3, startY, cardW, cardH, "📝", "EXERCÍCIOS", `${exercisesCompleted}`, "#38bdf8");
+
+        // 6. Painel de Detalhes Adicionais com drawRoundRect seguro
+        const panelY = 480;
+        const panelW = 1050;
+        const panelH = 260;
+        const panelX = 600 - panelW / 2;
+
+        ctx.fillStyle = "rgba(15, 23, 42, 0.8)";
+        ctx.strokeStyle = "rgba(167, 139, 250, 0.25)";
+        ctx.lineWidth = 2;
+        drawRoundRect(ctx, panelX, panelY, panelW, panelH, 24);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.textAlign = "left";
+        ctx.fillStyle = "#e2e8f0";
+        ctx.font = "bold 26px system-ui, -apple-system, sans-serif";
+        ctx.fillText("🏆 Fase Concluída:", panelX + 50, panelY + 65);
+
+        ctx.fillStyle = "#34d399";
+        ctx.fillText("SIM (100% dos desafios superados)", panelX + 310, panelY + 65);
+
+        ctx.fillStyle = "#e2e8f0";
+        ctx.fillText("🚀 Próximo Nível:", panelX + 50, panelY + 125);
+
+        ctx.fillStyle = "#60a5fa";
+        ctx.fillText(`${nextLevelName}`, panelX + 280, panelY + 125);
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "500 22px system-ui, -apple-system, sans-serif";
+        ctx.fillText(`✅ Total de Acertos: ${hits} acertos`, panelX + 50, panelY + 185);
+        ctx.fillText(`🔄 Total de Tentativas: ${attempts} tentativas`, panelX + 450, panelY + 185);
+
+        const dataStr = new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+        ctx.fillText(`📅 Data: ${dataStr}`, panelX + 830, panelY + 185);
+
+        // 7. Rodapé
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#64748b";
+        ctx.font = "16px system-ui, -apple-system, sans-serif";
+        ctx.fillText("🌱 Fala Eh — Jogo Educativo de Exercícios Fonoaudiológicos • Treino Lúdico da Fala", 600, 850);
+
+        // 8. Download Automático sem envio a servidores
+        const cleanName = playerName
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "") || "resultado";
+
+        const dataUrl = canvas.toDataURL("image/png");
+        const a = document.createElement("a");
+        a.href = dataUrl;
+        a.download = `falaeh-certificado-${cleanName}.png`;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+        }, 100);
+
+        showToast("🖼️", "Imagem personalizada gerada e baixada com sucesso!");
+    } catch (err) {
+        console.error("Falha ao gerar imagem do relatório:", err);
+        showToast("⚠️", "Não foi possível gerar a imagem no navegador.");
+    }
 }
 
 function initEventHandlers() {
@@ -793,6 +1204,14 @@ function initEventHandlers() {
 
     if (btnNextExercise) {
         btnNextExercise.addEventListener("click", goToNextExercise);
+    }
+
+    if (btnExportPdf) {
+        btnExportPdf.addEventListener("click", exportReportPDF);
+    }
+
+    if (btnExportImage) {
+        btnExportImage.addEventListener("click", exportReportImage);
     }
 
     if (btnBackHome) {
