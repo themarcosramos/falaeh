@@ -238,6 +238,24 @@ desktop-builder: ## Constrói a imagem Docker para compilação multiplataforma 
 	@printf '\n  $(C_TITLE)Desktop Builder — $(APP_NAME)$(C_OFF)\n\n'
 	docker build -t $(DESKTOP_BUILDER_IMAGE) -f build/desktop/Dockerfile .
 
+ifeq ($(shell uname -s),Darwin)
+desktop-icons: ## Gera os ícones da aplicação (PNG, ICO) com as ferramentas nativas do macOS
+	@printf '\n  $(C_TITLE)Ícones Desktop — $(APP_NAME)$(C_OFF)\n\n'
+	@command -v rsvg-convert >/dev/null || { echo "Instale librsvg com 'brew install librsvg'." >&2; exit 1; }
+	@command -v icotool >/dev/null || { echo "Instale icoutils com 'brew install icoutils'." >&2; exit 1; }
+	@mkdir -p /tmp/icons build/windows build/darwin backend/cmd/desktop/build/windows backend/cmd/desktop/build/darwin
+	@rsvg-convert -w 512 -h 512 frontend/assets/icons/icon.svg -o build/appicon.png
+	@rsvg-convert -w 16 -h 16 frontend/assets/icons/icon.svg -o /tmp/icons/16.png
+	@rsvg-convert -w 32 -h 32 frontend/assets/icons/icon.svg -o /tmp/icons/32.png
+	@rsvg-convert -w 48 -h 48 frontend/assets/icons/icon.svg -o /tmp/icons/48.png
+	@rsvg-convert -w 64 -h 64 frontend/assets/icons/icon.svg -o /tmp/icons/64.png
+	@rsvg-convert -w 128 -h 128 frontend/assets/icons/icon.svg -o /tmp/icons/128.png
+	@rsvg-convert -w 256 -h 256 frontend/assets/icons/icon.svg -o /tmp/icons/256.png
+	@icotool -c -o build/windows/icon.ico /tmp/icons/*.png
+	@cp -f build/appicon.png backend/cmd/desktop/build/appicon.png
+	@cp -f build/windows/icon.ico backend/cmd/desktop/build/windows/icon.ico
+	@printf '  $(C_OK)✔ Ícones PNG e Windows ICO gerados com sucesso a partir de frontend/assets/icons/icon.svg$(C_OFF)\n\n'
+else
 desktop-icons: desktop-builder ## Gera os ícones da aplicação (PNG, ICO) a partir do SVG do navegador
 	@printf '\n  $(C_TITLE)Ícones Desktop — $(APP_NAME)$(C_OFF)\n\n'
 	@docker run --rm --user $$(id -u):$$(id -g) \
@@ -256,6 +274,7 @@ desktop-icons: desktop-builder ## Gera os ícones da aplicação (PNG, ICO) a pa
 		cp -f build/appicon.png backend/cmd/desktop/build/appicon.png && \
 		cp -f build/windows/icon.ico backend/cmd/desktop/build/windows/icon.ico'
 	@printf '  $(C_OK)✔ Ícones PNG e Windows ICO gerados com sucesso a partir de frontend/assets/icons/icon.svg$(C_OFF)\n\n'
+endif
 
 desktop-sync: desktop-icons ## Sincroniza frontend, dados e ícones para o pacote desktop
 	@mkdir -p backend/cmd/desktop/frontend backend/cmd/desktop/data build/bin

@@ -26,6 +26,7 @@ RUN curl -sL https://github.com/AppImage/appimagetool/releases/download/continuo
     && chmod +x /tmp/appimagetool.AppImage \
     && cd /tmp && ./appimagetool.AppImage --appimage-extract \
     && mv /tmp/squashfs-root /opt/appimagetool \
+    && chmod -R a+rX /opt/appimagetool \
     && ln -s /opt/appimagetool/AppRun /usr/local/bin/appimagetool \
     && rm -f /tmp/appimagetool.AppImage
 
