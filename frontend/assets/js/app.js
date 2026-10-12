@@ -1664,9 +1664,10 @@ async function checkAPI() {
         statusEl.textContent = "API online";
         statusEl.className = "badge text-bg-success";
     } catch (err) {
-        console.warn("API indisponível ou inacessível no momento:", err);
-        statusEl.textContent = "API indisponível";
+        console.warn("API ainda inicializando ou inacessível:", err);
+        statusEl.textContent = "Conectando...";
         statusEl.className = "badge text-bg-secondary opacity-75";
+        setTimeout(checkAPI, 2500);
     }
 }
 
