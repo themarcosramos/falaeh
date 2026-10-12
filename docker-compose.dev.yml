@@ -1,0 +1,11 @@
+services:
+  api:
+    build:
+      target: dev
+    volumes:
+      - ./backend:/app
+
+  web:
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
