@@ -3,11 +3,13 @@ name: CI Quality Gate
 on:
   pull_request:
     branches:
+      - main
       - stage
       - homolog
       - production
   push:
     branches:
+      - main
       - stage
       - homolog
       - production
