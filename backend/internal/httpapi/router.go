@@ -8,12 +8,22 @@ import (
 )
 
 // NewRouter monta as rotas da API. Novos domínios devem registrar suas rotas aqui.
-func NewRouter(logger *slog.Logger) http.Handler {
+func NewRouter(logger *slog.Logger, exerciseService ExerciseService) http.Handler {
 	mux := http.NewServeMux()
 
+	// Infraestrutura e documentação
 	mux.HandleFunc("GET /health", handleHealth(logger))
 	mux.HandleFunc("GET /docs", handleSwaggerUI(logger))
 	mux.HandleFunc("GET /swagger.yaml", handleSwaggerSpec(logger))
+
+	// Domínio de Exercícios
+	if exerciseService != nil {
+		mux.HandleFunc("GET /api/v1/levels", handleListLevels(logger, exerciseService))
+		mux.HandleFunc("GET /api/v1/levels/{level}/exercises", handleListExercisesByLevel(logger, exerciseService))
+		mux.HandleFunc("GET /api/v1/exercises", handleListExercises(logger, exerciseService))
+		mux.HandleFunc("GET /api/v1/exercises/{id}", handleGetExercise(logger, exerciseService))
+		mux.HandleFunc("POST /api/v1/exercises/{id}/answer", handleAnswerExercise(logger, exerciseService))
+	}
 
 	return securityHeaders(mux)
 }
@@ -43,6 +53,10 @@ func writeJSON(w http.ResponseWriter, logger *slog.Logger, status int, payload a
 	if err := json.NewEncoder(w).Encode(payload); err != nil {
 		logger.Error("falha ao escrever resposta JSON", slog.Any("error", err))
 	}
+}
+
+func writeError(w http.ResponseWriter, logger *slog.Logger, status int, msg string) {
+	writeJSON(w, logger, status, ErrorResponse{Error: msg})
 }
 
 func securityHeaders(next http.Handler) http.Handler {

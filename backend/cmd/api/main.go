@@ -4,13 +4,17 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io/fs"
 	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
+	"github.com/themarcosramos/falaeh/backend/internal/exercise"
 	"github.com/themarcosramos/falaeh/backend/internal/httpapi"
 )
 
@@ -40,9 +44,15 @@ func main() {
 }
 
 func run(logger *slog.Logger) error {
+	repo, err := exercise.NewJSONRepository(dataFS())
+	if err != nil {
+		return fmt.Errorf("falha ao carregar repositório de exercícios: %w", err)
+	}
+	exerciseService := exercise.NewService(repo)
+
 	server := &http.Server{
 		Addr:         ":" + port(),
-		Handler:      httpapi.NewRouter(logger),
+		Handler:      httpapi.NewRouter(logger, exerciseService),
 		ReadTimeout:  readTimeout,
 		WriteTimeout: writeTimeout,
 		IdleTimeout:  idleTimeout,
@@ -80,4 +90,19 @@ func port() string {
 	}
 
 	return defaultPort
+}
+
+func dataFS() fs.FS {
+	if dir := os.Getenv("DATA_DIR"); dir != "" {
+		return os.DirFS(dir)
+	}
+
+	candidates := []string{"data", "backend/data", "../data", "../../data", "../../../data"}
+	for _, c := range candidates {
+		if _, err := os.Stat(filepath.Join(c, "beginner.json")); err == nil {
+			return os.DirFS(c)
+		}
+	}
+
+	return os.DirFS("data")
 }
