@@ -49,6 +49,8 @@ func NextLevel(current exercise.Level) (exercise.Level, bool) {
 	case exercise.LevelIntermediate:
 		return exercise.LevelAdvanced, true
 	case exercise.LevelAdvanced:
+		return exercise.LevelFinal, true
+	case exercise.LevelFinal:
 		return "", false
 	default:
 		return "", false

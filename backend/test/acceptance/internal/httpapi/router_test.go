@@ -141,11 +141,14 @@ func TestRouter_Levels(t *testing.T) {
 		t.Fatalf("falha ao decodificar resposta de níveis: %v", err)
 	}
 
-	if len(levels) != 3 {
-		t.Fatalf("esperava 3 níveis, obteve %d", len(levels))
+	if len(levels) != 4 {
+		t.Fatalf("esperava 4 níveis (3 mundos + Desafio Final), obteve %d", len(levels))
 	}
 	if levels[0].ID != exercise.LevelBeginner || levels[0].Name == "" {
 		t.Errorf("nível iniciante inválido: %+v", levels[0])
+	}
+	if levels[3].ID != exercise.LevelFinal || levels[3].Name != "Desafio Final" {
+		t.Errorf("nível Desafio Final inválido: %+v", levels[3])
 	}
 }
 

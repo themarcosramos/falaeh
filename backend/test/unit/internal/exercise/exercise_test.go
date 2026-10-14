@@ -15,6 +15,7 @@ func TestLevel_IsValid(t *testing.T) {
 		{"beginner", exercise.LevelBeginner, true},
 		{"intermediate", exercise.LevelIntermediate, true},
 		{"advanced", exercise.LevelAdvanced, true},
+		{"final", exercise.LevelFinal, true},
 		{"invalid", exercise.Level("expert"), false},
 		{"empty", exercise.Level(""), false},
 	}
@@ -163,6 +164,10 @@ func TestExercise_CheckAnswer_And_Normalize(t *testing.T) {
 		{"espaços múltiplos intermediários", "O sapo no saco", "o   sapo   no   saco", true},
 		{"pontuação removida na checagem", "Pão!", "pão", true},
 		{"interrogação e ponto final", "Quem é?", "quem é.", true},
+		{"emoji do gabarito é ignorado (resposta falada natural)", "⚽ Bola", "bola", true},
+		{"emoji com seletor de variação é ignorado", "\uFE0F \u26BD Bola", "bola", true},
+		{"símbolos e pontuação combinados no gabarito", "🍎 Maçã!", "Maçã", true},
+		{"emoji não conecta palavras diferentes", "⚽ Bola", "gato", false},
 		{"resposta incorreta", "Pato", "Gato", false},
 		{"resposta vazia", "Pato", "", false},
 	}

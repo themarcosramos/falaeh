@@ -4,6 +4,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"testing/fstest"
 
@@ -59,6 +60,22 @@ func TestJSONRepository_Success(t *testing.T) {
 				]
 			}`),
 		},
+		"final.json": &fstest.MapFile{
+			Data: []byte(`{
+				"level": "final",
+				"exercises": [
+					{
+						"id": "fin-1",
+						"level": "final",
+						"type": "voice",
+						"instruction": "Pronuncie o trava-línguas do doce.",
+						"targetWord": "O doce perguntou para o doce qual é o doce mais doce",
+						"options": ["O doce perguntou para o doce qual é o doce mais doce"],
+						"correctAnswer": "O doce perguntou para o doce qual é o doce mais doce"
+					}
+				]
+			}`),
+		},
 	}
 
 	repo, err := exercise.NewJSONRepository(mockFS)
@@ -101,8 +118,8 @@ func TestJSONRepository_Success(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListAll falhou: %v", err)
 	}
-	if len(all) != 3 {
-		t.Errorf("ListAll() retornou tamanho %d, esperado 3", len(all))
+	if len(all) != 4 {
+		t.Errorf("ListAll() retornou tamanho %d, esperado 4", len(all))
 	}
 }
 
@@ -182,10 +199,87 @@ func TestJSONRepository_Errors(t *testing.T) {
 			}`)},
 			"intermediate.json": &fstest.MapFile{Data: []byte(`{"level":"intermediate","exercises":[]}`)},
 			"advanced.json":     &fstest.MapFile{Data: []byte(`{"level":"advanced","exercises":[]}`)},
+			"final.json":        &fstest.MapFile{Data: []byte(`{"level":"final","exercises":[]}`)},
 		}
 		_, err := exercise.NewJSONRepository(mockFS)
 		if err == nil {
 			t.Errorf("esperava erro por id duplicado")
+		}
+	})
+
+	t.Run("duplicação de palavra dentro do mesmo nível", func(t *testing.T) {
+		mockFS := fstest.MapFS{
+			"beginner.json": &fstest.MapFile{Data: []byte(`{
+				"level": "beginner",
+				"exercises": [
+					{
+						"id": "beg-1",
+						"level": "beginner",
+						"type": "voice",
+						"instruction": "Fale pato",
+						"targetWord": "Pato",
+						"correctAnswer": "Pato"
+					},
+					{
+						"id": "beg-2",
+						"level": "beginner",
+						"type": "voice",
+						"instruction": "Fale  PATO ",
+						"targetWord": " PATO ",
+						"correctAnswer": " PATO "
+					}
+				]
+			}`)},
+			"intermediate.json": &fstest.MapFile{Data: []byte(`{"level":"intermediate","exercises":[]}`)},
+			"advanced.json":     &fstest.MapFile{Data: []byte(`{"level":"advanced","exercises":[]}`)},
+			"final.json":        &fstest.MapFile{Data: []byte(`{"level":"final","exercises":[]}`)},
+		}
+		_, err := exercise.NewJSONRepository(mockFS)
+		if err == nil {
+			t.Fatalf("esperava erro por palavra duplicada no mesmo nível")
+		}
+		if !strings.Contains(err.Error(), "duplicada") {
+			t.Errorf("mensagem de erro não indica duplicação de palavra: %v", err)
+		}
+	})
+
+	t.Run("duplicação de palavra entre níveis", func(t *testing.T) {
+		mockFS := fstest.MapFS{
+			"beginner.json": &fstest.MapFile{Data: []byte(`{
+				"level": "beginner",
+				"exercises": [
+					{
+						"id": "beg-1",
+						"level": "beginner",
+						"type": "voice",
+						"instruction": "Fale pato",
+						"targetWord": "Pato",
+						"correctAnswer": "Pato"
+					}
+				]
+			}`)},
+			"intermediate.json": &fstest.MapFile{Data: []byte(`{
+				"level": "intermediate",
+				"exercises": [
+					{
+						"id": "int-1",
+						"level": "intermediate",
+						"type": "voice",
+						"instruction": "Fale pato!",
+						"targetWord": "PATO!",
+						"correctAnswer": "PATO!"
+					}
+				]
+			}`)},
+			"advanced.json": &fstest.MapFile{Data: []byte(`{"level":"advanced","exercises":[]}`)},
+			"final.json":    &fstest.MapFile{Data: []byte(`{"level":"final","exercises":[]}`)},
+		}
+		_, err := exercise.NewJSONRepository(mockFS)
+		if err == nil {
+			t.Fatalf("esperava erro por palavra repetida entre mundos")
+		}
+		if !strings.Contains(err.Error(), "já pertence") {
+			t.Errorf("mensagem de erro não indica a repetição entre mundos: %v", err)
 		}
 	})
 }

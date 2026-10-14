@@ -151,6 +151,25 @@ Makefile
 
 ---
 
+## Progressão, Mundos e Desafio Final
+
+As regras de progressão são centralizadas no domínio (`internal/gamification/progression.go`) e jamais duplicadas no frontend:
+
+| Fase | Exercícios disponíveis | Acertos necessários para concluir |
+| --- | --- | --- |
+| Mundo 1 — Iniciante (Planeta Sons) | 40 | 25 |
+| Mundo 2 — Intermediário (Vale das Palavras) | 50 | 35 |
+| Mundo 3 — Avançado (Galáxia da Fala) | 60 | 40 |
+| Desafio Final | 10 | 10 (encerra o Falaêh) |
+
+- Cada partida apresenta os exercícios **embaralhados sem reposição**: ao iniciar uma sessão o backend embala o banco completo do mundo (Fisher-Yates) e consome a sequência sem repetir palavras até o jogador atingir os acertos necessários;
+- Todo o restante do banco **continua disponível**, aumentando a variedade das próximas jogatinas;
+- Responder errado não gera XP nem avança: o jogador pode tentar o mesmo exercício quantas vezes precisar;
+- Nenhuma palavra se repete entre os mundos: o repositório valida unicidade global (com a mesma normalização usada na conferência das respostas) ao carregar `backend/data/*.json`;
+- Concluir o **Desafio Final** sinaliza o fim da progressão: feedback de "Falaêh concluído", relatório final, PDF/imagem e opção de jogar novamente (com nova ordem embaralhada) continuam funcionando.
+
+---
+
 ## API
 
 Documentação interativa disponível em `http://localhost:8080/docs` (spec em `/swagger.yaml`).
@@ -197,12 +216,24 @@ make wails-dev         # Ambiente opcional de desenvolvimento com hot reload (Wa
 ## Modo por voz
 
 Exercícios do tipo `voice` desafiam a criança ou adolescente a pronunciar fonemas, palavras ou trava-línguas.
-O reconhecimento ocorre **localmente no navegador** via Web Speech API (`SpeechRecognition` / `webkitSpeechRecognition`), configurada para `pt-BR`.
+O reconhecimento utiliza a Web Speech API do navegador (`SpeechRecognition` / `webkitSpeechRecognition`), configurada para `pt-BR`. A aplicação **não faz integração direta com nenhuma API de fala** (não há chave, SDK nem chamada a serviço remoto próprio): quem conecta o áudio ao serviço de fala é o **próprio motor do navegador**, fora do controle do Falaêh.
 
 ### Privacidade e Segurança da Fala:
-- **Nenhum áudio é gravado, armazenado ou transmitido para servidores.**
+- **Nenhum áudio é gravado, armazenado ou enviado pela aplicação.** A app nunca tem acesso a gravações — só recebe o texto final reconhecido pelo motor do navegador.
 - Apenas a transcrição textual é normalizada localmente e enviada para conferência no backend.
-- **Fallback total por toque**: opções de resposta por clique permanecem disponíveis caso o navegador não ofereça suporte a fala, a permissão do microfone seja recusada ou ocorra ruído ambiente.
+- **Fallback total por toque**: opções de resposta por clique permanecem disponíveis caso o navegador não ofereça suporte a fala, a permissão do microfone seja recusada, não haja microfone funcionando ou o serviço de fala esteja indisponível.
+
+### Limitações conhecidas do modo por voz:
+- **Não funciona offline.** A transcrição pelo motor do navegador (Chrome/Edge conectam ao serviço de fala) exige conexão; sem rede, o reconhecimento falha com aviso amigável e o jogo continua por toque. O cache offline do PWA mantém a interface, mas **não há comprovação de transcrição offline**.
+- **Disponibilidade por plataforma** (o jogo nunca fica bloqueado — onde a API não existe, o fallback por toque assume):
+  | Ambiente | Reconhecimento por voz |
+  | --- | --- |
+  | Chrome / Edge (desktop e Android) | ✅ disponível (online) |
+  | Safari iOS 14.5+ | ✅ disponível (serviço da Apple) |
+  | Firefox | ❌ não suportado → resposta por toque |
+  | Desktop Wails — Linux (WebKitGTK) | ❌ não suportado → resposta por toque |
+  | Desktop Wails — Windows (WebView2) | ⚠️ esperado disponível (online) — a confirmar no dispositivo |
+  | Desktop Wails — macOS (WKWebView) | ⚠️ a confirmar no dispositivo (a API é garantida no Safari, não necessariamente no WKWebView) |
 
 ---
 
