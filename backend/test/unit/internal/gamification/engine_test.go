@@ -174,10 +174,31 @@ func TestEngine_CompleteLevel_Progression(t *testing.T) {
 		}
 	})
 
-	t.Run("conclusão do nível advanced finaliza o jogo", func(t *testing.T) {
+	t.Run("conclusão do nível advanced desbloqueia o Desafio Final", func(t *testing.T) {
 		res := engine.CompleteLevel(exercise.LevelAdvanced)
+		if res.NextLevel != exercise.LevelFinal || !res.NextUnlocked {
+			t.Errorf("esperava desbloqueio do Desafio Final: %+v", res)
+		}
+		if res.GameCompleted {
+			t.Errorf("o jogo não deveria estar concluído após o advanced")
+		}
+
+		progress := engine.GetProgress()
+		if !progress.IsLevelUnlocked(exercise.LevelFinal) {
+			t.Errorf("final deveria estar desbloqueado")
+		}
+		if progress.CurrentLevel != exercise.LevelFinal {
+			t.Errorf("CurrentLevel = %s, esperado final", progress.CurrentLevel)
+		}
+	})
+
+	t.Run("conclusão do Desafio Final conclui o jogo", func(t *testing.T) {
+		res := engine.CompleteLevel(exercise.LevelFinal)
 		if res.NextLevel != "" || res.NextUnlocked {
-			t.Errorf("não deveria haver próximo nível após advanced: %+v", res)
+			t.Errorf("não deveria haver próximo nível após o Desafio Final: %+v", res)
+		}
+		if !res.GameCompleted {
+			t.Errorf("esperava flag gameCompleted após concluir o Desafio Final")
 		}
 	})
 }

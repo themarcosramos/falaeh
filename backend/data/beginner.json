@@ -1,59 +1,525 @@
 {
-    "level": "beginner",
-    "exercises": [
-        {
-            "id": "beg-001",
-            "level": "beginner",
-            "type": "multiple_choice",
-            "instruction": "Qual palavra começa com o som /P/?",
-            "targetWord": "Pato",
-            "options": ["Pato", "Gato", "Bola"],
-            "correctAnswer": "Pato"
-        },
-        {
-            "id": "beg-002",
-            "level": "beginner",
-            "type": "image_word_match",
-            "instruction": "Qual imagem representa a palavra BOLA?",
-            "targetWord": "Bola",
-            "options": ["⚽ Bola", "🚗 Carro", "🍎 Maçã"],
-            "correctAnswer": "⚽ Bola"
-        },
-        {
-            "id": "beg-003",
-            "level": "beginner",
-            "type": "sound_identification",
-            "instruction": "Qual dessas palavras rima com MÃO?",
-            "targetWord": "Mão",
-            "options": ["Pão", "Cão", "Sol"],
-            "correctAnswer": "Pão"
-        },
-        {
-            "id": "beg-004",
-            "level": "beginner",
-            "type": "voice",
-            "instruction": "Pronuncie a palavra PATO em voz alta, abrindo bem a boca.",
-            "targetWord": "Pato",
-            "options": ["Pato", "Mato", "Gato"],
-            "correctAnswer": "Pato"
-        },
-        {
-            "id": "beg-005",
-            "level": "beginner",
-            "type": "voice",
-            "instruction": "Diga a palavra BOLA com voz clara e animada!",
-            "targetWord": "Bola",
-            "options": ["Bola", "Mola", "Cola"],
-            "correctAnswer": "Bola"
-        },
-        {
-            "id": "beg-006",
-            "level": "beginner",
-            "type": "voice",
-            "instruction": "Pronuncie o nome do animal: MACACO.",
-            "targetWord": "Macaco",
-            "options": ["Macaco", "Cavalo", "Peixe"],
-            "correctAnswer": "Macaco"
-        }
-    ]
+  "level": "beginner",
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /P/?",
+      "targetWord": "Pato",
+      "options": [
+        "Gato",
+        "Bola",
+        "Pato"
+      ],
+      "correctAnswer": "Pato",
+      "id": "beg-001",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o mesmo som /P/ de PIPA?",
+      "targetWord": "Pipa",
+      "options": [
+        "Mel",
+        "Casa",
+        "Pipa"
+      ],
+      "correctAnswer": "Pipa",
+      "id": "beg-002",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /B/?",
+      "targetWord": "Bolo",
+      "options": [
+        "Vela",
+        "Cadeira",
+        "Bolo"
+      ],
+      "correctAnswer": "Bolo",
+      "id": "beg-003",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /K/ de CAVALO?",
+      "targetWord": "Cavalo",
+      "options": [
+        "Gelo",
+        "Fogo",
+        "Cavalo"
+      ],
+      "correctAnswer": "Cavalo",
+      "id": "beg-004",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /D/?",
+      "targetWord": "Dado",
+      "options": [
+        "Mala",
+        "Ovo",
+        "Dado"
+      ],
+      "correctAnswer": "Dado",
+      "id": "beg-005",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /V/?",
+      "targetWord": "Vela",
+      "options": [
+        "Faca",
+        "Lua",
+        "Vela"
+      ],
+      "correctAnswer": "Vela",
+      "id": "beg-006",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /G/, como em GATO?",
+      "targetWord": "Gato",
+      "options": [
+        "Bota",
+        "Fita",
+        "Gato"
+      ],
+      "correctAnswer": "Gato",
+      "id": "beg-007",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /S/ de SAPATO?",
+      "targetWord": "Sapato",
+      "options": [
+        "Bola",
+        "Vela",
+        "Sapato"
+      ],
+      "correctAnswer": "Sapato",
+      "id": "beg-008",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /F/ de FOGO?",
+      "targetWord": "Fogo",
+      "options": [
+        "Bebê",
+        "Bola",
+        "Fogo"
+      ],
+      "correctAnswer": "Fogo",
+      "id": "beg-009",
+      "level": "beginner"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /M/ de MEL?",
+      "targetWord": "Mel",
+      "options": [
+        "Dado",
+        "Casa",
+        "Mel"
+      ],
+      "correctAnswer": "Mel",
+      "id": "beg-010",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra BOLA?",
+      "targetWord": "Bola",
+      "options": [
+        "🐴 Cavalo",
+        "🍎 Maçã",
+        "⚽ Bola"
+      ],
+      "correctAnswer": "⚽ Bola",
+      "id": "beg-011",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra MAÇÃ?",
+      "targetWord": "Maçã",
+      "options": [
+        "🌙 Lua",
+        "🐮 Vaca",
+        "🍎 Maçã"
+      ],
+      "correctAnswer": "🍎 Maçã",
+      "id": "beg-012",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra FACA?",
+      "targetWord": "Faca",
+      "options": [
+        "🥚 Ovo",
+        "🕯️ Vela",
+        "🔪 Faca"
+      ],
+      "correctAnswer": "🔪 Faca",
+      "id": "beg-013",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra OVO?",
+      "targetWord": "Ovo",
+      "options": [
+        "🌙 Lua",
+        "🐓 Galo",
+        "🥚 Ovo"
+      ],
+      "correctAnswer": "🥚 Ovo",
+      "id": "beg-014",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra BARCO?",
+      "targetWord": "Barco",
+      "options": [
+        "🚗 Carro",
+        "🪑 Cadeira",
+        "⛵ Barco"
+      ],
+      "correctAnswer": "⛵ Barco",
+      "id": "beg-015",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra CASA?",
+      "targetWord": "Casa",
+      "options": [
+        "🔪 Faca",
+        "🌙 Lua",
+        "🏠 Casa"
+      ],
+      "correctAnswer": "🏠 Casa",
+      "id": "beg-016",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra LIVRO?",
+      "targetWord": "Livro",
+      "options": [
+        "🥚 Ovo",
+        "🐓 Galo",
+        "📖 Livro"
+      ],
+      "correctAnswer": "📖 Livro",
+      "id": "beg-017",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra GALO?",
+      "targetWord": "Galo",
+      "options": [
+        "🎈 Balão",
+        "🐮 Vaca",
+        "🐓 Galo"
+      ],
+      "correctAnswer": "🐓 Galo",
+      "id": "beg-018",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra BOTA?",
+      "targetWord": "Bota",
+      "options": [
+        "🏠 Casa",
+        "🐮 Vaca",
+        "🥾 Bota"
+      ],
+      "correctAnswer": "🥾 Bota",
+      "id": "beg-019",
+      "level": "beginner"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra VACA?",
+      "targetWord": "Vaca",
+      "options": [
+        "🥚 Ovo",
+        "🎈 Balão",
+        "🐮 Vaca"
+      ],
+      "correctAnswer": "🐮 Vaca",
+      "id": "beg-020",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual dessas palavras rima com MÃO?",
+      "targetWord": "Mão",
+      "options": [
+        "Bola",
+        "Mel",
+        "Pão"
+      ],
+      "correctAnswer": "Pão",
+      "id": "beg-021",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual dessas palavras rima com BALÃO?",
+      "targetWord": "Balão",
+      "options": [
+        "Fita",
+        "Bolo",
+        "Cão"
+      ],
+      "correctAnswer": "Cão",
+      "id": "beg-022",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra rima com BONECA?",
+      "targetWord": "Boneca",
+      "options": [
+        "Mel",
+        "Bola",
+        "Troca"
+      ],
+      "correctAnswer": "Troca",
+      "id": "beg-023",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra rima com BEBÊ?",
+      "targetWord": "Bebê",
+      "options": [
+        "Bola",
+        "Fita",
+        "Café"
+      ],
+      "correctAnswer": "Café",
+      "id": "beg-024",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /V/ de VOVÓ?",
+      "targetWord": "Vovó",
+      "options": [
+        "Faca",
+        "Bola",
+        "Vento"
+      ],
+      "correctAnswer": "Vento",
+      "id": "beg-025",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /F/ de FORMIGA?",
+      "targetWord": "Formiga",
+      "options": [
+        "Pipa",
+        "Mel",
+        "Fita"
+      ],
+      "correctAnswer": "Fita",
+      "id": "beg-026",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Abelha tem o som estalado /LH/. Qual palavra também tem o som /LH/?",
+      "targetWord": "Abelha",
+      "options": [
+        "Fita",
+        "Pipa",
+        "Molho"
+      ],
+      "correctAnswer": "Molho",
+      "id": "beg-027",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual dessas palavras rima com FOLHA?",
+      "targetWord": "Folha",
+      "options": [
+        "Mel",
+        "Bola",
+        "Bolha"
+      ],
+      "correctAnswer": "Bolha",
+      "id": "beg-028",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual dessas palavras rima com PANELA?",
+      "targetWord": "Panela",
+      "options": [
+        "Fita",
+        "Bola",
+        "Vela"
+      ],
+      "correctAnswer": "Vela",
+      "id": "beg-029",
+      "level": "beginner"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "GELO tem o som /J/ (como em JANELA). Qual palavra também tem esse som?",
+      "targetWord": "Gelo",
+      "options": [
+        "Pipa",
+        "Bola",
+        "Janela"
+      ],
+      "correctAnswer": "Janela",
+      "id": "beg-030",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra MACACO, olhando bem pro macaquinho!",
+      "targetWord": "Macaco",
+      "options": [
+        "Macaco",
+        "Cavalo",
+        "Peixe"
+      ],
+      "correctAnswer": "Macaco",
+      "id": "beg-031",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra MAMÃE, com voz mansinha e carinhosa!",
+      "targetWord": "Mamãe",
+      "options": [
+        "Mamãe",
+        "Vovô",
+        "Bola"
+      ],
+      "correctAnswer": "Mamãe",
+      "id": "beg-032",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra PAPAI, bem forte e feliz!",
+      "targetWord": "Papai",
+      "options": [
+        "Papai",
+        "Pipa",
+        "Vovô"
+      ],
+      "correctAnswer": "Papai",
+      "id": "beg-033",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BOCA, abrindo bem a boca!",
+      "targetWord": "Boca",
+      "options": [
+        "Boca",
+        "Bota",
+        "Mel"
+      ],
+      "correctAnswer": "Boca",
+      "id": "beg-034",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra DEDO, estalando o /D/ nos dedinhos!",
+      "targetWord": "Dedo",
+      "options": [
+        "Dedo",
+        "Vela",
+        "Bola"
+      ],
+      "correctAnswer": "Dedo",
+      "id": "beg-035",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra LUA, com voz suave e clara!",
+      "targetWord": "Lua",
+      "options": [
+        "Lua",
+        "Lula",
+        "Vela"
+      ],
+      "correctAnswer": "Lua",
+      "id": "beg-036",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra FITA, deslizando bem o /F/!",
+      "targetWord": "Fita",
+      "options": [
+        "Fita",
+        "Pipa",
+        "Mel"
+      ],
+      "correctAnswer": "Fita",
+      "id": "beg-037",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CARRO, vibrando bem o /RR/!",
+      "targetWord": "Carro",
+      "options": [
+        "Carro",
+        "Barco",
+        "Bola"
+      ],
+      "correctAnswer": "Carro",
+      "id": "beg-038",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra MALA, estalando o /M/!",
+      "targetWord": "Mala",
+      "options": [
+        "Mala",
+        "Bala",
+        "Fita"
+      ],
+      "correctAnswer": "Mala",
+      "id": "beg-039",
+      "level": "beginner"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CADEIRA, estalando bem o /DR/!",
+      "targetWord": "Cadeira",
+      "options": [
+        "Cadeira",
+        "Bola",
+        "Panela"
+      ],
+      "correctAnswer": "Cadeira",
+      "id": "beg-040",
+      "level": "beginner"
+    }
+  ]
 }

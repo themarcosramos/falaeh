@@ -48,6 +48,22 @@ func newTestService(t *testing.T) *exercise.Service {
 				"exercises": []
 			}`),
 		},
+		"final.json": &fstest.MapFile{
+			Data: []byte(`{
+				"level": "final",
+				"exercises": [
+					{
+						"id": "fin-1",
+						"level": "final",
+						"type": "voice",
+						"instruction": "Pronuncie o trava-línguas do doce.",
+						"targetWord": "O doce perguntou para o doce qual é o doce mais doce",
+						"options": ["O doce perguntou para o doce qual é o doce mais doce"],
+						"correctAnswer": "O doce perguntou para o doce qual é o doce mais doce"
+					}
+				]
+			}`),
+		},
 	}
 
 	repo, err := exercise.NewJSONRepository(mockFS)
@@ -107,11 +123,14 @@ func TestService_ListLevels(t *testing.T) {
 	ctx := context.Background()
 
 	levels := svc.ListLevels(ctx)
-	if len(levels) != 3 {
-		t.Fatalf("esperava 3 níveis, obteve %d", len(levels))
+	if len(levels) != 4 {
+		t.Fatalf("esperava 4 níveis, obteve %d", len(levels))
 	}
 	if levels[0].ID != exercise.LevelBeginner || levels[1].ID != exercise.LevelIntermediate || levels[2].ID != exercise.LevelAdvanced {
 		t.Errorf("ordem de níveis inesperada: %+v", levels)
+	}
+	if levels[3].ID != exercise.LevelFinal || levels[3].Name != "Desafio Final" {
+		t.Errorf("nível final inesperado: %+v", levels[3])
 	}
 }
 
@@ -123,8 +142,8 @@ func TestService_ListAll(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ListAll falhou: %v", err)
 	}
-	if len(list) != 2 {
-		t.Fatalf("esperava 2 exercícios no total, obteve %d", len(list))
+	if len(list) != 3 {
+		t.Fatalf("esperava 3 exercícios no total, obteve %d", len(list))
 	}
 	if list[0].ID != "beg-1" || list[1].ID != "int-1" {
 		t.Errorf("lista inesperada: %+v", list)

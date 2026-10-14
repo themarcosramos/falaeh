@@ -5,11 +5,13 @@ definitions:
     - beginner
     - intermediate
     - advanced
+    - final
     type: string
     x-enum-varnames:
     - LevelBeginner
     - LevelIntermediate
     - LevelAdvanced
+    - LevelFinal
   exercise.LevelInfo:
     properties:
       description:
@@ -157,6 +159,7 @@ definitions:
     - beginner_complete
     - intermediate_complete
     - advanced_complete
+    - final_complete
     type: string
     x-enum-varnames:
     - AchievementFirstCorrect
@@ -165,12 +168,15 @@ definitions:
     - AchievementBeginnerComplete
     - AchievementIntermediateComplete
     - AchievementAdvancedComplete
+    - AchievementFinalComplete
   gamification.LevelCompletionResult:
     properties:
       breakdown:
         $ref: '#/definitions/gamification.XPBreakdown'
       earnedXp:
         type: integer
+      gameCompleted:
+        type: boolean
       level:
         $ref: '#/definitions/exercise.Level'
       newAchievements:
