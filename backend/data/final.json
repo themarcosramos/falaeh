@@ -1,0 +1,125 @@
+{
+  "level": "final",
+  "exercises": [
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O doce perguntou para o doce qual é o doce mais doce'. Quem descobre o doce certo vence o jogo!",
+      "targetWord": "O doce perguntou para o doce qual é o doce mais doce",
+      "options": [
+        "O doce perguntou para o doce qual é o doce mais doce",
+        "O doce perguntou para o doce qual é o bolo mais doce"
+      ],
+      "correctAnswer": "O doce perguntou para o doce qual é o doce mais doce",
+      "id": "fin-001",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O tempo perguntou ao tempo quanto tempo o tempo tem'. Sem perder o pulso do relógio!",
+      "targetWord": "O tempo perguntou ao tempo quanto tempo o tempo tem",
+      "options": [
+        "O tempo perguntou ao tempo quanto tempo o tempo tem",
+        "O tempo perguntou ao tempo quanto tempo a chuva tem"
+      ],
+      "correctAnswer": "O tempo perguntou ao tempo quanto tempo o tempo tem",
+      "id": "fin-002",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A aranha arranha a rã e a rã arranha a aranha'. Arranhando cada /R/!",
+      "targetWord": "A aranha arranha a rã e a rã arranha a aranha",
+      "options": [
+        "A aranha arranha a rã e a rã arranha a aranha",
+        "A aranha arranha o sapo e a rã arranha a aranha"
+      ],
+      "correctAnswer": "A aranha arranha a rã e a rã arranha a aranha",
+      "id": "fin-003",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Para o piquenique, o padre Pedro pintou o pinto'. Pintando cada /P/!",
+      "targetWord": "Para o piquenique, o padre Pedro pintou o pinto",
+      "options": [
+        "Para o piquenique, o padre Pedro pintou o pinto",
+        "Para o piquenique, o padre Pedro pintou a parede"
+      ],
+      "correctAnswer": "Para o piquenique, o padre Pedro pintou o pinto",
+      "id": "fin-004",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O bode bêbado bebeu boa bebida e bocejou'. Bocejando entre um /B/ e outro!",
+      "targetWord": "O bode bêbado bebeu boa bebida e bocejou",
+      "options": [
+        "O bode bêbado bebeu boa bebida e bocejou",
+        "O bode esperto bebeu água gelada e bocejou"
+      ],
+      "correctAnswer": "O bode bêbado bebeu boa bebida e bocejou",
+      "id": "fin-005",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Teodora teceu tapete triste para o trapeiro Tadeu'. Tecendo sílaba por sílaba!",
+      "targetWord": "Teodora teceu tapete triste para o trapeiro Tadeu",
+      "options": [
+        "Teodora teceu tapete triste para o trapeiro Tadeu",
+        "Teodora teceu tapete liso para o trapeiro Tadeu"
+      ],
+      "correctAnswer": "Teodora teceu tapete triste para o trapeiro Tadeu",
+      "id": "fin-006",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Chico chutou o chicote para o chapéu do chinelo'. Chutando o /CH/ na medida!",
+      "targetWord": "Chico chutou o chicote para o chapéu do chinelo",
+      "options": [
+        "Chico chutou o chicote para o chapéu do chinelo",
+        "Chico chutou a bola para o chapéu do chinelo"
+      ],
+      "correctAnswer": "Chico chutou o chicote para o chapéu do chinelo",
+      "id": "fin-007",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A zebra do Zé zumbiu no zoológico da Zinha'. Zumbindo devagar, sílaba por sílaba!",
+      "targetWord": "A zebra do Zé zumbiu no zoológico da Zinha",
+      "options": [
+        "A zebra do Zé zumbiu no zoológico da Zinha",
+        "A zebra do Zé dormiu no zoológico da Zinha"
+      ],
+      "correctAnswer": "A zebra do Zé zumbiu no zoológico da Zinha",
+      "id": "fin-008",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Bruna brincou no bloco com o boneco azul'. Bem balançado no som do /BR/!",
+      "targetWord": "Bruna brincou no bloco com o boneco azul",
+      "options": [
+        "Bruna brincou no bloco com o boneco azul",
+        "Bruna brincou no banco com o boneco azul"
+      ],
+      "correctAnswer": "Bruna brincou no bloco com o boneco azul",
+      "id": "fin-009",
+      "level": "final"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O moinho velho molhou a manilha do caminho'. Molhando bem o /LH/!",
+      "targetWord": "O moinho velho molhou a manilha do caminho",
+      "options": [
+        "O moinho velho molhou a manilha do caminho",
+        "O moinho novo molhou a manilha do caminho"
+      ],
+      "correctAnswer": "O moinho velho molhou a manilha do caminho",
+      "id": "fin-010",
+      "level": "final"
+    }
+  ]
+}

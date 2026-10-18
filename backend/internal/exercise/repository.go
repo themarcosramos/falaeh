@@ -46,7 +46,10 @@ func NewJSONRepository(fileSystem fs.FS) (*JSONRepository, error) {
 		{level: LevelBeginner, path: "beginner.json"},
 		{level: LevelIntermediate, path: "intermediate.json"},
 		{level: LevelAdvanced, path: "advanced.json"},
+		{level: LevelFinal, path: "final.json"},
 	}
+
+	byWord := make(map[string]Level)
 
 	for _, lf := range levelFiles {
 		data, err := fs.ReadFile(fileSystem, filepath.Clean(lf.path))
@@ -71,6 +74,9 @@ func NewJSONRepository(fileSystem fs.FS) (*JSONRepository, error) {
 			if _, exists := exercises[ex.ID]; exists {
 				return nil, fmt.Errorf("exercício com id duplicado %s em %s", ex.ID, lf.path)
 			}
+			if err := requireUniqueWord(ex, byWord, lf.level); err != nil {
+				return nil, fmt.Errorf("arquivo %s: %w", lf.path, err)
+			}
 			exercises[ex.ID] = ex
 			list = append(list, ex)
 		}
@@ -82,6 +88,21 @@ func NewJSONRepository(fileSystem fs.FS) (*JSONRepository, error) {
 		exercises: exercises,
 		byLevel:   byLevel,
 	}, nil
+}
+
+// requireUniqueWord garante que cada palavra-alvo pertença a um único exercício:
+// nenhuma palavra pode se repetir dentro do próprio nível nem reaparecer em outro.
+// A comparação usa a mesma normalização empregada na validação das respostas.
+func requireUniqueWord(ex Exercise, byWord map[string]Level, level Level) error {
+	key := NormalizeAnswer(ex.TargetWord)
+	if owner, exists := byWord[key]; exists {
+		if owner == level {
+			return fmt.Errorf("palavra %q duplicada dentro do nível %s (exercício %s)", ex.TargetWord, level, ex.ID)
+		}
+		return fmt.Errorf("palavra %q do nível %s (exercício %s) já pertence ao nível %s", ex.TargetWord, level, ex.ID, owner)
+	}
+	byWord[key] = level
+	return nil
 }
 
 // GetByID busca um exercício pelo seu identificador.
@@ -122,7 +143,7 @@ func (r *JSONRepository) ListAll() ([]Exercise, error) {
 	defer r.mu.RUnlock()
 
 	all := make([]Exercise, 0, len(r.exercises))
-	levels := []Level{LevelBeginner, LevelIntermediate, LevelAdvanced}
+	levels := []Level{LevelBeginner, LevelIntermediate, LevelAdvanced, LevelFinal}
 	for _, l := range levels {
 		if list, ok := r.byLevel[l]; ok {
 			all = append(all, list...)

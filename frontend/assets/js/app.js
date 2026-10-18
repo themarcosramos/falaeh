@@ -202,8 +202,15 @@ const WORLDS = {
         id: "advanced",
         name: "Galáxia da Fala",
         icon: "🪐",
-        next: null,
+        next: "final",
         badge: "✨ NÍVEL 3",
+    },
+    final: {
+        id: "final",
+        name: "Desafio Final",
+        icon: "👑",
+        next: null,
+        badge: "🏆 DESAFIO FINAL",
     },
 };
 
@@ -279,6 +286,7 @@ const btnStartAdventure = document.getElementById("btn-start-adventure");
 const btnSelectBeginner = document.getElementById("btn-select-beginner");
 const btnSelectIntermediate = document.getElementById("btn-select-intermediate");
 const btnSelectAdvanced = document.getElementById("btn-select-advanced");
+const btnSelectFinal = document.getElementById("btn-select-final");
 
 const btnReplayWorld = document.getElementById("btn-replay-world");
 const btnNextWorld = document.getElementById("btn-next-world");
@@ -430,7 +438,9 @@ function normalizeSpeechText(text) {
     return text
         .trim()
         .toLowerCase()
-        .replace(/[.,/#!$%^&*;:{}=\-_`~()?"'!\\]/g, "")
+        // Mantém letras, números, marcas combinadas, espaços e hífen; remove pontuação,
+        // símbolos e emojis (a fala nunca contém emojis, mas os rótulos das opções podem).
+        .replace(/[^\p{L}\p{N}\p{M}\s-]/gu, "")
         .replace(/\s+/g, " ");
 }
 
@@ -664,6 +674,18 @@ function setupVoiceRecognition() {
                 }
             } else if (event.error === "network") {
                 friendlyMessage = "Falha temporária de rede no reconhecimento. Tente novamente ou use as opções de toque.";
+            } else if (event.error === "audio-capture") {
+                friendlyMessage = "Não encontramos um microfone que funcione. Você pode responder tocando nas opções abaixo!";
+                if (voiceUnsupportedMsg) {
+                    voiceUnsupportedMsg.textContent = "ℹ️ Microfone não encontrado ou sem funcionar. Você pode responder tocando nas opções abaixo!";
+                    voiceUnsupportedMsg.classList.remove("d-none");
+                }
+            } else if (event.error === "service-not-allowed") {
+                friendlyMessage = "O serviço de fala do navegador não está disponível neste momento. Você pode responder tocando nas opções abaixo!";
+                if (voiceUnsupportedMsg) {
+                    voiceUnsupportedMsg.textContent = "ℹ️ Serviço de fala indisponível neste navegador. Você pode responder tocando nas opções abaixo!";
+                    voiceUnsupportedMsg.classList.remove("d-none");
+                }
             }
 
             showToast("🎙️", friendlyMessage);
@@ -851,6 +873,9 @@ function renderCurrentExercise() {
         } else {
             voiceInteractionArea.classList.add("d-none");
             if (voiceFallbackLabel) voiceFallbackLabel.classList.add("d-none");
+            // O exercício não tem slot de voz: o microfone fica desabilitado
+            // (a área está oculta, mas o botão não deve responder nem a clique programático/teclado).
+            if (btnVoiceRecord) btnVoiceRecord.disabled = true;
         }
     }
 
@@ -1066,6 +1091,7 @@ function finishWorld() {
     const report = state.report;
     const nextWorldId = state.completion?.nextLevel || null;
     const unlockedNext = Boolean(state.completion?.nextUnlocked);
+    const gameCompleted = Boolean(state.completion?.gameCompleted);
 
     // Preenche cabeçalho e estatísticas do relatório final
     const celebrationTitleEl = document.getElementById("celebration-title");
@@ -1088,11 +1114,18 @@ function finishWorld() {
     if (celebrationWorldName) celebrationWorldName.textContent = currentWorld?.name || "Mundo";
 
     if (celebrationTitleEl) {
-        celebrationTitleEl.textContent = !nextWorldId ? "Jornada Concluída! 👑" : "Mundo Concluído! 🏆";
+        if (gameCompleted) {
+            celebrationTitleEl.textContent = "Falaêh Concluído! 👑";
+        } else {
+            celebrationTitleEl.textContent = !nextWorldId ? "Jornada Concluída! 👑" : "Mundo Concluído! 🏆";
+        }
     }
 
     if (celebrationUnlockBanner && celebrationUnlockText) {
-        if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
+        if (gameCompleted) {
+            celebrationUnlockText.textContent = "VOCÊ CONCLUIU O FALAÊH! MESTRE SUPREMO DA FALA! 🌟";
+            celebrationUnlockBanner.classList.remove("d-none");
+        } else if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
             celebrationUnlockText.textContent = `NOVO MUNDO DESBLOQUEADO: ${WORLDS[nextWorldId].name.toUpperCase()}! 🔓`;
             celebrationUnlockBanner.classList.remove("d-none");
         } else if (!nextWorldId) {
@@ -1104,8 +1137,10 @@ function finishWorld() {
     }
 
     if (celebrationSubtitle) {
-        if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
-            celebrationSubtitle.textContent = `Incrível! Você concluiu todos os exercícios do ${currentWorld?.name} e desbloqueou o ${WORLDS[nextWorldId].name}!`;
+        if (gameCompleted) {
+            celebrationSubtitle.textContent = `Sensacional! Você venceu o ${currentWorld?.name} e conquistou o Falaêh por completo!`;
+        } else if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
+            celebrationSubtitle.textContent = `Incrível! Você concluiu todos os desafios do ${currentWorld?.name} e desbloqueou o ${WORLDS[nextWorldId].name}!`;
         } else if (!nextWorldId) {
             celebrationSubtitle.textContent = `Sensacional! Você superou com maestria todos os exercícios e conquistou toda a galáxia da fala!`;
         } else {
@@ -1135,7 +1170,10 @@ function finishWorld() {
     if (reportAttempts) reportAttempts.textContent = `${attemptsVal}`;
 
     if (reportNextLevel) {
-        if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
+        if (gameCompleted) {
+            reportNextLevel.textContent = "Falaêh Concluído! 👑";
+            reportNextLevel.className = "badge text-bg-success px-2 py-1 fw-bold";
+        } else if (unlockedNext && nextWorldId && WORLDS[nextWorldId]) {
             reportNextLevel.textContent = `${WORLDS[nextWorldId].name} (${WORLDS[nextWorldId].badge})`;
             reportNextLevel.className = "badge text-bg-primary px-2 py-1 fw-bold";
         } else if (!nextWorldId) {
@@ -1771,6 +1809,13 @@ function initEventHandlers() {
         btnSelectAdvanced.addEventListener("click", (e) => {
             e.stopPropagation();
             handleWorldSelection("advanced");
+        });
+    }
+
+    if (btnSelectFinal) {
+        btnSelectFinal.addEventListener("click", (e) => {
+            e.stopPropagation();
+            handleWorldSelection("final");
         });
     }
 
