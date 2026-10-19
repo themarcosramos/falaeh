@@ -1,59 +1,766 @@
 {
-    "level": "advanced",
-    "exercises": [
-        {
-            "id": "adv-001",
-            "level": "advanced",
-            "type": "multiple_choice",
-            "instruction": "Qual palavra completa a rima fonética: 'O dragão voa no ___'?",
-            "targetWord": "Vulcão",
-            "options": ["Vulcão", "Castelo", "Jardim"],
-            "correctAnswer": "Vulcão"
-        },
-        {
-            "id": "adv-002",
-            "level": "advanced",
-            "type": "voice",
-            "instruction": "Pronuncie o trava-línguas: 'O sapo dentro do saco'.",
-            "targetWord": "O sapo dentro do saco",
-            "options": ["O sapo dentro do saco", "O pato dentro do saco"],
-            "correctAnswer": "O sapo dentro do saco"
-        },
-        {
-            "id": "adv-003",
-            "level": "advanced",
-            "type": "sound_identification",
-            "instruction": "Qual destas frases possui repetição do som /R/ vibrante?",
-            "targetWord": "O rato roeu a roupa do rei",
-            "options": ["O rato roeu a roupa do rei", "O gato subiu no muro alto", "O pássaro canta na árvore"],
-            "correctAnswer": "O rato roeu a roupa do rei"
-        },
-        {
-            "id": "adv-004",
-            "level": "advanced",
-            "type": "voice",
-            "instruction": "Fale o clássico trava-línguas: 'O rato roeu a roupa do rei de Roma'.",
-            "targetWord": "O rato roeu a roupa do rei de Roma",
-            "options": ["O rato roeu a roupa do rei de Roma", "O gato comeu a roupa do rei de Roma"],
-            "correctAnswer": "O rato roeu a roupa do rei de Roma"
-        },
-        {
-            "id": "adv-005",
-            "level": "advanced",
-            "type": "voice",
-            "instruction": "Pronuncie com ritmo e dicção: 'Três pratos de trigo para três tigres tristes'.",
-            "targetWord": "Três pratos de trigo para três tigres tristes",
-            "options": ["Três pratos de trigo para três tigres tristes", "Dois pratos de trigo para dois tigres tristes"],
-            "correctAnswer": "Três pratos de trigo para três tigres tristes"
-        },
-        {
-            "id": "adv-006",
-            "level": "advanced",
-            "type": "voice",
-            "instruction": "Pronuncie articulando bem: 'Sabia que o sabiá sabia assobiar?'.",
-            "targetWord": "Sabia que o sabiá sabia assobiar",
-            "options": ["Sabia que o sabiá sabia assobiar", "Sabia que o sabiá sabia voar"],
-            "correctAnswer": "Sabia que o sabiá sabia assobiar"
-        }
-    ]
+  "level": "advanced",
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra completa a rima fonética: 'O dragão voa no ___'?",
+      "targetWord": "Vulcão",
+      "options": [
+        "Castelo",
+        "Jardim",
+        "Vulcão"
+      ],
+      "correctAnswer": "Vulcão",
+      "id": "adv-001",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o som /SS/ forte, como em DINOSSAURO?",
+      "targetWord": "Dinossauro",
+      "options": [
+        "Aquarela",
+        "Fantasma",
+        "Dinossauro"
+      ],
+      "correctAnswer": "Dinossauro",
+      "id": "adv-002",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o som /CH/ forte de XÍCARA?",
+      "targetWord": "Xícara",
+      "options": [
+        "Parafuso",
+        "Vagalume",
+        "Xícara"
+      ],
+      "correctAnswer": "Xícara",
+      "id": "adv-003",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra contém o encontro /MB/, como em AMBULÂNCIA?",
+      "targetWord": "Ambulância",
+      "options": [
+        "Hospital",
+        "Gorila",
+        "Ambulância"
+      ],
+      "correctAnswer": "Ambulância",
+      "id": "adv-004",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o encontro /TR/ no meio, como em TRAVESSEIRO?",
+      "targetWord": "Travesseiro",
+      "options": [
+        "Chocalho",
+        "Gorila",
+        "Travesseiro"
+      ],
+      "correctAnswer": "Travesseiro",
+      "id": "adv-005",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o som /LH/ estalado, como em ORELHÃO?",
+      "targetWord": "Orelhão",
+      "options": [
+        "Chafariz",
+        "Gorila",
+        "Orelhão"
+      ],
+      "correctAnswer": "Orelhão",
+      "id": "adv-006",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra termina com o som /JÁ/, como em MARACUJÁ?",
+      "targetWord": "Maracujá",
+      "options": [
+        "Travesseiro",
+        "Girassol",
+        "Maracujá"
+      ],
+      "correctAnswer": "Maracujá",
+      "id": "adv-007",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o som /SP/ + /LH/, como em ESPANTALHO?",
+      "targetWord": "Espantalho",
+      "options": [
+        "Aquarela",
+        "Gorila",
+        "Espantalho"
+      ],
+      "correctAnswer": "Espantalho",
+      "id": "adv-008",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra termina com o som /R/ forte, como em AMOR?",
+      "targetWord": "Ventilador",
+      "options": [
+        "Astronave",
+        "Sereia",
+        "Ventilador"
+      ],
+      "correctAnswer": "Ventilador",
+      "id": "adv-009",
+      "level": "advanced"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra termina com o som de SOL no final, como em GIRASSOL?",
+      "targetWord": "Girassol",
+      "options": [
+        "Astronave",
+        "Chafariz",
+        "Girassol"
+      ],
+      "correctAnswer": "Girassol",
+      "id": "adv-010",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual destas frases possui repetição do som /R/ vibrante?",
+      "targetWord": "O rato roeu a roupa do rei",
+      "options": [
+        "O gato subiu no muro alto",
+        "O pássaro canta na árvore",
+        "O rato roeu a roupa do rei"
+      ],
+      "correctAnswer": "O rato roeu a roupa do rei",
+      "id": "adv-011",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual destas frases repete o som /S/ forte, igual a SSSS do assobio?",
+      "targetWord": "Sabia que o sabiá sabia assobiar",
+      "options": [
+        "O sapo pulou do saco",
+        "A vaca mugiu na fazenda",
+        "Sabia que o sabiá sabia assobiar"
+      ],
+      "correctAnswer": "Sabia que o sabiá sabia assobiar",
+      "id": "adv-012",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual destas frases repete o som /T/ em sequência, como T-T-T?",
+      "targetWord": "Três pratos de trigo para três tigres tristes",
+      "options": [
+        "O peixe nadou no lago",
+        "A bola rolou pela rampa",
+        "Três pratos de trigo para três tigres tristes"
+      ],
+      "correctAnswer": "Três pratos de trigo para três tigres tristes",
+      "id": "adv-013",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra termina com o som /ÃO/, como em PÃO?",
+      "targetWord": "Coração",
+      "options": [
+        "Pirâmide",
+        "Astronave",
+        "Coração"
+      ],
+      "correctAnswer": "Coração",
+      "id": "adv-014",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o som /G/, como em GATO (não como em GIRO)?",
+      "targetWord": "Gorila",
+      "options": [
+        "Girassol",
+        "Zebra",
+        "Gorila"
+      ],
+      "correctAnswer": "Gorila",
+      "id": "adv-015",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o som /CH/ (χ) de CHAPÉU?",
+      "targetWord": "Chafariz",
+      "options": [
+        "Trovão",
+        "Sereia",
+        "Chafariz"
+      ],
+      "correctAnswer": "Chafariz",
+      "id": "adv-016",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra contém o encontro /NT/, como em MONTE?",
+      "targetWord": "Fantasma",
+      "options": [
+        "Caldeirão",
+        "Astronave",
+        "Fantasma"
+      ],
+      "correctAnswer": "Fantasma",
+      "id": "adv-017",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra tem o /CH/ + /R/ vibrado juntos?",
+      "targetWord": "Cachoeira",
+      "options": [
+        "Ventilador",
+        "Hospital",
+        "Cachoeira"
+      ],
+      "correctAnswer": "Cachoeira",
+      "id": "adv-018",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra tem o encontro /ST/, como em PASTEL?",
+      "targetWord": "Estrada",
+      "options": [
+        "Sereia",
+        "Pirâmide",
+        "Estrada"
+      ],
+      "correctAnswer": "Estrada",
+      "id": "adv-019",
+      "level": "advanced"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra contém o som /SK/, igual ao da palavra ESCOLA?",
+      "targetWord": "Telescópio",
+      "options": [
+        "Parafuso",
+        "Trovão",
+        "Telescópio"
+      ],
+      "correctAnswer": "Telescópio",
+      "id": "adv-020",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra HELICÓPTERO, girando as hélices com todas as sílabas!",
+      "targetWord": "Helicóptero",
+      "options": [
+        "Helicóptero",
+        "Ventilador",
+        "Balão"
+      ],
+      "correctAnswer": "Helicóptero",
+      "id": "adv-021",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra HOSPITAL, bem claro do começo ao fim!",
+      "targetWord": "Hospital",
+      "options": [
+        "Hospital",
+        "Abacaxi",
+        "Ambulância"
+      ],
+      "correctAnswer": "Hospital",
+      "id": "adv-022",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BIBLIOTECA, empilhando as sílabas como livros!",
+      "targetWord": "Biblioteca",
+      "options": [
+        "Biblioteca",
+        "Bicicleta",
+        "Vagalume"
+      ],
+      "correctAnswer": "Biblioteca",
+      "id": "adv-023",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra VAGALUME, acendendo o /L/ do final!",
+      "targetWord": "Vagalume",
+      "options": [
+        "Vagalume",
+        "Volante",
+        "Parafuso"
+      ],
+      "correctAnswer": "Vagalume",
+      "id": "adv-024",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra LAGARTIXA, esticando o /R/ como a lagartixa!",
+      "targetWord": "Lagartixa",
+      "options": [
+        "Lagartixa",
+        "Xícara",
+        "Borracha"
+      ],
+      "correctAnswer": "Lagartixa",
+      "id": "adv-025",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra AQUARELA, molhando bem o /AR/ inicial!",
+      "targetWord": "Aquarela",
+      "options": [
+        "Aquarela",
+        "Astronauta",
+        "Estrada"
+      ],
+      "correctAnswer": "Aquarela",
+      "id": "adv-026",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra GUARDA-CHUVA, abrindo o guarda-chuva com firmeza!",
+      "targetWord": "Guarda-chuva",
+      "options": [
+        "Guarda-chuva",
+        "Trovão",
+        "Chafariz"
+      ],
+      "correctAnswer": "Guarda-chuva",
+      "id": "adv-027",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra ABACAXI, picadinho em quatro sílabas!",
+      "targetWord": "Abacaxi",
+      "options": [
+        "Abacaxi",
+        "Abacate",
+        "Tangerina"
+      ],
+      "correctAnswer": "Abacaxi",
+      "id": "adv-028",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra TANGERINA, descascada sílaba por sílaba!",
+      "targetWord": "Tangerina",
+      "options": [
+        "Tangerina",
+        "Guardanapo",
+        "Abacaxi"
+      ],
+      "correctAnswer": "Tangerina",
+      "id": "adv-029",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra PIRÂMIDE, subindo degrau por degrau até o topo!",
+      "targetWord": "Pirâmide",
+      "options": [
+        "Pirâmide",
+        "Pirata",
+        "Parafuso"
+      ],
+      "correctAnswer": "Pirâmide",
+      "id": "adv-030",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra PLANETÁRIO, girando como os planetas!",
+      "targetWord": "Planetário",
+      "options": [
+        "Planetário",
+        "Planeta",
+        "Telefone"
+      ],
+      "correctAnswer": "Planetário",
+      "id": "adv-031",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra ASTRONAUTA, flutuando em zero gravidade!",
+      "targetWord": "Astronauta",
+      "options": [
+        "Astronauta",
+        "Foguete",
+        "Sereia"
+      ],
+      "correctAnswer": "Astronauta",
+      "id": "adv-032",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra SEREIA, cantando com o /R/ macio como espuma!",
+      "targetWord": "Sereia",
+      "options": [
+        "Sereia",
+        "Sandália",
+        "Xícara"
+      ],
+      "correctAnswer": "Sereia",
+      "id": "adv-033",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra ASTRONAVE, decolando em alta velocidade!",
+      "targetWord": "Astronave",
+      "options": [
+        "Astronave",
+        "Astronauta",
+        "Xícara"
+      ],
+      "correctAnswer": "Astronave",
+      "id": "adv-034",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra TROVÃO, troando forte como um trovão!",
+      "targetWord": "Trovão",
+      "options": [
+        "Trovão",
+        "Guarda-chuva",
+        "Tambor"
+      ],
+      "correctAnswer": "Trovão",
+      "id": "adv-035",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra PARAFUSO, apertando roda por roda!",
+      "targetWord": "Parafuso",
+      "options": [
+        "Parafuso",
+        "Farofa",
+        "Pedra"
+      ],
+      "correctAnswer": "Parafuso",
+      "id": "adv-036",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CHOCALHO, chacoalhando bem o /CH/ com o /LH/!",
+      "targetWord": "Chocalho",
+      "options": [
+        "Chocalho",
+        "Chinelo",
+        "Trovão"
+      ],
+      "correctAnswer": "Chocalho",
+      "id": "adv-037",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BUMERANGUE, voltando completo como o boomerang!",
+      "targetWord": "Bumerangue",
+      "options": [
+        "Bumerangue",
+        "Besouro",
+        "Chinelo"
+      ],
+      "correctAnswer": "Bumerangue",
+      "id": "adv-038",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra FLORESTA, caminhando sílaba por sílaba!",
+      "targetWord": "Floresta",
+      "options": [
+        "Floresta",
+        "Folha",
+        "Princesa"
+      ],
+      "correctAnswer": "Floresta",
+      "id": "adv-039",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CALDEIRÃO, borbulhando todas as sílabas!",
+      "targetWord": "Caldeirão",
+      "options": [
+        "Caldeirão",
+        "Caderno",
+        "Bolinho"
+      ],
+      "correctAnswer": "Caldeirão",
+      "id": "adv-040",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra COTOVELO, dobrando bem o cotovelo!",
+      "targetWord": "Cotovelo",
+      "options": [
+        "Cotovelo",
+        "Cordeiro",
+        "Orelhão"
+      ],
+      "correctAnswer": "Cotovelo",
+      "id": "adv-041",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O sapo dentro do saco'. Diga em ritmo de pulinho!",
+      "targetWord": "O sapo dentro do saco",
+      "options": [
+        "O sapo dentro do saco",
+        "O pato dentro do saco"
+      ],
+      "correctAnswer": "O sapo dentro do saco",
+      "id": "adv-042",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O rato roeu a roupa do rei de Roma'. Rapidinho, vibrando o /RR/!",
+      "targetWord": "O rato roeu a roupa do rei de Roma",
+      "options": [
+        "O rato roeu a roupa do rei de Roma",
+        "O gato comeu a roupa do rei de Roma"
+      ],
+      "correctAnswer": "O rato roeu a roupa do rei de Roma",
+      "id": "adv-043",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Pedro pintou o painel da praça com o pincel preto'. Bem ritmado, no som do /P/!",
+      "targetWord": "Pedro pintou o painel da praça com o pincel preto",
+      "options": [
+        "Pedro pintou o painel da praça com o pincel preto",
+        "Pedro pintou o painel da praça com o pincel azul"
+      ],
+      "correctAnswer": "Pedro pintou o painel da praça com o pincel preto",
+      "id": "adv-044",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Bia balançou o balão azul no barco da baía'. Balançando no som do /B/!",
+      "targetWord": "Bia balançou o balão azul no barco da baía",
+      "options": [
+        "Bia balançou o balão azul no barco da baía",
+        "Bia balançou o balão vermelho no barco da baía"
+      ],
+      "correctAnswer": "Bia balançou o balão azul no barco da baía",
+      "id": "adv-045",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Tita tateou a tinta da tartaruga torta'. Sem tropeçar no /T/!",
+      "targetWord": "Tita tateou a tinta da tartaruga torta",
+      "options": [
+        "Tita tateou a tinta da tartaruga torta",
+        "Tita tateou a tinta da tartaruga lisa"
+      ],
+      "correctAnswer": "Tita tateou a tinta da tartaruga torta",
+      "id": "adv-046",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Duda dava dado dourado para a dona Dina'. Bem pontual, no som do /D/!",
+      "targetWord": "Duda dava dado dourado para a dona Dina",
+      "options": [
+        "Duda dava dado dourado para a dona Dina",
+        "Duda dava dado prateado para a dona Dina"
+      ],
+      "correctAnswer": "Duda dava dado dourado para a dona Dina",
+      "id": "adv-047",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Fábio foi à feira comprar farinha para o bolo da Filó'. Soprando o /F/ de cada palavra!",
+      "targetWord": "Fábio foi à feira comprar farinha para o bolo da Filó",
+      "options": [
+        "Fábio foi à feira comprar farinha para o bolo da Filó",
+        "Fábio foi à feira comprar sal para o bolo da Filó"
+      ],
+      "correctAnswer": "Fábio foi à feira comprar farinha para o bolo da Filó",
+      "id": "adv-048",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O vovô de Vilma viu a vaca velha no vale'. Ventando o /V/ como o vento!",
+      "targetWord": "O vovô de Vilma viu a vaca velha no vale",
+      "options": [
+        "O vovô de Vilma viu a vaca velha no vale",
+        "O vovô de Vilma viu a vaca nova no vale"
+      ],
+      "correctAnswer": "O vovô de Vilma viu a vaca velha no vale",
+      "id": "adv-049",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O macaco maluco mora no morro com o moleque Mateus'. Bem musical, no som do /M/!",
+      "targetWord": "O macaco maluco mora no morro com o moleque Mateus",
+      "options": [
+        "O macaco maluco mora no morro com o moleque Mateus",
+        "O macaco maluco mora na montanha com o moleque Mateus"
+      ],
+      "correctAnswer": "O macaco maluco mora no morro com o moleque Mateus",
+      "id": "adv-050",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A carroça de Rute carregou a ração do rato risonho'. Rondando o /RR/!",
+      "targetWord": "A carroça de Rute carregou a ração do rato risonho",
+      "options": [
+        "A carroça de Rute carregou a ração do rato risonho",
+        "A carroça de Rute carregou a ração do gato risonho"
+      ],
+      "correctAnswer": "A carroça de Rute carregou a ração do rato risonho",
+      "id": "adv-051",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O zangão zumbia ziguezagueando no jardim'. Zumbindo sem perder o fôlego!",
+      "targetWord": "O zangão zumbia ziguezagueando no jardim",
+      "options": [
+        "O zangão zumbia ziguezagueando no jardim",
+        "O zangão zumbia ziguezagueando no quintal"
+      ],
+      "correctAnswer": "O zangão zumbia ziguezagueando no jardim",
+      "id": "adv-052",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O cachorro chato chupava chuchu com chá'. Chupando cada /CH/!",
+      "targetWord": "O cachorro chato chupava chuchu com chá",
+      "options": [
+        "O cachorro chato chupava chuchu com chá",
+        "O cachorro chato chupava chuchu com leite"
+      ],
+      "correctAnswer": "O cachorro chato chupava chuchu com chá",
+      "id": "adv-053",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A moça molhou a folha velha do moinho'. Molhadinho, no som do /LH/!",
+      "targetWord": "A moça molhou a folha velha do moinho",
+      "options": [
+        "A moça molhou a folha velha do moinho",
+        "A moça molhou a folha nova do moinho"
+      ],
+      "correctAnswer": "A moça molhou a folha velha do moinho",
+      "id": "adv-054",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A galinha agarrou o pintinho no ninho'. Piando no som do /NH/!",
+      "targetWord": "A galinha agarrou o pintinho no ninho",
+      "options": [
+        "A galinha agarrou o pintinho no ninho",
+        "A galinha agarrou o pintinho fora do ninho"
+      ],
+      "correctAnswer": "A galinha agarrou o pintinho no ninho",
+      "id": "adv-055",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A bruxa brava brincou com o broche brilhante'. Bem bravo no som do /BR/!",
+      "targetWord": "A bruxa brava brincou com o broche brilhante",
+      "options": [
+        "A bruxa brava brincou com o broche brilhante",
+        "A bruxa brava brincou com o anel brilhante"
+      ],
+      "correctAnswer": "A bruxa brava brincou com o broche brilhante",
+      "id": "adv-056",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'O trator de Túlio treinou na trilha torta'. Triturando o /TR/!",
+      "targetWord": "O trator de Túlio treinou na trilha torta",
+      "options": [
+        "O trator de Túlio treinou na trilha torta",
+        "O trator de Túlio descansou na trilha torta"
+      ],
+      "correctAnswer": "O trator de Túlio treinou na trilha torta",
+      "id": "adv-057",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Gugu gritou no gramado com o grilo gordo'. Grudando o /GR/!",
+      "targetWord": "Gugu gritou no gramado com o grilo gordo",
+      "options": [
+        "Gugu gritou no gramado com o grilo gordo",
+        "Gugu gritou no gramado com o grilo magro"
+      ],
+      "correctAnswer": "Gugu gritou no gramado com o grilo gordo",
+      "id": "adv-058",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'A flor de Flora flutuou na foz da fonte'. Fluindo no som do /FL/!",
+      "targetWord": "A flor de Flora flutuou na foz da fonte",
+      "options": [
+        "A flor de Flora flutuou na foz da fonte",
+        "A flor de Flora flutuou na foz do rio"
+      ],
+      "correctAnswer": "A flor de Flora flutuou na foz da fonte",
+      "id": "adv-059",
+      "level": "advanced"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie o trava-línguas: 'Juca jogou jujuba para o jabuti'. Jogando o /J/ no ar!",
+      "targetWord": "Juca jogou jujuba para o jabuti",
+      "options": [
+        "Juca jogou jujuba para o jabuti",
+        "Juca jogou jujuba para o jabuti fugir"
+      ],
+      "correctAnswer": "Juca jogou jujuba para o jabuti",
+      "id": "adv-060",
+      "level": "advanced"
+    }
+  ]
 }

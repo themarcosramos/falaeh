@@ -161,6 +161,9 @@ jobs:
       - name: Instalar Wails CLI
         run: go install github.com/wailsapp/wails/v2/cmd/wails@v2.15.0
 
+      - name: Instalar dependências de conversão de ícones
+        run: brew install librsvg icoutils
+
       - name: Sincronizar Assets do Desktop
         run: make desktop-sync
 
@@ -221,8 +224,12 @@ jobs:
           # Desambiguação de tag caso já exista e o evento não seja push de tag
           if [ "${{ github.ref_type }}" != "tag" ]; then
             if git rev-parse "$TAG" >/dev/null 2>&1 || git ls-remote --tags origin "$TAG" | grep -q "$TAG"; then
-              TAG="${TAG}-${{ github.run_number }}"
-              echo "Tag base já existente. Desambiguando para ${TAG}."
+              if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ github.event.inputs.version }}" ]; then
+                echo "Reutilizando a tag existente ${TAG} para concluir a publicação."
+              else
+                TAG="${TAG}-${{ github.run_number }}"
+                echo "Tag base já existente. Desambiguando para ${TAG}."
+              fi
             fi
           fi
 

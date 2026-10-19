@@ -25,6 +25,7 @@ type LevelCompletionResult struct {
 	TotalXP         int            `json:"totalXp"`
 	NextLevel       exercise.Level `json:"nextLevel,omitempty"`
 	NextUnlocked    bool           `json:"nextUnlocked"`
+	GameCompleted   bool           `json:"gameCompleted"`
 	NewAchievements []Achievement  `json:"newAchievements,omitempty"`
 }
 
@@ -173,15 +174,19 @@ func (e *Engine) CompleteLevel(level exercise.Level) LevelCompletionResult {
 	case exercise.LevelBeginner:
 		levelAch = AchievementBeginnerComplete
 		title = "Explorador Inicial"
-		desc = "Concluiu todos os desafios do Nível Iniciante!"
+		desc = "Concluiu os desafios do Nível Iniciante!"
 	case exercise.LevelIntermediate:
 		levelAch = AchievementIntermediateComplete
 		title = "Aventureiro da Articulação"
-		desc = "Concluiu todos os desafios do Nível Intermediário!"
+		desc = "Concluiu os desafios do Nível Intermediário!"
 	case exercise.LevelAdvanced:
 		levelAch = AchievementAdvancedComplete
-		title = "Mestre da Fala"
-		desc = "Parabéns! Concluiu todos os desafios do Nível Avançado!"
+		title = "Desafiante Supremo"
+		desc = "Concluiu os desafios do Nível Avançado e desbloqueou o Desafio Final!"
+	case exercise.LevelFinal:
+		levelAch = AchievementFinalComplete
+		title = "Lenda da Fala"
+		desc = "Concluiu o Desafio Final e conquistou o Falaêh!"
 	}
 
 	if levelAch != "" && !e.progress.HasAchievement(levelAch) {
@@ -196,6 +201,7 @@ func (e *Engine) CompleteLevel(level exercise.Level) LevelCompletionResult {
 	}
 
 	next, hasNext := NextLevel(level)
+	gameCompleted := !hasNext
 	nextUnlocked := false
 	if hasNext {
 		nextUnlocked = e.progress.UnlockLevel(next)
@@ -211,6 +217,7 @@ func (e *Engine) CompleteLevel(level exercise.Level) LevelCompletionResult {
 		TotalXP:         e.progress.TotalXP,
 		NextLevel:       next,
 		NextUnlocked:    nextUnlocked,
+		GameCompleted:   gameCompleted,
 		NewAchievements: newAchievements,
 	}
 }

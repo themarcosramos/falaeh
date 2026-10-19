@@ -1,7 +1,16 @@
 FROM golang:1.27-alpine AS base
 WORKDIR /app
 COPY go.mod ./
-RUN go mod download
+RUN for attempt in 1 2 3 4 5; do \
+        if go mod download; then exit 0; fi; \
+        if [ "$attempt" -eq 5 ]; then \
+            echo "go mod download failed after $attempt attempts" >&2; \
+            exit 1; \
+        fi; \
+        delay=$((attempt * 5)); \
+        echo "go mod download failed; retrying in ${delay}s (attempt $((attempt + 1))/5)" >&2; \
+        sleep "$delay"; \
+    done
 COPY . .
 
 FROM base AS dev
