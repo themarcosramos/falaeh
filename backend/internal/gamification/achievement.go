@@ -11,6 +11,7 @@ const (
 	AchievementBeginnerComplete     AchievementID = "beginner_complete"
 	AchievementIntermediateComplete AchievementID = "intermediate_complete"
 	AchievementAdvancedComplete     AchievementID = "advanced_complete"
+	AchievementFinalComplete        AchievementID = "final_complete"
 )
 
 // Achievement descreve uma conquista ganha durante a sessão.

@@ -15,12 +15,13 @@ const (
 	LevelBeginner     Level = "beginner"
 	LevelIntermediate Level = "intermediate"
 	LevelAdvanced     Level = "advanced"
+	LevelFinal        Level = "final"
 )
 
 // IsValid verifica se o nível informado é suportado.
 func (l Level) IsValid() bool {
 	switch l {
-	case LevelBeginner, LevelIntermediate, LevelAdvanced:
+	case LevelBeginner, LevelIntermediate, LevelAdvanced, LevelFinal:
 		return true
 	default:
 		return false
@@ -50,6 +51,11 @@ var AvailableLevels = []LevelInfo{
 		ID:          LevelAdvanced,
 		Name:        "Avançado",
 		Description: "Mundo 3: Articulação avançada e frases",
+	},
+	{
+		ID:          LevelFinal,
+		Name:        "Desafio Final",
+		Description: "Desafio Final: trava-línguas definitivos para conquistar o Falaêh",
 	},
 }
 
@@ -145,12 +151,14 @@ func (e Exercise) CheckAnswer(userAnswer string) bool {
 	return NormalizeAnswer(userAnswer) == NormalizeAnswer(e.CorrectAnswer)
 }
 
-// NormalizeAnswer padroniza o texto removendo espaços periféricos, caracteres de controle
-// e tratando pontuação para uma comparação justa de voz e texto.
+// NormalizeAnswer padroniza o texto para uma comparação justa de voz e texto:
+// remove espaços periféricos, pontuação e símbolos visuais (emojis e ícones usados
+// nos rótulos das alternativas) e colapsa espaços internos. A transcript falada
+// nunca contém emojis, portanto eles não podem decidir uma resposta.
 func NormalizeAnswer(s string) string {
 	var sb strings.Builder
 	for _, r := range strings.TrimSpace(strings.ToLower(s)) {
-		if unicode.IsPunct(r) && r != '-' {
+		if r != '-' && (unicode.IsPunct(r) || unicode.IsSymbol(r) || r == '\uFE0F' || r == '\u200D') {
 			continue
 		}
 		sb.WriteRune(r)

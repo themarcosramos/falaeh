@@ -53,8 +53,14 @@ func TestNextLevel(t *testing.T) {
 			hasNext:      true,
 		},
 		{
-			name:         "advanced não possui próximo nível",
+			name:         "advanced avança para o Desafio Final",
 			current:      exercise.LevelAdvanced,
+			expectedNext: exercise.LevelFinal,
+			hasNext:      true,
+		},
+		{
+			name:         "Desafio Final encerra a progressão",
+			current:      exercise.LevelFinal,
 			expectedNext: "",
 			hasNext:      false,
 		},

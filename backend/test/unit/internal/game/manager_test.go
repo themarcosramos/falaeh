@@ -3,6 +3,7 @@ package game_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -56,7 +57,18 @@ func newFakeProvider() *fakeProvider {
 
 func newManager(t *testing.T, provider game.ExerciseProvider, cfg game.Config) *game.Manager {
 	t.Helper()
+	// Embaralhamento identidade mantém os testes determinísticos; os aspectos
+	// de aleatoriedade são cobertos por testes próprios abaixo.
+	if cfg.Shuffle == nil {
+		cfg.Shuffle = identityShuffle
+	}
 	return game.NewManager(provider, gamification.DefaultRules(), cfg)
+}
+
+func identityShuffle(exercises []exercise.PublicExercise) []exercise.PublicExercise {
+	shuffled := make([]exercise.PublicExercise, len(exercises))
+	copy(shuffled, exercises)
+	return shuffled
 }
 
 func TestManager_Start_CreatesSessionWithFirstExercise(t *testing.T) {
@@ -357,5 +369,292 @@ func TestManager_Answer_ExerciseNotFoundInProvider(t *testing.T) {
 
 	if _, err := manager.Answer(context.Background(), start.SessionID, "beg-001", "pato"); !errors.Is(err, exercise.ErrExerciseNotFound) {
 		t.Fatalf("erro = %v, esperado ErrExerciseNotFound", err)
+	}
+}
+
+// reverseShuffle inverte a ordem: ferramenta determinística para provar que a
+// apresentação não depende da posição original no banco.
+func reverseShuffle(exercises []exercise.PublicExercise) []exercise.PublicExercise {
+	shuffled := make([]exercise.PublicExercise, len(exercises))
+	for i, ex := range exercises {
+		shuffled[len(exercises)-1-i] = ex
+	}
+	return shuffled
+}
+
+func bankProvider(n int) *fakeProvider {
+	return multiLevelProvider(map[exercise.Level]int{exercise.LevelBeginner: n})
+}
+
+// multiLevelProvider cria bancos com a quantidade informada para cada nível.
+func multiLevelProvider(counts map[exercise.Level]int) *fakeProvider {
+	prefixes := map[exercise.Level]string{
+		exercise.LevelBeginner: "beg", exercise.LevelIntermediate: "int",
+		exercise.LevelAdvanced: "adv", exercise.LevelFinal: "fin",
+	}
+	byLevel := make(map[exercise.Level][]exercise.PublicExercise, len(counts))
+	answers := make(map[string]string)
+	for level, n := range counts {
+		list := make([]exercise.PublicExercise, 0, n)
+		for i := 0; i < n; i++ {
+			id := fmt.Sprintf("%s-%03d", prefixes[level], i+1)
+			list = append(list, exercise.PublicExercise{ID: id, Level: level, Type: exercise.TypeVoice, Instruction: "Pronuncie"})
+			answers[id] = id
+		}
+		byLevel[level] = list
+	}
+	return &fakeProvider{byLevel: byLevel, answers: answers}
+}
+
+// TestManager_FullProgression cobre o fluxo completo: 25 → 35 → 40 acertos desbloqueiam
+// os mundos seguintes e o Desafio Final encerra o jogo. Erros no caminho não contam.
+func TestManager_FullProgression(t *testing.T) {
+	provider := multiLevelProvider(map[exercise.Level]int{
+		exercise.LevelBeginner:     gamification.BeginnerTotalExercises,
+		exercise.LevelIntermediate: gamification.IntermediateTotalExercises,
+		exercise.LevelAdvanced:     gamification.AdvancedTotalExercises,
+		exercise.LevelFinal:        gamification.FinalTotalExercises,
+	})
+	manager := newManager(t, provider, game.Config{})
+	ctx := context.Background()
+	sessionID := ""
+
+	playPhase := func(level exercise.Level, required int) game.AnswerResult {
+		t.Helper()
+		start, err := manager.Start(ctx, level, sessionID)
+		if err != nil {
+			t.Fatalf("erro ao iniciar %s: %v", level, err)
+		}
+		sessionID = start.SessionID
+		if start.TotalExercises != required {
+			t.Fatalf("sessão de %s = %d exercícios, esperado %d", level, start.TotalExercises, required)
+		}
+		current := start.Exercise.ID
+		var last game.AnswerResult
+		for i := 0; i < required; i++ {
+			// Um erro no meio (sem XP, sem progresso) e depois o acerto do mesmo exercício.
+			if _, err := manager.Answer(ctx, start.SessionID, current, "errado"); err != nil {
+				t.Fatalf("erro ao errar em %s: %v", level, err)
+			}
+			res, err := manager.Answer(ctx, start.SessionID, current, current)
+			if err != nil {
+				t.Fatalf("erro ao acertar em %s: %v", level, err)
+			}
+			last = res
+			if i+1 < required {
+				if res.NextExercise == nil {
+					t.Fatalf("esperava próximo exercício em %s", level)
+				}
+				current = res.NextExercise.ID
+			}
+		}
+		if !last.PhaseCompleted {
+			t.Fatalf("fase %s deveria concluir após %d acertos", level, required)
+		}
+		return last
+	}
+
+	// Mundo 1: bloqueado antes dos 25; com 25 acertos abre o Intermediário.
+	if _, err := manager.Start(ctx, exercise.LevelIntermediate, ""); !errors.Is(err, game.ErrLevelLocked) {
+		t.Fatalf("intermediate deveria estar bloqueado inicialmente; erro=%v", err)
+	}
+	if _, err := manager.Start(ctx, exercise.LevelFinal, ""); !errors.Is(err, game.ErrLevelLocked) {
+		t.Fatalf("Desafio Final deveria estar bloqueado inicialmente; erro=%v", err)
+	}
+	beg := playPhase(exercise.LevelBeginner, gamification.BeginnerRequiredHits)
+	if beg.Completion == nil || beg.Completion.NextLevel != exercise.LevelIntermediate || !beg.Completion.NextUnlocked {
+		t.Fatalf("25 acertos deveriam desbloquear o intermediate: %+v", beg.Completion)
+	}
+
+	// Mundo 2: 35 acertos desbloqueiam o Avançado.
+	if _, err := manager.Start(ctx, exercise.LevelAdvanced, ""); !errors.Is(err, game.ErrLevelLocked) {
+		t.Fatalf("advanced deveria estar bloqueado; erro=%v", err)
+	}
+	intm := playPhase(exercise.LevelIntermediate, gamification.IntermediateRequiredHits)
+	if intm.Completion == nil || intm.Completion.NextLevel != exercise.LevelAdvanced || !intm.Completion.NextUnlocked {
+		t.Fatalf("35 acertos deveriam desbloquear o advanced: %+v", intm.Completion)
+	}
+
+	// Mundo 3: sessão avançada com 40 exercícios; ao concluir, o Desafio Final abre
+	// (não antes: enquanto a fase não terminou, final continua travado).
+	start, err := manager.Start(ctx, exercise.LevelAdvanced, sessionID)
+	if err != nil {
+		t.Fatalf("erro ao iniciar advanced: %v", err)
+	}
+	sessionID = start.SessionID
+	if start.TotalExercises != gamification.AdvancedRequiredHits {
+		t.Fatalf("sessão avançada = %d, esperado %d", start.TotalExercises, gamification.AdvancedRequiredHits)
+	}
+	current := start.Exercise.ID
+	var advancedResult game.AnswerResult
+	for i := 0; i < gamification.AdvancedRequiredHits; i++ {
+		if _, err := manager.Answer(ctx, start.SessionID, current, "errado"); err != nil {
+			t.Fatalf("erro ao errar no advanced: %v", err)
+		}
+		res, err := manager.Answer(ctx, start.SessionID, current, current)
+		if err != nil {
+			t.Fatalf("erro ao acertar no advanced: %v", err)
+		}
+		advancedResult = res
+		if i+1 < gamification.AdvancedRequiredHits {
+			if _, err := manager.Start(ctx, exercise.LevelFinal, ""); !errors.Is(err, game.ErrLevelLocked) {
+				t.Fatalf("com %d acertos o Desafio Final deveria continuar travado", i+1)
+			}
+			current = res.NextExercise.ID
+		}
+	}
+	if _, err := manager.Start(ctx, exercise.LevelFinal, sessionID); err != nil {
+		t.Fatalf("com 40 acertos o Desafio Final deveria estar aberto; erro=%v", err)
+	}
+	if advancedResult.Completion == nil || advancedResult.Completion.NextLevel != exercise.LevelFinal || !advancedResult.Completion.NextUnlocked {
+		t.Fatalf("40 acertos deveriam desbloquear o Desafio Final: %+v", advancedResult.Completion)
+	}
+	if advancedResult.Completion.GameCompleted {
+		t.Error("o jogo não deveria estar concluído após o advanced")
+	}
+
+	// Desafio Final: 10 acertos concluem o Falaêh.
+	fin := playPhase(exercise.LevelFinal, gamification.FinalRequiredHits)
+	if fin.Completion == nil || !fin.Completion.GameCompleted {
+		t.Fatalf("concluir o Desafio Final deveria encerrar o jogo: %+v", fin.Completion)
+	}
+	if fin.Completion.NextLevel != "" {
+		t.Errorf("não deveria haver próximo nível após o Desafio Final: %+v", fin.Completion)
+	}
+}
+
+// TestManager_PhaseSequence consumes the session in an orderly manner and verifies the randomized properties.
+func TestManager_PhaseSequence_EmbaralhaELimita(t *testing.T) {
+	provider := bankProvider(40)
+	manager := newManager(t, provider, game.Config{Shuffle: game.DefaultShuffle})
+
+	start, err := manager.Start(context.Background(), exercise.LevelBeginner, "")
+	if err != nil {
+		t.Fatalf("erro inesperado: %v", err)
+	}
+
+	if start.TotalExercises != gamification.BeginnerRequiredHits {
+		t.Fatalf("sessão devem conter %d exercícios, obteve %d", gamification.BeginnerRequiredHits, start.TotalExercises)
+	}
+	if start.Exercise.ID == "" || start.Exercise.Level != exercise.LevelBeginner {
+		t.Fatalf("exercício fora do mundo iniciante: %+v", start.Exercise)
+	}
+
+	// Consome a sessão inteira verificando que nenhum exercício reaparece.
+	seen := make(map[string]bool)
+	current := start.Exercise.ID
+	final := game.AnswerResult{}
+	for i := 0; i < start.TotalExercises; i++ {
+		if seen[current] {
+			t.Fatalf("exercício %q reapareceu na mesma sessão", current)
+		}
+		seen[current] = true
+		res, err := manager.Answer(context.Background(), start.SessionID, current, current)
+		if err != nil {
+			t.Fatalf("erro na resposta %d: %v", i+1, err)
+		}
+		if !res.Correct {
+			t.Fatalf("resposta %d deveria ser correta", i+1)
+		}
+		final = res
+		if i+1 < start.TotalExercises {
+			if res.NextExercise == nil {
+				t.Fatalf("esperava próximo exercício na posição %d", i+1)
+			}
+			current = res.NextExercise.ID
+		}
+	}
+
+	if !final.PhaseCompleted {
+		t.Fatal("a fase deveria concluir com 25 acertos diferentes")
+	}
+	if final.Report.Hits != gamification.BeginnerRequiredHits {
+		t.Errorf("hits = %d, esperado %d", final.Report.Hits, gamification.BeginnerRequiredHits)
+	}
+
+	// Sem exercícios repetidos: 25 exercícios distintos, todos do mundo.
+	if len(seen) != gamification.BeginnerRequiredHits {
+		t.Fatalf("quantidade consumida = %d, esperado %d", len(seen), gamification.BeginnerRequiredHits)
+	}
+}
+
+// TestManager_AdvancedProgression_40Acertos cobre: erros no caminho não contam como
+// acertos; funciona via TestManager_FullProgression, aqui validamos só o banco truncado.
+func TestManager_Answer_WrongDoesNotProgress(t *testing.T) {
+	provider := bankProvider(gamification.BeginnerRequiredHits + 1)
+	manager := newManager(t, provider, game.Config{})
+
+	start, _ := manager.Start(context.Background(), exercise.LevelBeginner, "")
+	current := start.Exercise.ID
+	var last game.AnswerResult
+	for i := 0; i < gamification.BeginnerRequiredHits; i++ {
+		if res, err := manager.Answer(context.Background(), start.SessionID, current, "errado"); err != nil {
+			t.Fatalf("erro na resposta %d: %v", i+1, err)
+		} else {
+			if res.Correct {
+				t.Fatal("resposta errada não deveria ser aceita")
+			}
+			if res.ExerciseIndex != i {
+				t.Fatalf("índice avançou após erro (%d, esperado %d): tentativas não podem contar como acertos", res.ExerciseIndex, i)
+			}
+			if res.EarnedXP != 0 {
+				t.Errorf("erro concedeu XP inesperado: %d", res.EarnedXP)
+			}
+		}
+		res, err := manager.Answer(context.Background(), start.SessionID, current, current)
+		if err != nil {
+			t.Fatalf("erro ao acertar o exercício %q: %v", current, err)
+		}
+		last = res
+		if i+1 < gamification.BeginnerRequiredHits {
+			current = res.NextExercise.ID
+		}
+	}
+
+	if !last.PhaseCompleted {
+		t.Fatal("após 25 acertos em exercícios diferentes a fase deveria estar concluída")
+	}
+	if last.Progress.TotalHits != gamification.BeginnerRequiredHits {
+		t.Errorf("totalHits = %d, esperado %d", last.Progress.TotalHits, gamification.BeginnerRequiredHits)
+	}
+}
+
+func TestManager_Start_ShuffleChangesOrder(t *testing.T) {
+	provider := bankProvider(12)
+
+	ordered, _ := newManager(t, provider, game.Config{}).Start(context.Background(), exercise.LevelBeginner, "")
+	reversed, _ := newManager(t, provider, game.Config{Shuffle: reverseShuffle}).Start(context.Background(), exercise.LevelBeginner, "")
+
+	if ordered.Exercise.ID == reversed.Exercise.ID {
+		t.Fatalf("ordens distintas deveriam produzir primeiros exercícios distintos; ambos %q", ordered.Exercise.ID)
+	}
+	if reversed.TotalExercises != 12 {
+		t.Errorf("banco de 12 com exigência 25 deveria preservar todos os 12: %d", reversed.TotalExercises)
+	}
+}
+
+func TestManager_Start_NewSessionReshuffles(t *testing.T) {
+	provider := bankProvider(40)
+	// Embaralhador determinístico baseado em um contador: cada nova jogatina
+	// rotaciona a entrada, provando que a nova sessão tem nova ordem.
+	rotations := 0
+	shuffle := func(exs []exercise.PublicExercise) []exercise.PublicExercise {
+		rotations++
+		out := make([]exercise.PublicExercise, len(exs))
+		for i, ex := range exs {
+			out[(i+rotations*7)%len(exs)] = ex
+		}
+		return out
+	}
+	manager := newManager(t, provider, game.Config{Shuffle: shuffle})
+
+	first, _ := manager.Start(context.Background(), exercise.LevelBeginner, "")
+	sid := first.SessionID
+	second, _ := manager.Start(context.Background(), exercise.LevelBeginner, sid)
+	if second.SessionID != sid {
+		t.Fatalf("jogar novamente deveria reaproveitar a sessão: %q != %q", second.SessionID, sid)
+	}
+	if first.Exercise.ID == second.Exercise.ID {
+		t.Fatal("a nova jogatina deveria apresentar nova ordem (primeiro exercício diferente)")
 	}
 }

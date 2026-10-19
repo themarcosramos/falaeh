@@ -1,59 +1,655 @@
 {
-    "level": "intermediate",
-    "exercises": [
-        {
-            "id": "int-001",
-            "level": "intermediate",
-            "type": "multiple_choice",
-            "instruction": "Qual palavra contém o encontro consonantal /TR/?",
-            "targetWord": "Trator",
-            "options": ["Prato", "Trator", "Tigre"],
-            "correctAnswer": "Trator"
-        },
-        {
-            "id": "int-002",
-            "level": "intermediate",
-            "type": "voice",
-            "instruction": "Pronuncie a palavra BORBOLETA com clareza em todas as sílabas.",
-            "targetWord": "Borboleta",
-            "options": ["Borboleta", "Bombom", "Boneca"],
-            "correctAnswer": "Borboleta"
-        },
-        {
-            "id": "int-003",
-            "level": "intermediate",
-            "type": "sound_identification",
-            "instruction": "Qual palavra começa com o mesmo som /J/ de JANELA?",
-            "targetWord": "Jacaré",
-            "options": ["Jacaré", "Gato", "Castelo"],
-            "correctAnswer": "Jacaré"
-        },
-        {
-            "id": "int-004",
-            "level": "intermediate",
-            "type": "voice",
-            "instruction": "Pronuncie a palavra JACARÉ estalando bem o som inicial /J/.",
-            "targetWord": "Jacaré",
-            "options": ["Jacaré", "Jipe", "Janela"],
-            "correctAnswer": "Jacaré"
-        },
-        {
-            "id": "int-005",
-            "level": "intermediate",
-            "type": "voice",
-            "instruction": "Diga a palavra ESTRELA soprando suavemente o som do /S/.",
-            "targetWord": "Estrela",
-            "options": ["Estrela", "Escola", "Espelho"],
-            "correctAnswer": "Estrela"
-        },
-        {
-            "id": "int-006",
-            "level": "intermediate",
-            "type": "voice",
-            "instruction": "Pronuncie a palavra PRATO destacando o encontro consonantal /PR/.",
-            "targetWord": "Prato",
-            "options": ["Prato", "Trato", "Grato"],
-            "correctAnswer": "Prato"
-        }
-    ]
+  "level": "intermediate",
+  "exercises": [
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra contém o encontro consonantal /TR/?",
+      "targetWord": "Trator",
+      "options": [
+        "Prato",
+        "Tigre",
+        "Trator"
+      ],
+      "correctAnswer": "Trator",
+      "id": "int-001",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o encontro /PL/ de PLACA?",
+      "targetWord": "Placa",
+      "options": [
+        "Blusa",
+        "Princesa",
+        "Placa"
+      ],
+      "correctAnswer": "Placa",
+      "id": "int-002",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o encontro /BL/ de BLOCO?",
+      "targetWord": "Bloco",
+      "options": [
+        "Placa",
+        "Brinquedo",
+        "Bloco"
+      ],
+      "correctAnswer": "Bloco",
+      "id": "int-003",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o encontro /GR/ de GRILO?",
+      "targetWord": "Grilo",
+      "options": [
+        "Dragão",
+        "Sabonete",
+        "Grilo"
+      ],
+      "correctAnswer": "Grilo",
+      "id": "int-004",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o encontro /DR/ de DRAGÃO?",
+      "targetWord": "Dragão",
+      "options": [
+        "Trator",
+        "Queijo",
+        "Dragão"
+      ],
+      "correctAnswer": "Dragão",
+      "id": "int-005",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o encontro /FR/ de FRUTA?",
+      "targetWord": "Fruta",
+      "options": [
+        "Flauta",
+        "Zebra",
+        "Fruta"
+      ],
+      "correctAnswer": "Fruta",
+      "id": "int-006",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra começa com o encontro /FL/ de FLAUTA?",
+      "targetWord": "Flauta",
+      "options": [
+        "Fruta",
+        "Chuveiro",
+        "Flauta"
+      ],
+      "correctAnswer": "Flauta",
+      "id": "int-007",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o som /NH/, como em BANHO?",
+      "targetWord": "Banho",
+      "options": [
+        "Zebra",
+        "Violino",
+        "Banho"
+      ],
+      "correctAnswer": "Banho",
+      "id": "int-008",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o som /LH/, como em ESPELHO?",
+      "targetWord": "Espelho",
+      "options": [
+        "Zebra",
+        "Dominó",
+        "Espelho"
+      ],
+      "correctAnswer": "Espelho",
+      "id": "int-009",
+      "level": "intermediate"
+    },
+    {
+      "type": "multiple_choice",
+      "instruction": "Qual palavra tem o /RR/ vibrado, como em GUITARRA?",
+      "targetWord": "Guitarra",
+      "options": [
+        "Zebra",
+        "Chave",
+        "Guitarra"
+      ],
+      "correctAnswer": "Guitarra",
+      "id": "int-010",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra PRATO?",
+      "targetWord": "Prato",
+      "options": [
+        "🍦 Sorvete",
+        "🎲 Dominó",
+        "🍽️ Prato"
+      ],
+      "correctAnswer": "🍽️ Prato",
+      "id": "int-011",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra SORVETE?",
+      "targetWord": "Sorvete",
+      "options": [
+        "⭐ Estrela",
+        "🌸 Flor",
+        "🍦 Sorvete"
+      ],
+      "correctAnswer": "🍦 Sorvete",
+      "id": "int-012",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra BICICLETA?",
+      "targetWord": "Bicicleta",
+      "options": [
+        "🚀 Foguete",
+        "👓 Óculos",
+        "🚲 Bicicleta"
+      ],
+      "correctAnswer": "🚲 Bicicleta",
+      "id": "int-013",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra ÓCULOS?",
+      "targetWord": "Óculos",
+      "options": [
+        "🦓 Zebra",
+        "🔑 Chave",
+        "👓 Óculos"
+      ],
+      "correctAnswer": "👓 Óculos",
+      "id": "int-014",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra VIOLINO?",
+      "targetWord": "Violino",
+      "options": [
+        "🎸 Guitarra",
+        "📞 Telefone",
+        "🎻 Violino"
+      ],
+      "correctAnswer": "🎻 Violino",
+      "id": "int-015",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra ÁRVORE?",
+      "targetWord": "Árvore",
+      "options": [
+        "🐿️ Esquilo",
+        "🐊 Jacaré",
+        "🌳 Árvore"
+      ],
+      "correctAnswer": "🌳 Árvore",
+      "id": "int-016",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra TELEFONE?",
+      "targetWord": "Telefone",
+      "options": [
+        "🚩 Bandeira",
+        "🔨 Martelo",
+        "📞 Telefone"
+      ],
+      "correctAnswer": "📞 Telefone",
+      "id": "int-017",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra CHAVE?",
+      "targetWord": "Chave",
+      "options": [
+        "🚿 Chuveiro",
+        "👔 Gravata",
+        "🔑 Chave"
+      ],
+      "correctAnswer": "🔑 Chave",
+      "id": "int-018",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra ZEBRA?",
+      "targetWord": "Zebra",
+      "options": [
+        "🐰 Coelho",
+        "🐵 Macaco",
+        "🦓 Zebra"
+      ],
+      "correctAnswer": "🦓 Zebra",
+      "id": "int-019",
+      "level": "intermediate"
+    },
+    {
+      "type": "image_word_match",
+      "instruction": "Qual imagem representa a palavra FOGUETE?",
+      "targetWord": "Foguete",
+      "options": [
+        "⭐ Estrela",
+        "🧼 Sabonete",
+        "🚀 Foguete"
+      ],
+      "correctAnswer": "🚀 Foguete",
+      "id": "int-020",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /J/ de JANELA?",
+      "targetWord": "Jacaré",
+      "options": [
+        "Gato",
+        "Castelo",
+        "Jacaré"
+      ],
+      "correctAnswer": "Jacaré",
+      "id": "int-021",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra rima com COELHO?",
+      "targetWord": "Coelho",
+      "options": [
+        "Zebra",
+        "Foguete",
+        "Espelho"
+      ],
+      "correctAnswer": "Espelho",
+      "id": "int-022",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /S/ de ESTRELA?",
+      "targetWord": "Estrela",
+      "options": [
+        "Gravata",
+        "Chuveiro",
+        "Sabonete"
+      ],
+      "correctAnswer": "Sabonete",
+      "id": "int-023",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /B/ de BANDEIRA?",
+      "targetWord": "Bandeira",
+      "options": [
+        "Grilo",
+        "Foguete",
+        "Bicicleta"
+      ],
+      "correctAnswer": "Bicicleta",
+      "id": "int-024",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra tem o encontro /BR/, igual a SOMBRAS?",
+      "targetWord": "Sombra",
+      "options": [
+        "Gravata",
+        "Sabonete",
+        "Bruxa"
+      ],
+      "correctAnswer": "Bruxa",
+      "id": "int-025",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra tem o encontro /GR/, igual a GRAVATA?",
+      "targetWord": "Gravata",
+      "options": [
+        "Bruxa",
+        "Zebra",
+        "Gruta"
+      ],
+      "correctAnswer": "Gruta",
+      "id": "int-026",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /TR/ de TRICICLO?",
+      "targetWord": "Triciclo",
+      "options": [
+        "Blusa",
+        "Martelo",
+        "Trator"
+      ],
+      "correctAnswer": "Trator",
+      "id": "int-027",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Medalha tem o som /LH/. Qual palavra também tem o som /LH/?",
+      "targetWord": "Medalha",
+      "options": [
+        "Sabonete",
+        "Triciclo",
+        "Molho"
+      ],
+      "correctAnswer": "Molho",
+      "id": "int-028",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /K/ de CABELO?",
+      "targetWord": "Cabelo",
+      "options": [
+        "Bruxa",
+        "Zebra",
+        "Caixa"
+      ],
+      "correctAnswer": "Caixa",
+      "id": "int-029",
+      "level": "intermediate"
+    },
+    {
+      "type": "sound_identification",
+      "instruction": "Qual palavra começa com o mesmo som /N/ de NOVELO?",
+      "targetWord": "Novelo",
+      "options": [
+        "Blusa",
+        "Zebra",
+        "Ninho"
+      ],
+      "correctAnswer": "Ninho",
+      "id": "int-030",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra TREM, juntando bem o T com o R!",
+      "targetWord": "Trem",
+      "options": [
+        "Trem",
+        "Trenó",
+        "Sombra"
+      ],
+      "correctAnswer": "Trem",
+      "id": "int-031",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BRAÇO, estalando o /BR/!",
+      "targetWord": "Braço",
+      "options": [
+        "Braço",
+        "Prato",
+        "Zebra"
+      ],
+      "correctAnswer": "Braço",
+      "id": "int-032",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BORBOLETA, com clareza em todas as sílabas!",
+      "targetWord": "Borboleta",
+      "options": [
+        "Borboleta",
+        "Bicicleta",
+        "Sombra"
+      ],
+      "correctAnswer": "Borboleta",
+      "id": "int-033",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BRINQUEDO, com o /BR/ bem forte!",
+      "targetWord": "Brinquedo",
+      "options": [
+        "Brinquedo",
+        "Queijo",
+        "Cabelo"
+      ],
+      "correctAnswer": "Brinquedo",
+      "id": "int-034",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra PRINCESA, ensaiando bem o /PR/!",
+      "targetWord": "Princesa",
+      "options": [
+        "Princesa",
+        "Prato",
+        "Foguete"
+      ],
+      "correctAnswer": "Princesa",
+      "id": "int-035",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BLUSA, juntando o /BL/!",
+      "targetWord": "Blusa",
+      "options": [
+        "Blusa",
+        "Bruxa",
+        "Queijo"
+      ],
+      "correctAnswer": "Blusa",
+      "id": "int-036",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CRAVO, estalando bem o /CR/!",
+      "targetWord": "Cravo",
+      "options": [
+        "Cravo",
+        "Gravata",
+        "Chave"
+      ],
+      "correctAnswer": "Cravo",
+      "id": "int-037",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra BRUXA, com o /BR/ assustador de bom!",
+      "targetWord": "Bruxa",
+      "options": [
+        "Bruxa",
+        "Blusa",
+        "Estrela"
+      ],
+      "correctAnswer": "Bruxa",
+      "id": "int-038",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra ESCOVA, escovando bem os dentinhos!",
+      "targetWord": "Escova",
+      "options": [
+        "Escova",
+        "Escola",
+        "Blusa"
+      ],
+      "correctAnswer": "Escova",
+      "id": "int-039",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra ESCOLA, com todas as sílabas caprichadas!",
+      "targetWord": "Escola",
+      "options": [
+        "Escola",
+        "Escada",
+        "Coelho"
+      ],
+      "correctAnswer": "Escola",
+      "id": "int-040",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra ESQUILO, juntando o S com o Q!",
+      "targetWord": "Esquilo",
+      "options": [
+        "Esquilo",
+        "Escola",
+        "Queijo"
+      ],
+      "correctAnswer": "Esquilo",
+      "id": "int-041",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CHUVEIRO, soprando bem o /CH/!",
+      "targetWord": "Chuveiro",
+      "options": [
+        "Chuveiro",
+        "Chuva",
+        "Escola"
+      ],
+      "correctAnswer": "Chuveiro",
+      "id": "int-042",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra MARTELO, estalando bem o T do meio!",
+      "targetWord": "Martelo",
+      "options": [
+        "Martelo",
+        "Tambor",
+        "Telefone"
+      ],
+      "correctAnswer": "Martelo",
+      "id": "int-043",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra SALADA, bem fresquinha e clara!",
+      "targetWord": "Salada",
+      "options": [
+        "Salada",
+        "Sorvete",
+        "Sabonete"
+      ],
+      "correctAnswer": "Salada",
+      "id": "int-044",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra SABONETE, com todas as sílabas enfileiradas!",
+      "targetWord": "Sabonete",
+      "options": [
+        "Sabonete",
+        "Banho",
+        "Coelho"
+      ],
+      "correctAnswer": "Sabonete",
+      "id": "int-045",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra CHINELO, soprando bem o /CH/!",
+      "targetWord": "Chinelo",
+      "options": [
+        "Chinelo",
+        "Chuveiro",
+        "Sabonete"
+      ],
+      "correctAnswer": "Chinelo",
+      "id": "int-046",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra DOMINÓ, empurrando bem o /D/!",
+      "targetWord": "Dominó",
+      "options": [
+        "Dominó",
+        "Chinelo",
+        "Coelho"
+      ],
+      "correctAnswer": "Dominó",
+      "id": "int-047",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra QUEIJO, mastigando bem o /J/!",
+      "targetWord": "Queijo",
+      "options": [
+        "Queijo",
+        "Beijo",
+        "Iogurte"
+      ],
+      "correctAnswer": "Queijo",
+      "id": "int-048",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra IOGURTE, cremoso e caprichado!",
+      "targetWord": "Iogurte",
+      "options": [
+        "Iogurte",
+        "Queijo",
+        "Sorvete"
+      ],
+      "correctAnswer": "Iogurte",
+      "id": "int-049",
+      "level": "intermediate"
+    },
+    {
+      "type": "voice",
+      "instruction": "Pronuncie a palavra FLOR, soprando bem o /FL/!",
+      "targetWord": "Flor",
+      "options": [
+        "Flor",
+        "Chuva",
+        "Sabonete"
+      ],
+      "correctAnswer": "Flor",
+      "id": "int-050",
+      "level": "intermediate"
+    }
+  ]
 }

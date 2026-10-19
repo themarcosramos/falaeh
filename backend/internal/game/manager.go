@@ -2,9 +2,10 @@ package game
 
 import (
 	"context"
-	"crypto/rand"
+	cryptorand "crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -24,11 +25,16 @@ type ExerciseProvider interface {
 	ValidateAnswer(ctx context.Context, exerciseID string, answer string) (exercise.ValidationResult, error)
 }
 
+// ShuffleFunc define a estratégia de apresentação aleatória dos exercícios.
+// A ordem original da fonte de dados não deve influenciar a sequência da sessão.
+type ShuffleFunc func(exercises []exercise.PublicExercise) []exercise.PublicExercise
+
 // Config ajusta os limites do gerenciador de partidas. O zero-value usa os padrões.
 type Config struct {
 	TTL         time.Duration
 	MaxSessions int
 	Now         func() time.Time
+	Shuffle     ShuffleFunc
 }
 
 // Manager guarda as partidas em andamento apenas em memória, com expiração por inatividade.
@@ -41,6 +47,7 @@ type Manager struct {
 	ttl         time.Duration
 	maxSessions int
 	now         func() time.Time
+	shuffle     ShuffleFunc
 }
 
 // NewManager cria o gerenciador de partidas do jogo.
@@ -54,6 +61,9 @@ func NewManager(exercises ExerciseProvider, rules gamification.Rules, cfg Config
 	if cfg.Now == nil {
 		cfg.Now = time.Now
 	}
+	if cfg.Shuffle == nil {
+		cfg.Shuffle = DefaultShuffle
+	}
 
 	return &Manager{
 		sessions:    make(map[string]*session),
@@ -62,21 +72,36 @@ func NewManager(exercises ExerciseProvider, rules gamification.Rules, cfg Config
 		ttl:         cfg.TTL,
 		maxSessions: cfg.MaxSessions,
 		now:         cfg.Now,
+		shuffle:     cfg.Shuffle,
 	}
+}
+
+// DefaultShuffle embala a sequência com Fisher-Yates, sem reposição e sem depender
+// da posição original. O consumidor lê a sequência embaralhada de forma linear.
+func DefaultShuffle(exercises []exercise.PublicExercise) []exercise.PublicExercise {
+	shuffled := make([]exercise.PublicExercise, len(exercises))
+	copy(shuffled, exercises)
+	//nolint:gosec // embaralhamento é apresentação de jogo, não uso de segurança
+	rand.Shuffle(len(shuffled), func(i, j int) {
+		shuffled[i], shuffled[j] = shuffled[j], shuffled[i]
+	})
+	return shuffled
 }
 
 // Start inicia uma fase. Informar um sessionID existente preserva XP, conquistas
 // e níveis desbloqueados; caso contrário uma nova partida é criada.
+// A sequência da fase é embaralhada a cada início e consumida sem reposição,
+// limitada à quantidade de acertos necessária para concluir a fase.
 func (m *Manager) Start(ctx context.Context, level exercise.Level, sessionID string) (StartResult, error) {
 	if !level.IsValid() {
 		return StartResult{}, fmt.Errorf("%w: %s", exercise.ErrInvalidLevel, level)
 	}
 
-	exercises, err := m.exercises.ListByLevel(ctx, level)
+	source, err := m.exercises.ListByLevel(ctx, level)
 	if err != nil {
 		return StartResult{}, err
 	}
-	if len(exercises) == 0 {
+	if len(source) == 0 {
 		return StartResult{}, ErrNoExercises
 	}
 
@@ -93,6 +118,7 @@ func (m *Manager) Start(ctx context.Context, level exercise.Level, sessionID str
 		return StartResult{}, ErrLevelLocked
 	}
 
+	exercises := m.phaseSequence(level, source)
 	sess.startPhase(level, exercises, m.now())
 	current, _ := sess.currentExercise()
 
@@ -106,6 +132,17 @@ func (m *Manager) Start(ctx context.Context, level exercise.Level, sessionID str
 		Progress:       progress,
 		Rules:          m.rules,
 	}, nil
+}
+
+// phaseSequence embaralha o banco completo do mundo e limita a sessão à
+// quantidade de acertos necessária para a progressão daquela fase.
+func (m *Manager) phaseSequence(level exercise.Level, source []exercise.PublicExercise) []exercise.PublicExercise {
+	shuffled := m.shuffle(source)
+	required := gamification.RequiredHits(level)
+	if required <= 0 || required >= len(shuffled) {
+		return shuffled
+	}
+	return shuffled[:required]
 }
 
 // Answer valida a resposta do exercício atual e devolve o resultado com XP,
@@ -242,7 +279,7 @@ func (m *Manager) ActiveSessions() int {
 
 func newSessionID() (string, error) {
 	buf := make([]byte, sessionIDBytes)
-	if _, err := rand.Read(buf); err != nil {
+	if _, err := cryptorand.Read(buf); err != nil {
 		return "", fmt.Errorf("falha ao gerar identificador de partida: %w", err)
 	}
 	return hex.EncodeToString(buf), nil
